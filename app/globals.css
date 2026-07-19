@@ -1,8 +1,4 @@
-﻿/* @import MUST be the first rule in the file (only @charset may precede
-   it) — this is a hard CSS spec requirement, not a Tailwind-specific one.
-   Ordering it after @tailwind directives, even though @tailwind is a
-   custom at-rule, still violates this and breaks the build. */
-@import "../styles/design-tokens.css";
+﻿@import "../styles/design-tokens.css";
 
 @tailwind base;
 @tailwind components;
@@ -28,9 +24,6 @@
 }
 
 @layer utilities {
-  /* Grain/noise texture — SVG feTurbulence data-URI, zero network request.
-     Applied directly to a section (e.g. className="relative bg-grain") to
-     avoid the flat/cheap-black look the PRD explicitly calls out. */
   .bg-grain {
     position: relative;
   }
@@ -43,6 +36,25 @@
     opacity: 0.045;
     mix-blend-mode: overlay;
     background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  }
+
+  /* Visually hidden until focused — reuses the topmost z-index tier since
+     a skip link must sit above absolutely everything, including a fixed
+     header, when a keyboard user tabs to it. */
+  .skip-link {
+    position: absolute;
+    top: 0;
+    left: -9999px;
+    z-index: var(--z-loading-screen);
+    padding: var(--space-3) var(--space-6);
+    background-color: rgb(var(--color-accent-primary));
+    color: rgb(var(--color-text-primary));
+    border-radius: 0 0 var(--radius-md) 0;
+    font-weight: 600;
+  }
+
+  .skip-link:focus {
+    left: 0;
   }
 }
 

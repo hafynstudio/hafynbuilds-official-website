@@ -5,7 +5,7 @@ import { createPortal } from "react-dom";
 import { AnimatePresence, motion, type PanInfo } from "framer-motion";
 import { X } from "lucide-react";
 import { cn } from "@/lib/utils";
-import { useMediaQuery, usePrefersReducedMotion } from "@/lib/hooks";
+import { useFocusTrap, useMediaQuery, usePrefersReducedMotion } from "@/lib/hooks";
 import { SPRING_SMOOTH } from "@/lib/motion";
 
 interface ModalProps {
@@ -19,9 +19,6 @@ interface ModalProps {
   className?: string;
   hideDefaultCloseButton?: boolean;
 }
-
-const FOCUSABLE_SELECTOR =
-  'a[href], button:not([disabled]), textarea:not([disabled]), input:not([disabled]), select:not([disabled]), [tabindex]:not([tabindex="-1"])';
 
 /**
  * Desktop → fullscreen immersive overlay. Mobile → fullscreen bottom
@@ -43,11 +40,13 @@ export function Modal({
   const previouslyFocusedElement = useRef<Element | null>(null);
   const [mounted, setMounted] = useState(false);
 
+  useFocusTrap(panelRef, isOpen);
+
   // Portals must only render client-side (no document in SSR).
   useEffect(() => setMounted(true), []);
 
   // Lock body scroll while open; restore the exact previous value on
-  // close rather than assuming "visible", in case another modal is
+  // close rather than assuming "visible", in case another overlay is
   // already stacked (defensive, cheap to get right).
   useEffect(() => {
     if (!isOpen) return;
@@ -71,33 +70,12 @@ export function Modal({
     }
   }, [isOpen]);
 
-  // Escape-to-close + manual Tab focus trap (no external dependency —
-  // keeps the deliberately small footprint from TAD §7 intact).
+  // Escape-to-close only here — Tab-trapping now lives in useFocusTrap.
   useEffect(() => {
     if (!isOpen) return;
 
     function handleKeyDown(event: KeyboardEvent) {
-      if (event.key === "Escape") {
-        onClose();
-        return;
-      }
-      if (event.key !== "Tab" || !panelRef.current) return;
-
-      const focusables = panelRef.current.querySelectorAll<HTMLElement>(
-        FOCUSABLE_SELECTOR
-      );
-      if (focusables.length === 0) return;
-
-      const first = focusables[0];
-      const last = focusables[focusables.length - 1];
-
-      if (event.shiftKey && document.activeElement === first) {
-        event.preventDefault();
-        last.focus();
-      } else if (!event.shiftKey && document.activeElement === last) {
-        event.preventDefault();
-        first.focus();
-      }
+      if (event.key === "Escape") onClose();
     }
 
     document.addEventListener("keydown", handleKeyDown);

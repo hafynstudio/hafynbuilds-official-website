@@ -73,6 +73,7 @@ const config: Config = {
         "24": "var(--space-24)",
         "32": "var(--space-32)",
         "48": "var(--space-48)",
+        header: "var(--header-height)",
       },
       borderRadius: {
         sm: "var(--radius-sm)",
