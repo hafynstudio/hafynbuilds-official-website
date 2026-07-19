@@ -1,14 +1,14 @@
 ﻿import { buildMetadata } from "@/lib/seo/metadata";
 
 export const metadata = buildMetadata({
-  title: "HAFYN BUILDS",
-  path: "/",
+  title: "Method",
+  path: "/method",
 });
 
-export default function HomePage() {
+export default function MethodPage() {
   return (
     <main>
-      <h1>Home — built in Phase 4 &amp; 5</h1>
+      <h1>Method — built in Phase 9</h1>
     </main>
   );
 }
