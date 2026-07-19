@@ -99,6 +99,15 @@ const config: Config = {
         slow: "var(--duration-slow)",
         reveal: "var(--duration-reveal)",
       },
+      keyframes: {
+        shimmer: {
+          "0%": { backgroundPosition: "-200% 0" },
+          "100%": { backgroundPosition: "200% 0" },
+        },
+      },
+      animation: {
+        shimmer: "shimmer var(--duration-shimmer) linear infinite",
+      },
       zIndex: {
         header: "var(--z-header)",
         cursor: "var(--z-cursor)",

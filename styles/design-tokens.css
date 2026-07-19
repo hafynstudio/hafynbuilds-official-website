@@ -85,6 +85,7 @@
   --duration-slow: 600ms;
   --duration-reveal: 700ms;
   --duration-stagger-step: 90ms;
+  --duration-shimmer: 2000ms; /* Skeleton loader shimmer sweep cycle */
 
   /* ---- Elevation (glass-surface shadows, not flat drop-shadows) ---- */
   --shadow-glass-sm: 0 1px 2px rgba(0, 0, 0, 0.4), 0 0 0 1px rgba(255, 255, 255, 0.04) inset;
@@ -92,11 +93,16 @@
   --shadow-glass-lg: 0 24px 64px rgba(0, 0, 0, 0.55), 0 0 0 1px rgba(255, 255, 255, 0.06) inset;
   --shadow-glow-accent: 0 0 48px rgba(62, 123, 250, 0.25);
 
-  /* ---- Z-Index Scale (centralized to avoid stacking-context guesswork) ---- */
+  /* ---- Z-Index Scale (centralized to avoid stacking-context guesswork) ----
+     Cursor is intentionally the highest interactive layer BELOW the
+     loading screen — a cursor must never be visually obscured by any
+     other UI surface, including modals. (Fixed in Phase 2: cursor was
+     originally below modal, causing it to visually vanish behind the
+     modal's opaque panel.) */
   --z-base: 0;
   --z-header: 40;
-  --z-cursor: 50;
   --z-modal-backdrop: 60;
   --z-modal: 70;
+  --z-cursor: 80;
   --z-loading-screen: 100;
 }

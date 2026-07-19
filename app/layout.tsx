@@ -1,6 +1,7 @@
 ﻿import type { Metadata } from "next";
 import { Inter, JetBrains_Mono } from "next/font/google";
 import { organizationSchema } from "@/lib/seo/schema";
+import { CustomCursor } from "@/components/ui/CustomCursor";
 import "./globals.css";
 
 const inter = Inter({
@@ -40,6 +41,9 @@ export default function RootLayout({
             __html: JSON.stringify(organizationSchema()),
           }}
         />
+        {/* Mounted once globally rather than per-page — the cursor is a
+            sitewide enhancement layer, not a per-page concern. */}
+        <CustomCursor />
         {children}
       </body>
     </html>
