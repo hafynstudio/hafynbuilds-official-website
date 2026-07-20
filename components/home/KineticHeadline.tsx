@@ -11,6 +11,13 @@ export type HeadlineWordVariant = "heavy" | "light" | "gradient";
 export interface HeadlineWord {
   text: string;
   variant: HeadlineWordVariant;
+  /** When true, inserts a semantic line break immediately BEFORE this
+   * word on md+ viewports (`display:block` wrapper that forces the word
+   * to start a new line regardless of font-size or container width).
+   * On mobile (<md), the break span is `display:none` so natural text
+   * wrapping governs instead — avoids overflow if the mobile font size
+   * makes both lines fit comfortably without a forced break. */
+  breakBefore?: boolean;
 }
 
 interface KineticHeadlineProps {
@@ -56,6 +63,11 @@ const VARIANT_CLASSES: Record<HeadlineWordVariant, string> = {
  * mid-character. The visible text is exposed once via aria-label on the
  * heading itself; the animated word spans are aria-hidden duplicates, so
  * screen readers announce the headline once, correctly.
+ *
+ * `breakBefore` on a HeadlineWord inserts a deterministic line break at
+ * that word on md+ viewports — makes the 2-line split ("Engineering the
+ * Impossible." / "Building What Matters.") independent of font-size or
+ * container-width interactions, so it never wraps mid-phrase accidentally.
  */
 export function KineticHeadline({
   words,
@@ -89,6 +101,13 @@ export function KineticHeadline({
 
           return (
             <Fragment key={index}>
+              {/* Deterministic semantic line break — `hidden md:block` so
+                  it only forces a new line on tablet/desktop. On mobile
+                  the browser wraps naturally from the font size + container
+                  width, which is correct and clean at mobile scales. */}
+              {word.breakBefore && (
+                <span className="hidden md:block" aria-hidden="true" />
+              )}
               <motion.span
                 className={cn("inline-block", VARIANT_CLASSES[word.variant])}
                 variants={{

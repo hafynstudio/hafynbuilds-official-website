@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/Button";
 import { AmbientGlow } from "@/components/home/AmbientGlow";
 import { BlinkingCursor } from "@/components/home/BlinkingCursor";
 import { EyebrowBadge } from "@/components/home/EyebrowBadge";
+import { HeroGrainOverlay } from "@/components/home/HeroGrainOverlay";
 import { HeroVisual } from "@/components/home/HeroVisual";
 import {
   KineticHeadline,
@@ -19,7 +20,7 @@ const HEADLINE_WORDS: HeadlineWord[] = [
   { text: "Engineering", variant: "heavy" },
   { text: "the", variant: "light" },
   { text: "Impossible.", variant: "gradient" },
-  { text: "Building", variant: "heavy" },
+  { text: "Building", variant: "heavy", breakBefore: true },
   { text: "What", variant: "light" },
   { text: "Matters.", variant: "gradient" },
 ];
@@ -27,24 +28,24 @@ const HEADLINE_WORDS: HeadlineWord[] = [
 /**
  * Home's Hero section (PRD §2.2.1).
  *
- * FINAL POLISH PASS: headline now uses the `.hero-heading-size` utility
- * (globals.css) — a vw+vh-blended clamp() that scales down naturally on
- * short-height viewports and a dedicated min-width+min-height media
- * query that restores dramatic scale (up to 4.25rem) on genuinely
- * spacious screens. `HeroRightColumnTexture` has been removed — its job
- * (right-column-concentrated background texture) is now handled by
- * ParallaxGrid's own left-to-right fade mask, consolidating what were
- * two separate, overlapping decorative layers into one. `bg-grain`
- * (fine noise texture) has been active on this section since Phase 1 —
- * unchanged, confirmed still present below.
+ * LAYERING FIX (this pass): background depth is now explicit z-indexed —
+ * AmbientGlow (z-auto, paints as z-0) → ParallaxGrid dot pattern (z-1)
+ * → HeroGrainOverlay (z-2) → content column (z-10). Previously `bg-grain`
+ * (a ::before pseudo on the section) painted UNDERNEATH AmbientGlow and
+ * ParallaxGrid's own layers with no z-index control, AND used the wrong
+ * blend mode for a near-black base (see HeroGrainOverlay's own comment
+ * for the overlay-vs-screen math). `bg-grain` class removed from this
+ * section entirely — grain is now HeroGrainOverlay, a real inspectable
+ * DOM node with the correct blend mode.
  */
 export function Hero() {
   const prefersReducedMotion = usePrefersReducedMotion();
 
   return (
-    <section className="bg-grain relative flex min-h-[calc(100dvh-var(--header-height))] items-center overflow-hidden bg-bg-primary px-6 py-6 lg:py-8">
+    <section className="relative flex min-h-[calc(100dvh-var(--header-height))] items-center overflow-hidden bg-bg-primary px-6 py-6 lg:py-8">
       <AmbientGlow />
       <ParallaxGrid />
+      <HeroGrainOverlay />
 
       <div className="relative z-10 mx-auto flex w-full max-w-7xl flex-col items-center gap-10 lg:flex-row lg:items-start lg:justify-between lg:gap-14">
         <div className="flex w-full max-w-2xl flex-col items-center text-center lg:items-start lg:text-left">
