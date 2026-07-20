@@ -38,9 +38,6 @@
     background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
   }
 
-  /* Visually hidden until focused — reuses the topmost z-index tier since
-     a skip link must sit above absolutely everything, including a fixed
-     header, when a keyboard user tabs to it. */
   .skip-link {
     position: absolute;
     top: 0;
@@ -55,6 +52,23 @@
 
   .skip-link:focus {
     left: 0;
+  }
+
+  /* Hero headline fluid sizing (Phase 4 final polish pass). Base formula
+     blends vw AND vh so short-height viewports (e.g. 1366x768 laptops)
+     naturally scale down even at wide widths — directly satisfies "CTAs
+     must stay above the fold" without a fixed breakpoint step. On
+     genuinely spacious screens (real min-width AND min-height compound
+     condition — not expressible via clamp() alone, hence a dedicated
+     media query here) the ceiling is raised for full dramatic impact. */
+  .hero-heading-size {
+    font-size: clamp(2.25rem, 1.6vw + 1.8vh, 3.25rem);
+  }
+
+  @media (min-width: 1440px) and (min-height: 900px) {
+    .hero-heading-size {
+      font-size: clamp(3.25rem, 3.5vw, 4.25rem);
+    }
   }
 }
 

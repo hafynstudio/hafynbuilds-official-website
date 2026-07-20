@@ -5,8 +5,8 @@ import { useEffect, useState, type RefObject } from "react";
 /**
  * Subscribes to a CSS media query and returns whether it currently
  * matches. Used for: desktop/mobile Modal variant switching, and
- * fine-pointer detection for the custom cursor (touch devices should
- * never render a desktop-style cursor).
+ * fine-pointer detection gating (magnetic buttons, ParallaxGrid's
+ * cursor-reactive spotlight — both meaningless on touch devices).
  */
 export function useMediaQuery(query: string): boolean {
   const [matches, setMatches] = useState(false);
@@ -28,9 +28,10 @@ export function useMediaQuery(query: string): boolean {
 
 /**
  * Wraps the `prefers-reduced-motion` media query. Every component with
- * non-essential motion (magnetic pull, cursor trailing, modal slide/scale,
- * loading screen sequence) must check this and fall back to an instant or
- * fade-only transition — this is a hard accessibility requirement.
+ * non-essential motion (magnetic pull, ParallaxGrid's spotlight, modal
+ * slide/scale, loading screen sequence) must check this and fall back to
+ * an instant or fade-only transition — this is a hard accessibility
+ * requirement.
  */
 export function usePrefersReducedMotion(): boolean {
   return useMediaQuery("(prefers-reduced-motion: reduce)");
@@ -38,8 +39,9 @@ export function usePrefersReducedMotion(): boolean {
 
 /**
  * True only for devices with an accurate pointing device (mouse/trackpad).
- * Touch devices report `pointer: coarse` — this gates the custom cursor
- * and magnetic button effects, which are meaningless on touchscreens.
+ * Touch devices report `pointer: coarse` — this gates the magnetic button
+ * pull effect and ParallaxGrid's cursor-reactive spotlight, both of which
+ * are meaningless on touchscreens.
  */
 export function useHasFinePointer(): boolean {
   return useMediaQuery("(pointer: fine)");
@@ -50,8 +52,7 @@ const FOCUSABLE_SELECTOR =
 
 /**
  * Traps Tab/Shift+Tab focus cycling within a container while `isActive`
- * is true. Extracted here (originally inline in Modal.tsx) so any
- * fullscreen overlay — Modal, MobileNav, and any future one — shares
+ * is true. Shared by Modal and MobileNav so any fullscreen overlay uses
  * exactly one implementation of this non-trivial accessibility behavior
  * instead of each reimplementing it slightly differently.
  */
@@ -85,3 +86,12 @@ export function useFocusTrap(
     return () => document.removeEventListener("keydown", handleKeyDown);
   }, [isActive, containerRef]);
 }
+
+// NOTE: useInView and useCountUp were added in an earlier Phase 4 pass
+// specifically to power StatChips.tsx, which has since been removed
+// (stats were integrated directly into HeroVisual's terminal card
+// instead — see components/home/HeroVisual.tsx). Removed here rather
+// than left as unconsumed exports, consistent with the CommandPalette
+// deferral precedent from Phase 2 (build shared primitives only once a
+// real consumer exists). Restore verbatim in Phase 5 if the Trust Bar
+// genuinely needs a scroll-triggered reveal.

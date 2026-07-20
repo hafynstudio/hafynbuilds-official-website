@@ -1,7 +1,6 @@
 ﻿import type { Metadata } from "next";
 import { Inter, JetBrains_Mono } from "next/font/google";
 import { organizationSchema } from "@/lib/seo/schema";
-import { CustomCursor } from "@/components/ui/CustomCursor";
 import { LoadingScreen } from "@/components/layout/LoadingScreen";
 import { Header } from "@/components/layout/Header";
 import { Footer } from "@/components/layout/Footer";
@@ -47,14 +46,9 @@ export default function RootLayout({
           }}
         />
 
-        <CustomCursor />
         <LoadingScreen />
         <Header />
 
-        {/* tabIndex={-1} makes this programmatically focusable so the
-            skip link above reliably moves keyboard focus here, not just
-            scroll position, across all browsers. pt-header compensates
-            for the fixed header being removed from normal document flow. */}
         <div id="main-content" tabIndex={-1} className="flex-1 pt-header">
           {children}
         </div>

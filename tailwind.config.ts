@@ -105,13 +105,17 @@ const config: Config = {
           "0%": { backgroundPosition: "-200% 0" },
           "100%": { backgroundPosition: "200% 0" },
         },
+        caretBlink: {
+          "0%, 49%": { opacity: "1" },
+          "50%, 100%": { opacity: "0" },
+        },
       },
       animation: {
         shimmer: "shimmer var(--duration-shimmer) linear infinite",
+        "caret-blink": "caretBlink var(--duration-caret-blink) steps(1) infinite",
       },
       zIndex: {
         header: "var(--z-header)",
-        cursor: "var(--z-cursor)",
         "modal-backdrop": "var(--z-modal-backdrop)",
         modal: "var(--z-modal)",
         "loading-screen": "var(--z-loading-screen)",

@@ -65,10 +65,9 @@
   --space-48: 12rem;
 
   /* ---- Layout ----
-     Header height is referenced by Header/MobileNav (own height) and the
-     root layout's content wrapper (top padding, since the header is
-     fixed/out of flow). Will also be used by Phase 4's Hero for
-     full-viewport-minus-header calculations. */
+     Header height is referenced by Header/MobileNav (own height), the
+     root layout's content wrapper (top padding), and Hero's
+     full-viewport-minus-header calculation. */
   --header-height: 4rem;
 
   /* ---- Radii ---- */
@@ -93,6 +92,7 @@
   --duration-reveal: 700ms;
   --duration-stagger-step: 90ms;
   --duration-shimmer: 2000ms;
+  --duration-caret-blink: 1000ms;
 
   /* ---- Elevation (glass-surface shadows, not flat drop-shadows) ---- */
   --shadow-glass-sm: 0 1px 2px rgba(0, 0, 0, 0.4), 0 0 0 1px rgba(255, 255, 255, 0.04) inset;
@@ -100,14 +100,10 @@
   --shadow-glass-lg: 0 24px 64px rgba(0, 0, 0, 0.55), 0 0 0 1px rgba(255, 255, 255, 0.06) inset;
   --shadow-glow-accent: 0 0 48px rgba(62, 123, 250, 0.25);
 
-  /* ---- Z-Index Scale ----
-     Cursor sits above modals (a cursor must never be visually obscured
-     by any UI surface) but below the loading screen, which is the true
-     topmost layer during its brief lifecycle. */
+  /* ---- Z-Index Scale ---- */
   --z-base: 0;
   --z-header: 40;
   --z-modal-backdrop: 60;
   --z-modal: 70;
-  --z-cursor: 80;
   --z-loading-screen: 100;
 }
