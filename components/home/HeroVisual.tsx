@@ -118,18 +118,15 @@ function Row({ lineNumber, children }: RowProps) {
 /**
  * Abstract "live deploy pipeline" visual for the Hero split layout.
  *
- * STATUS-BAR CONTRAST FIX (this pass): the footer stats row previously
- * used `text-tertiary`, which measures ~3.8:1 against this card's actual
- * background (bg-surface/60 composited over bg-bg-primary) — a WCAG AA
- * failure for body text (needs 4.5:1). Switched to `text-secondary`
- * (~7.1:1 against the same background, comfortably passing). To keep
- * the row still reading as visually quieter than the main terminal
- * lines above it, differentiation now comes from smaller size (text-xs,
- * the 12px token — the accessibility-minimum-acceptable size per this
- * fix's own spec) rather than a dimmer color, since dimming further
- * would move contrast in the wrong direction. `gap-y` and slightly
- * larger padding added so a 2-line wrap on narrow mobile widths keeps
- * comfortable breathing room rather than feeling cramped.
+ * BLEED-BUG DEFENSE-IN-DEPTH (this pass): the outer card now declares
+ * `isolate` (a new stacking context) and `[contain:paint]` directly on
+ * ITSELF, not only relying on Hero's own section-level containment
+ * added previously. `contain: paint` is a hard CSS guarantee that no
+ * descendant of an element — including transformed/animated Framer
+ * Motion rows, box-shadows, and the backdrop-blur layer below — can
+ * ever paint outside that element's own border box. Applying it at both
+ * levels (this card AND its Hero-section ancestor) means the fix no
+ * longer depends on any single containment boundary holding correctly.
  */
 export function HeroVisual() {
   const prefersReducedMotion = usePrefersReducedMotion();
@@ -218,7 +215,7 @@ export function HeroVisual() {
       initial={{ opacity: 0, y: prefersReducedMotion ? 0 : 16 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ delay: HERO_SEQUENCE_DELAYS_S.visualPanel, duration: 0.5 }}
-      className="relative w-full overflow-hidden rounded-xl border border-border bg-surface/60 shadow-glass-lg backdrop-blur-md"
+      className="relative isolate w-full overflow-hidden rounded-xl border border-border bg-surface/60 shadow-glass-lg backdrop-blur-md [contain:paint]"
     >
       <div aria-hidden="true" className="p-5 pb-8">
         <div className="mb-4 flex items-center justify-between border-b border-border pb-3">

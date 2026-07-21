@@ -35,7 +35,7 @@
   --color-success: 34 197 94;
   --color-warning: 245 158 11;
   --color-error: 239 68 68;
-  --color-whatsapp: 37 211 102; /* Contact page WhatsApp CTA + social icon only — never used elsewhere */
+  --color-whatsapp: 37 211 102; /* Contact page WhatsApp CTA + social icon only */
 
   /* ---- Typography Scale ---- */
   --font-size-xs: 0.75rem;
@@ -64,10 +64,7 @@
   --space-32: 8rem;
   --space-48: 12rem;
 
-  /* ---- Layout ----
-     Header height is referenced by Header/MobileNav (own height), the
-     root layout's content wrapper (top padding), and Hero's
-     full-viewport-minus-header calculation. */
+  /* ---- Layout ---- */
   --header-height: 4rem;
 
   /* ---- Radii ---- */
@@ -77,9 +74,7 @@
   --radius-xl: 1.5rem;
   --radius-full: 9999px;
 
-  /* ---- Motion: Easing Curves ----
-     Reused across Framer Motion + GSAP so every reveal, hover, and
-     transition feels like one motion system, not per-page one-offs. */
+  /* ---- Motion: Easing Curves ---- */
   --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
   --ease-out-quart: cubic-bezier(0.25, 1, 0.5, 1);
   --ease-in-out-quart: cubic-bezier(0.76, 0, 0.24, 1);
@@ -93,8 +88,9 @@
   --duration-stagger-step: 90ms;
   --duration-shimmer: 2000ms;
   --duration-caret-blink: 1000ms;
+  --duration-marquee: 30000ms;
 
-  /* ---- Elevation (glass-surface shadows, not flat drop-shadows) ---- */
+  /* ---- Elevation (glass-surface shadows) ---- */
   --shadow-glass-sm: 0 1px 2px rgba(0, 0, 0, 0.4), 0 0 0 1px rgba(255, 255, 255, 0.04) inset;
   --shadow-glass-md: 0 8px 24px rgba(0, 0, 0, 0.45), 0 0 0 1px rgba(255, 255, 255, 0.05) inset;
   --shadow-glass-lg: 0 24px 64px rgba(0, 0, 0, 0.55), 0 0 0 1px rgba(255, 255, 255, 0.06) inset;
@@ -102,6 +98,21 @@
 
   /* ---- Z-Index Scale ---- */
   --z-base: 0;
+  /* CORRECTED (was -1 in the previous pass — that was wrong and is why
+     the global spotlight went completely invisible). CSS stacking rule:
+     ordinary, non-positioned, in-flow content (which every page section
+     on this site is — plain <section> elements with no z-index set)
+     paints ABOVE any sibling with a NEGATIVE z-index, regardless of DOM
+     order. Since every section has its own opaque background, a
+     negative z-index spotlight is guaranteed to render underneath all
+     of them, everywhere. The correct approach — the same technique
+     HeroGrainOverlay already uses successfully — is a POSITIVE z-index
+     placed above ordinary section content but below Header/modals,
+     combined with `mix-blend-mode: screen` on the element itself so it
+     only ADDS light rather than covering content. See
+     components/ui/CursorSpotlight.tsx.
+  */
+  --z-cursor-spotlight: 25;
   --z-header: 40;
   --z-modal-backdrop: 60;
   --z-modal: 70;

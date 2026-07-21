@@ -1,14 +1,18 @@
 ﻿import type { Metadata } from "next";
 import { buildMetadata } from "@/lib/seo/metadata";
 import { Hero } from "@/components/home/Hero";
+import { TrustBar } from "@/components/home/TrustBar";
+import { CapabilitiesTeaser } from "@/components/home/CapabilitiesTeaser";
+import { MethodTeaser } from "@/components/home/MethodTeaser";
+import { FeaturedWork } from "@/components/home/FeaturedWork";
+import { FounderTeaser } from "@/components/home/FounderTeaser";
+import { ValuesSection } from "@/components/home/ValuesSection";
+import { FinalCTA } from "@/components/home/FinalCTA";
 
-// Title passed WITHOUT the brand name so buildMetadata's normal suffix
-// path applies, producing "Engineering the Impossible. Building What
-// Matters. | HAFYN BUILDS" — the motto leads, the brand name closes the
-// title tag. (buildMetadata has a special-case that leaves the title
-// bare/unsuffixed only when it's passed as exactly "HAFYN BUILDS" —
-// intentionally not used here since the homepage title tag should carry
-// the motto for SEO/brand purposes.)
+// Title passed WITHOUT the brand name so buildMetadata applies its normal
+// suffix, producing:
+// "Engineering the Impossible. Building What Matters. | HAFYN BUILDS"
+// The motto leads; the brand name closes — correct for homepage SEO.
 export const metadata: Metadata = buildMetadata({
   title: "Engineering the Impossible. Building What Matters.",
   description:
@@ -20,10 +24,13 @@ export default function HomePage() {
   return (
     <>
       <Hero />
-      {/* Remaining Home sections — Trust Bar, Capabilities Teaser, Method
-          Teaser, Featured Work, Founder Teaser, Values, Final CTA — are
-          built in Phase 5, per TAD §13's build order (Hero establishes
-          the motion language first; every later section reuses it). */}
+      <TrustBar />
+      <CapabilitiesTeaser />
+      <MethodTeaser />
+      <FeaturedWork />
+      <FounderTeaser />
+      <ValuesSection />
+      <FinalCTA />
     </>
   );
 }

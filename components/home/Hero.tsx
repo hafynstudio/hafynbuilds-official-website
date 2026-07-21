@@ -28,21 +28,25 @@ const HEADLINE_WORDS: HeadlineWord[] = [
 /**
  * Home's Hero section (PRD §2.2.1).
  *
- * LAYERING FIX (this pass): background depth is now explicit z-indexed —
- * AmbientGlow (z-auto, paints as z-0) → ParallaxGrid dot pattern (z-1)
- * → HeroGrainOverlay (z-2) → content column (z-10). Previously `bg-grain`
- * (a ::before pseudo on the section) painted UNDERNEATH AmbientGlow and
- * ParallaxGrid's own layers with no z-index control, AND used the wrong
- * blend mode for a near-black base (see HeroGrainOverlay's own comment
- * for the overlay-vs-screen math). `bg-grain` class removed from this
- * section entirely — grain is now HeroGrainOverlay, a real inspectable
- * DOM node with the correct blend mode.
+ * LAYERING: background depth is explicit z-indexed — AmbientGlow
+ * (z-auto, paints as z-0) → ParallaxGrid's static dot pattern (z-1) →
+ * HeroGrainOverlay (z-2) → content column (z-10). The cursor-reactive
+ * spotlight that used to live here has moved to a global, page-wide
+ * component (components/ui/CursorSpotlight.tsx, mounted once in
+ * app/layout.tsx) — see that file and ParallaxGrid.tsx for the full
+ * history of that change.
+ *
+ * `isolate` + `[contain:paint]` remain on this section as defense-in-
+ * depth against HeroVisual's terminal card (or any future descendant)
+ * ever painting outside Hero's own box — HeroVisual additionally
+ * declares the same containment on itself as an independent second
+ * layer (see HeroVisual.tsx).
  */
 export function Hero() {
   const prefersReducedMotion = usePrefersReducedMotion();
 
   return (
-    <section className="relative flex min-h-[calc(100dvh-var(--header-height))] items-center overflow-hidden bg-bg-primary px-6 py-6 lg:py-8">
+    <section className="relative isolate flex min-h-[calc(100dvh-var(--header-height))] items-center overflow-hidden bg-bg-primary px-6 py-6 lg:py-8 [contain:paint]">
       <AmbientGlow />
       <ParallaxGrid />
       <HeroGrainOverlay />

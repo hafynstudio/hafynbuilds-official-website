@@ -109,12 +109,18 @@ const config: Config = {
           "0%, 49%": { opacity: "1" },
           "50%, 100%": { opacity: "0" },
         },
+        marquee: {
+          "0%": { transform: "translateX(0)" },
+          "100%": { transform: "translateX(-50%)" },
+        },
       },
       animation: {
         shimmer: "shimmer var(--duration-shimmer) linear infinite",
         "caret-blink": "caretBlink var(--duration-caret-blink) steps(1) infinite",
+        marquee: "marquee var(--duration-marquee) linear infinite",
       },
       zIndex: {
+        "cursor-spotlight": "var(--z-cursor-spotlight)",
         header: "var(--z-header)",
         "modal-backdrop": "var(--z-modal-backdrop)",
         modal: "var(--z-modal)",

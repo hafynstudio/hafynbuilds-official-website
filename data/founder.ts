@@ -1,14 +1,14 @@
 ﻿import type { FounderProfile } from "@/types/founder";
 
-// Structure only — real bio, portrait, and social links are pending from
-// the user per PRD §5. Populated fully in Phase 13. Shape matches
-// FounderProfile exactly so FounderHero.tsx/PhilosophyQuotes.tsx never
-// need to change when real content drops in.
+// PLACEHOLDER — tagline is provisional brand-voice copy, NOT the real
+// founder quote. Replace tagline, set photoUrl to the real image path,
+// and flip isTaglinePlaceholder to false when founder content arrives
+// (PRD §5). FounderTeaser.tsx branches on photoUrl null vs. string.
 export const founder: FounderProfile = {
   name: "Zain Marwat",
   title: "Founder, CEO & Architect of HAFYN",
-  portraitUrl: "",
-  bio: "",
-  philosophyQuotes: [],
-  socialLinks: [],
+  tagline:
+    "We do not build software to launch it. We build it to still be running, still be right, years later.",
+  photoUrl: null,
+  isTaglinePlaceholder: true,
 };
