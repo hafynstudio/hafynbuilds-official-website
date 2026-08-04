@@ -23,7 +23,7 @@ export function EyebrowBadge() {
     <motion.div
       initial={{ opacity: 0, y: prefersReducedMotion ? 0 : -8 }}
       animate={{ opacity: 1, y: 0 }}
-      transition={{ delay: HERO_SEQUENCE_DELAYS_S.eyebrow, duration: 0.3 }}
+      transition={{ delay: HERO_SEQUENCE_DELAYS_S.eyebrow, duration: prefersReducedMotion ? 0 : 0.3 }}
       className="inline-flex items-center gap-2 rounded-full border border-border bg-surface/50 px-4 py-1.5 font-mono text-xs text-text-secondary backdrop-blur-sm"
     >
       <LiveDot />

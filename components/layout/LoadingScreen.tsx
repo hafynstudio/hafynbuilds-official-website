@@ -95,7 +95,7 @@ export function LoadingScreen() {
         <motion.div
           className="fixed inset-0 z-loading-screen flex items-center justify-center bg-bg-primary"
           exit={{ opacity: 0 }}
-          transition={{ duration: 0.5, ease: [0.76, 0, 0.24, 1] }}
+          transition={{ duration: prefersReducedMotion ? 0 : 0.5, ease: [0.76, 0, 0.24, 1] }}
           role="status"
           aria-label="HAFYN BUILDS is loading"
         >

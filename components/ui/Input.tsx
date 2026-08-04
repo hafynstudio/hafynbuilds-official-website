@@ -46,7 +46,7 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(
           <label
             htmlFor={inputId}
             className={cn(
-              "pointer-events-none absolute left-4 top-3.5 origin-left text-text-tertiary transition-all duration-fast ease-out-quart",
+              "pointer-events-none absolute left-4 top-3.5 origin-left text-text-secondary transition-all duration-fast ease-out-quart",
               // Floating-label mechanics: rests as placeholder text at
               // input height, floats up + shrinks on focus OR when filled
               // (the peer-[:not(:placeholder-shown)] check is what makes

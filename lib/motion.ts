@@ -39,3 +39,50 @@ export const HERO_SEQUENCE_DELAYS_S = {
   ctas: 0.65,
   visualPanel: 0.75,
 } as const;
+
+/**
+ * Static RGB literal constants — used ONLY inside Framer Motion animated
+ * color values (boxShadow, borderColor, etc. inside `animate`/`whileHover`/
+ * `initial` objects). Framer Motion's color interpolator cannot parse
+ * `rgb(var(--color-x) / a)` — it needs a literal, resolvable color string,
+ * and silently fails with "... is not an animatable color" otherwise
+ * (confirmed console bug, About page — Ecosystem Diagram + Vision pills).
+ *
+ * These values MUST mirror styles/design-tokens.css exactly. Static
+ * (non-animated) styles should keep using `rgb(var(--color-x) / a)` as
+ * normal — this pair exists solely to unblock JS-driven color animation.
+ */
+export const ACCENT_PRIMARY_RGB = "62, 123, 250";
+export const ACCENT_GLOW_RGB = "34, 211, 238";
+
+/**
+ * Shared Framer-Motion-safe color token set — promoted from a local
+ * `TOKEN` object originally defined only inside CapabilitiesTeaser.tsx
+ * (Phase 4). Promoted to lib/motion.ts once Phase 8's DeployedInterfaces.tsx
+ * became a second real consumer needing the identical values — this file's
+ * own header comment already commits to being the single source of truth
+ * for exactly this kind of value, so duplicating it a second time would
+ * have violated that stated contract.
+ *
+ * Space-separated triplet format (distinct from the comma-separated
+ * ACCENT_PRIMARY_RGB/ACCENT_GLOW_RGB pair above) matches the
+ * `rgb(r g b / a)` CSS Color Module 4 syntax used throughout
+ * design-tokens.css. rgbaToken() below builds a legal CSS color string
+ * that Framer Motion's color interpolator can parse directly.
+ *
+ * Kept manually in sync with styles/design-tokens.css — only 5 values,
+ * changed only during a full palette revision, not a routine edit.
+ */
+export const FRAMER_COLOR_TOKENS = {
+  accent: "62 123 250",
+  accentGlow: "34 211 238",
+  success: "34 197 94",
+  white: "255 255 255",
+} as const;
+
+export function rgbaToken(
+  triplet: (typeof FRAMER_COLOR_TOKENS)[keyof typeof FRAMER_COLOR_TOKENS],
+  alpha: number
+): string {
+  return `rgb(${triplet} / ${alpha})`;
+}

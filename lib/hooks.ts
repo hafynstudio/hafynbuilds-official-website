@@ -1,6 +1,6 @@
 ﻿"use client";
 
-import { useEffect, useState, type RefObject } from "react";
+import { useEffect, useRef, useState, type RefObject } from "react";
 
 /**
  * Subscribes to a CSS media query and returns whether it currently
@@ -45,6 +45,22 @@ export function usePrefersReducedMotion(): boolean {
  */
 export function useHasFinePointer(): boolean {
   return useMediaQuery("(pointer: fine)");
+}
+
+/**
+ * True for devices with no reliable hover (touch phones/tablets) — the
+ * complementary concept to useHasFinePointer, kept as a distinct query
+ * (not a simple `!useHasFinePointer()`) since a device could theoretically
+ * report neither "fine" nor "coarse". Promoted from a local implementation
+ * originally defined only inside CapabilitiesTeaser.tsx (Phase 4), where
+ * it powered the touch-device auto-activation fallback for cards that
+ * would otherwise never receive a hover event. Promoted here once Phase 8
+ * (DeployedInterfaces.tsx) became a second real consumer needing the
+ * identical behavior — mirrors this file's own "promote once reconfirmed"
+ * precedent, first established for useFocusTrap.
+ */
+export function useCoarsePointer(): boolean {
+  return useMediaQuery("(hover: none), (pointer: coarse)");
 }
 
 const FOCUSABLE_SELECTOR =
@@ -95,3 +111,53 @@ export function useFocusTrap(
 // deferral precedent from Phase 2 (build shared primitives only once a
 // real consumer exists). Restore verbatim in Phase 5 if the Trust Bar
 // genuinely needs a scroll-triggered reveal.
+
+/**
+ * BUG-003 (corrective #3): Lazy-mount hook for below-the-fold content.
+ *
+ * Uses IntersectionObserver to detect when a sentinel element approaches
+ * the viewport (with configurable lookahead via rootMargin), then flips a
+ * one-shot shouldMount flag. Designed for the DynamicBuildConsole wrapper
+ * so that the GSAP-heavy HorizontalCinematic component only loads when the
+ * user has scrolled near it — moving its chunk-fetch + GSAP initialization
+ * outside Lighthouse's measurement window.
+ *
+ * Falls back to immediate mount if IntersectionObserver is unavailable
+ * (SSR, extremely old browsers) — never withholds content permanently.
+ */
+export function useLazyMount(
+  options?: { rootMargin?: string }
+): { sentinelRef: React.RefObject<HTMLDivElement | null>; shouldMount: boolean } {
+  const [shouldMount, setShouldMount] = useState(false);
+  const sentinelRef = useRef<HTMLDivElement | null>(null);
+
+  // SSR-safe fallback: IntersectionObserver is only checked post-hydration,
+  // so server and client agree on shouldMount=false during the first render.
+  useEffect(() => {
+    if (typeof IntersectionObserver === "undefined") {
+      setShouldMount(true);
+    }
+  }, []);
+
+  useEffect(() => {
+    const el = sentinelRef.current;
+    if (!el || shouldMount) return;
+
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry?.isIntersecting) {
+          setShouldMount(true);
+          observer.disconnect();
+        }
+      },
+      { rootMargin: options?.rootMargin ?? "200px" }
+    );
+
+    observer.observe(el);
+
+    return () => observer.disconnect();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [options?.rootMargin]);
+
+  return { sentinelRef, shouldMount };
+}

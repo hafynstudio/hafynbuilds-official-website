@@ -1,9 +1,5 @@
 ﻿import type { Config } from "tailwindcss";
 
-// Tailwind's theme is a thin mapping layer over the CSS custom properties
-// in styles/design-tokens.css. Values are never duplicated as raw literals
-// here — every entry points back to a token, so there is exactly one place
-// to change a color, spacing value, or timing curve across the entire site.
 const config: Config = {
   darkMode: "class",
   content: [
@@ -18,6 +14,9 @@ const config: Config = {
           primary: "rgb(var(--color-bg-primary) / <alpha-value>)",
           secondary: "rgb(var(--color-bg-secondary) / <alpha-value>)",
           tertiary: "rgb(var(--color-bg-tertiary) / <alpha-value>)",
+          deep: "rgb(var(--color-bg-deep) / <alpha-value>)",
+          elevated: "rgb(var(--color-bg-elevated) / <alpha-value>)",
+          "elevated-hover": "rgb(var(--color-bg-elevated-hover) / <alpha-value>)",
         },
         surface: {
           DEFAULT: "rgb(var(--color-surface) / <alpha-value>)",
@@ -26,6 +25,8 @@ const config: Config = {
         border: {
           DEFAULT: "rgb(var(--color-border) / <alpha-value>)",
           hover: "rgb(var(--color-border-hover) / <alpha-value>)",
+          hairline: "var(--border-hairline)",
+          "hairline-strong": "var(--border-hairline-strong)",
         },
         text: {
           primary: "rgb(var(--color-text-primary) / <alpha-value>)",
@@ -38,7 +39,26 @@ const config: Config = {
           hover: "rgb(var(--color-accent-primary-hover) / <alpha-value>)",
           glow: "rgb(var(--color-accent-glow) / <alpha-value>)",
         },
-        success: "rgb(var(--color-success) / <alpha-value>)",
+        success: {
+          DEFAULT: "rgb(var(--color-success) / <alpha-value>)",
+          green: "rgb(var(--color-success-green) / <alpha-value>)",
+        },
+        price: {
+          strike: "rgb(var(--color-price-strike) / <alpha-value>)",
+          active: "rgb(var(--color-price-active) / <alpha-value>)",
+        },
+        badge: {
+          founding: "rgb(var(--color-badge-founding) / <alpha-value>)",
+        },
+        /** Industry Explorer visual-theme accents (Phase 11) — only the
+         * 2 of 5 `visualTheme` values with no existing token to reuse.
+         * warm/clean/professional map to badge.founding/accent.glow/
+         * accent.DEFAULT directly in component code instead of being
+         * duplicated here. */
+        theme: {
+          elegant: "rgb(var(--color-theme-elegant) / <alpha-value>)",
+          vibrant: "rgb(var(--color-theme-vibrant) / <alpha-value>)",
+        },
         warning: "rgb(var(--color-warning) / <alpha-value>)",
         error: "rgb(var(--color-error) / <alpha-value>)",
         whatsapp: "rgb(var(--color-whatsapp) / <alpha-value>)",
@@ -81,12 +101,17 @@ const config: Config = {
         lg: "var(--radius-lg)",
         xl: "var(--radius-xl)",
         full: "var(--radius-full)",
+        card: "var(--radius-card)",
+        button: "var(--radius-button)",
+        sharp: "var(--radius-sharp)",
       },
       boxShadow: {
         "glass-sm": "var(--shadow-glass-sm)",
         "glass-md": "var(--shadow-glass-md)",
         "glass-lg": "var(--shadow-glass-lg)",
         "glow-accent": "var(--shadow-glow-accent)",
+        "card-rest": "var(--shadow-card-rest)",
+        "card-hover": "var(--shadow-card-hover)",
       },
       transitionTimingFunction: {
         "out-expo": "var(--ease-out-expo)",
@@ -102,8 +127,13 @@ const config: Config = {
       },
       keyframes: {
         shimmer: {
-          "0%": { backgroundPosition: "-200% 0" },
-          "100%": { backgroundPosition: "200% 0" },
+          // translateX-based shimmer — compositor-only (GPU), zero paint cost.
+          // Replaces the backgroundPosition approach which triggered repaint
+          // every frame and could not be GPU-composited (BUG-024 fix).
+          // The animated element is a child overlay div (see PriceCallout.tsx)
+          // that travels from fully-left to fully-right of its clipped parent.
+          "0%": { transform: "translateX(-100%)" },
+          "100%": { transform: "translateX(100%)" },
         },
         caretBlink: {
           "0%, 49%": { opacity: "1" },
@@ -113,11 +143,21 @@ const config: Config = {
           "0%": { transform: "translateX(0)" },
           "100%": { transform: "translateX(-50%)" },
         },
+        /* Ambient "scanner" line drifting down through the blueprint grid.
+           translateY with vh units — still a pure transform (compositor-only,
+           no layout/paint cost) even though the unit is viewport-relative. */
+        scanDrift: {
+          "0%": { transform: "translateY(-10vh)", opacity: "0" },
+          "10%": { opacity: "1" },
+          "90%": { opacity: "1" },
+          "100%": { transform: "translateY(70vh)", opacity: "0" },
+        },
       },
       animation: {
         shimmer: "shimmer var(--duration-shimmer) linear infinite",
         "caret-blink": "caretBlink var(--duration-caret-blink) steps(1) infinite",
         marquee: "marquee var(--duration-marquee) linear infinite",
+        "scan-drift": "scanDrift 15s linear infinite",
       },
       zIndex: {
         "cursor-spotlight": "var(--z-cursor-spotlight)",

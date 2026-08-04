@@ -65,7 +65,7 @@ export function Hero() {
           </div>
 
           <motion.p
-            initial={{ opacity: 0, y: prefersReducedMotion ? 0 : 16 }}
+            initial={{ opacity: 1, y: prefersReducedMotion ? 0 : 16 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{
               delay: HERO_SEQUENCE_DELAYS_S.subtext,
@@ -82,11 +82,15 @@ export function Hero() {
           <motion.div
             initial={{ opacity: 0, y: prefersReducedMotion ? 0 : 16 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{
-              delay: HERO_SEQUENCE_DELAYS_S.ctas,
-              duration: 0.4,
-              ease: EASE_OUT_EXPO,
-            }}
+            transition={
+              prefersReducedMotion
+                ? { duration: 0 }
+                : {
+                    delay: HERO_SEQUENCE_DELAYS_S.ctas,
+                    duration: 0.4,
+                    ease: EASE_OUT_EXPO,
+                  }
+            }
             className="mt-6 flex flex-col justify-center gap-4 sm:flex-row lg:justify-start"
           >
             <Button href="/contact" size="lg">

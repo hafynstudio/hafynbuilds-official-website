@@ -3,15 +3,9 @@
    Single source of truth for color, spacing, typography, and motion values.
    tailwind.config.ts reads these CSS custom properties — never hardcode a
    hex/px/ms value directly in a component.
-
-   Colors are stored as space-separated RGB triplets (no `#`, no `rgb()`
-   wrapper) so Tailwind's `rgb(var(--token) / <alpha-value>)` pattern can
-   support opacity modifiers like `bg-accent/30` correctly. See
-   tailwind.config.ts for how these are consumed.
    ========================================================================== */
 
 :root {
-  /* ---- Color: Surfaces (dark-mode-first, layered near-black) ---- */
   --color-bg-primary: 10 10 11;
   --color-bg-secondary: 15 15 17;
   --color-bg-tertiary: 22 22 26;
@@ -20,24 +14,20 @@
   --color-border: 42 42 49;
   --color-border-hover: 56 56 63;
 
-  /* ---- Color: Text ---- */
   --color-text-primary: 250 250 250;
   --color-text-secondary: 161 161 170;
   --color-text-tertiary: 113 113 122;
   --color-text-disabled: 76 76 83;
 
-  /* ---- Color: Brand Accent ---- */
   --color-accent-primary: 62 123 250;
   --color-accent-primary-hover: 91 143 252;
   --color-accent-glow: 34 211 238;
 
-  /* ---- Color: Semantic ---- */
   --color-success: 34 197 94;
   --color-warning: 245 158 11;
   --color-error: 239 68 68;
-  --color-whatsapp: 37 211 102; /* Contact page WhatsApp CTA + social icon only */
+  --color-whatsapp: 37 211 102;
 
-  /* ---- Typography Scale ---- */
   --font-size-xs: 0.75rem;
   --font-size-sm: 0.875rem;
   --font-size-base: 1rem;
@@ -51,7 +41,6 @@
   --font-size-7xl: 4.5rem;
   --font-size-8xl: 6rem;
 
-  /* ---- Spacing Scale (4px base unit) ---- */
   --space-1: 0.25rem;
   --space-2: 0.5rem;
   --space-3: 0.75rem;
@@ -64,23 +53,22 @@
   --space-32: 8rem;
   --space-48: 12rem;
 
-  /* ---- Layout ---- */
   --header-height: 4rem;
 
-  /* ---- Radii ---- */
   --radius-sm: 0.375rem;
   --radius-md: 0.625rem;
   --radius-lg: 1rem;
   --radius-xl: 1.5rem;
   --radius-full: 9999px;
+  /* Sharp radius for Build Spec CTA buttons — technical-drawing precision
+     language, deliberately not the soft/pill radii used elsewhere. */
+  --radius-sharp: 0.25rem;
 
-  /* ---- Motion: Easing Curves ---- */
   --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
   --ease-out-quart: cubic-bezier(0.25, 1, 0.5, 1);
   --ease-in-out-quart: cubic-bezier(0.76, 0, 0.24, 1);
   --ease-spring: cubic-bezier(0.34, 1.56, 0.64, 1);
 
-  /* ---- Motion: Durations ---- */
   --duration-fast: 150ms;
   --duration-base: 300ms;
   --duration-slow: 600ms;
@@ -90,31 +78,81 @@
   --duration-caret-blink: 1000ms;
   --duration-marquee: 30000ms;
 
-  /* ---- Elevation (glass-surface shadows) ---- */
   --shadow-glass-sm: 0 1px 2px rgba(0, 0, 0, 0.4), 0 0 0 1px rgba(255, 255, 255, 0.04) inset;
   --shadow-glass-md: 0 8px 24px rgba(0, 0, 0, 0.45), 0 0 0 1px rgba(255, 255, 255, 0.05) inset;
   --shadow-glass-lg: 0 24px 64px rgba(0, 0, 0, 0.55), 0 0 0 1px rgba(255, 255, 255, 0.06) inset;
   --shadow-glow-accent: 0 0 48px rgba(62, 123, 250, 0.25);
 
-  /* ---- Z-Index Scale ---- */
   --z-base: 0;
-  /* CORRECTED (was -1 in the previous pass — that was wrong and is why
-     the global spotlight went completely invisible). CSS stacking rule:
-     ordinary, non-positioned, in-flow content (which every page section
-     on this site is — plain <section> elements with no z-index set)
-     paints ABOVE any sibling with a NEGATIVE z-index, regardless of DOM
-     order. Since every section has its own opaque background, a
-     negative z-index spotlight is guaranteed to render underneath all
-     of them, everywhere. The correct approach — the same technique
-     HeroGrainOverlay already uses successfully — is a POSITIVE z-index
-     placed above ordinary section content but below Header/modals,
-     combined with `mix-blend-mode: screen` on the element itself so it
-     only ADDS light rather than covering content. See
-     components/ui/CursorSpotlight.tsx.
-  */
   --z-cursor-spotlight: 25;
   --z-header: 40;
   --z-modal-backdrop: 60;
   --z-modal: 70;
   --z-loading-screen: 100;
+
+  /* ==========================================================================
+     Investment Page — "Build Spec" Design Tokens
+     ========================================================================== */
+  --color-bg-deep: 6 6 7;
+  --color-bg-elevated: 18 18 20;
+  --color-bg-elevated-hover: 23 23 26;
+
+  --color-success-green: 52 211 153;
+  --color-price-strike: 82 82 91;
+  --color-price-active: 255 255 255;
+  --color-badge-founding: 245 158 11;
+
+  --border-hairline: rgba(255, 255, 255, 0.08);
+  --border-hairline-strong: rgba(255, 255, 255, 0.14);
+
+  --radius-card: 1.25rem;
+  --radius-button: 0.75rem;
+
+  --shadow-card-rest: 0 1px 0 rgba(255, 255, 255, 0.04) inset, 0 20px 40px -20px rgba(0, 0, 0, 0.6);
+  --shadow-card-hover: 0 1px 0 rgba(255, 255, 255, 0.06) inset, 0 30px 60px -20px rgba(0, 0, 0, 0.75);
+
+  /* ==========================================================================
+     Investment Page — Industry Explorer Visual Themes (Phase 11)
+     Covers the 2 of 5 `visualTheme` values with no existing token to
+     reuse. warm/clean/professional deliberately reuse
+     --color-badge-founding / --color-accent-glow / --color-accent-primary
+     respectively — added here only what didn't already exist, per the
+     Master Build Prompt's "reuse before adding to the token system" rule.
+     ========================================================================== */
+  --color-theme-elegant: 244 165 178;
+  --color-theme-vibrant: 192 111 247;
+}
+
+/* ==========================================================================
+   Capabilities Console — Height Reservation (BUG-003 corrective #3)
+   Reserves GSAP pin-spacer height from FIRST paint using data-driven CSS.
+   --panel-count is set as an inline custom property by the component.
+   The @media (pointer: fine) guard ensures this only applies on desktop
+   (matching the device-branch architecture's useCoarsePointer decision).
+   ========================================================================== */
+.capabilities-console-reserve {
+  min-height: 100vh;
+}
+
+@media (pointer: fine) {
+  .capabilities-console-reserve {
+    min-height: calc(var(--panel-count, 5) * 100vw + 100vh);
+  }
+}
+
+/* ==========================================================================
+   HeroVisual Terminal Rows — Height Reservation (BUG-020)
+   Reserves space for the maximum row count (5 rows) from first paint so
+   the terminal card never changes height during the type→process→deploy→
+   reset animation cycle. Without this, the card grows and collapses as
+   rows are added/removed, causing Hero's items-center flex layout to
+   recalculate vertical centering position — recorded by Lighthouse as a
+   0.018 CLS event on the Hero content wrapper (desktop only: mobile uses
+   flex-col so the centering recalculation does not affect sibling position).
+
+   Calculation: 5 rows × 20px (text-sm line-height) + 4 gaps × 8px
+   (space-y-2) = 132px = 8.25rem.
+   ========================================================================== */
+.hero-visual-rows-reserve {
+  min-height: 8.25rem;
 }

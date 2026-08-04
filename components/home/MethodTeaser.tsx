@@ -1,181 +1,307 @@
 ﻿"use client";
 
-import { useRef } from "react";
+import { useRef, useState } from "react";
 import Link from "next/link";
 import { motion, useInView } from "framer-motion";
 import { ArrowRight } from "lucide-react";
 import { methodStages } from "@/data/method-stages";
-import { usePrefersReducedMotion } from "@/lib/hooks";
 import { cn } from "@/lib/utils";
+import { usePrefersReducedMotion } from "@/lib/hooks";
 
-/**
- * Home Method Teaser (PRD §2.2.1) — introduces the 5-stage sequential
- * pipeline that the full "Live Deploy" page (Phase 9) pays off with
- * GSAP ScrollTrigger cinematic treatment.
- *
- * DELIBERATE RESTRAINT: this teaser uses Framer Motion scroll-reveal
- * only — no ScrollTrigger, no scrubbed timelines. The cinematic
- * version is reserved for Phase 9 so it lands with full impact on
- * first encounter, rather than being diluted by a preview here.
- *
- * DESIGN LANGUAGE:
- * - Dark canvas section (bg-bg-secondary) — distinct from the
- *   Capabilities section above (bg-primary) for clear rhythm
- * - Horizontal node track on desktop, vertical on mobile
- * - Connecting line: a static gradient track (bg-tertiary) with an
- *   animated accent fill that grows to cover it as nodes enter view —
- *   suggests "progress through a pipeline" without needing GSAP
- * - Each node: a small terminal-style status card. The featured node
- *   (Build) gets an accent border + glow — the clear visual anchor
- * - Status labels (statusLabel field) shown below each node in
- *   monospace — extends the terminal/deploy motif from Hero/TrustBar
- * - Background: continuation of the same radial dot-grid pattern
- *   used in Hero and Capabilities, maintaining visual consistency
- *
- * MOBILE: nodes stack vertically, connecting line becomes a left-edge
- * vertical accent bar (same CSS, different flex direction).
- *
- * COLOR ANIMATION NOTE: all colors inside animate={{}} use plain
- * resolved rgb() strings (no CSS var() references) — Framer Motion
- * cannot tween CSS custom properties. This follows the TOKEN/rgba()
- * convention established in CapabilitiesTeaser.tsx.
- */
+type StageStatus = "done" | "active" | "pending";
 
-// Resolved color tokens for Framer Motion animate={{}} only
-const T = {
-  accent: "62 123 250",
-  accentGlow: "34 211 238",
-  white: "255 255 255",
-} as const;
-
-function rgb(triplet: string, alpha: number) {
-  return `rgb(${triplet} / ${alpha})`;
+function getStatus(index: number, featuredIndex: number): StageStatus {
+  if (index < featuredIndex) return "done";
+  if (index === featuredIndex) return "active";
+  return "pending";
 }
 
-interface StageNodeProps {
+const STATUS_COLOR: Record<StageStatus, string> = {
+  done:    "34 197 94",
+  active:  "62 123 250",
+  pending: "245 158 11",
+};
+
+function rgba(status: StageStatus, alpha: number) {
+  return `rgb(${STATUS_COLOR[status]} / ${alpha})`;
+}
+
+const KEYFRAMES = `
+  @keyframes hb-breathe-blue {
+    0%,100% { transform: scale(1); }
+    50%      { transform: scale(1.018); }
+  }
+  @keyframes hb-glow-drift {
+    0%,100% { transform: translate(-50%,-50%) scale(1);    opacity: 0.14; }
+    33%      { transform: translate(-42%,-58%) scale(1.1);  opacity: 0.20; }
+    66%      { transform: translate(-58%,-44%) scale(0.95); opacity: 0.10; }
+  }
+  @keyframes hb-pulse-ring-blue {
+    0%   { transform: scale(1);   opacity: 0.55; }
+    100% { transform: scale(1.7); opacity: 0;    }
+  }
+  @keyframes hb-dot-pulse {
+    0%,100% { opacity: 1;    }
+    50%     { opacity: 0.25; }
+  }
+  @keyframes hb-sweep {
+    0%   { transform: translateX(-120%); opacity: 0;   }
+    15%  { opacity: 0.6; }
+    85%  { opacity: 0.6; }
+    100% { transform: translateX(420%);  opacity: 0;   }
+  }
+  .hb-breathe-blue {
+    animation: hb-breathe-blue 5s ease-in-out infinite;
+    will-change: transform;
+    box-shadow: 0 0 0 1px rgb(62 123 250 / 0.52),
+                0 0 27px rgb(62 123 250 / 0.18),
+                0 0 56px rgb(62 123 250 / 0.07);
+  }
+  .hb-glow-drift   { animation: hb-glow-drift 8s ease-in-out infinite; }
+  .hb-pulse-ring   { animation: hb-pulse-ring-blue 2.2s ease-out infinite; }
+  .hb-dot-pulse    { animation: hb-dot-pulse 2s ease-in-out infinite; }
+  .hb-sweep::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(
+      105deg,
+      transparent 0%,
+      rgb(255 255 255 / 0.06) 45%,
+      rgb(255 255 255 / 0.09) 50%,
+      rgb(255 255 255 / 0.06) 55%,
+      transparent 100%
+    );
+    animation: hb-sweep 1.4s cubic-bezier(0.22,1,0.36,1) forwards;
+    pointer-events: none;
+    border-radius: inherit;
+  }
+`;
+
+const EASE: [number, number, number, number] = [0.22, 1, 0.36, 1];
+
+function StatusIcon({ status, rm }: { status: StageStatus; rm: boolean }) {
+  if (status === "done") {
+    return (
+      <svg viewBox="0 0 14 14" className="h-3 w-3" aria-hidden="true">
+        <path
+          d="M3 7.5L5.5 10L11 4"
+          fill="none"
+          stroke={`rgb(${STATUS_COLOR.done})`}
+          strokeWidth="1.6"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+        />
+      </svg>
+    );
+  }
+  if (status === "active") {
+    return (
+      <span className="relative flex h-2.5 w-2.5" aria-hidden="true">
+        {!rm && (
+          <span className="hb-pulse-ring absolute inset-0 rounded-full border border-accent/50" />
+        )}
+        <span
+          className={cn(
+            "relative inline-flex h-2.5 w-2.5 rounded-full bg-accent",
+            !rm && "hb-dot-pulse"
+          )}
+        />
+      </span>
+    );
+  }
+  return (
+    <span
+      className="inline-flex h-2.5 w-2.5 rounded-full border"
+      style={{
+        borderColor: rgba("pending", 0.6),
+        backgroundColor: rgba("pending", 0.15),
+      }}
+      aria-hidden="true"
+    />
+  );
+}
+
+interface NodeProps {
   stage: (typeof methodStages)[0];
   index: number;
   total: number;
-  inView: boolean;
-  reducedMotion: boolean;
+  featuredIndex: number;
+  sectionInView: boolean;
+  rm: boolean;
 }
 
-function StageNode({ stage, index, total, inView, reducedMotion }: StageNodeProps) {
-  const isFeatured = stage.isFeatured;
+function DesktopNode({
+  stage,
+  index,
+  total,
+  featuredIndex,
+  sectionInView,
+  rm,
+}: NodeProps) {
+  const [hovered, setHovered] = useState(false);
+  const [swept, setSwept] = useState(false);
+  const [sweepKey, setSweepKey] = useState(0);
+  const status = getStatus(index, featuredIndex);
+  const isActive = status === "active";
   const isLast = index === total - 1;
 
-  return (
-    <div className="group relative flex flex-1 flex-col items-center">
+  function handleHoverStart() {
+    setHovered(true);
+    if (!rm) {
+      setSwept(false);
+      requestAnimationFrame(() => {
+        setSweepKey((k) => k + 1);
+        setSwept(true);
+      });
+    }
+  }
 
-      {/* ── NODE CARD ────────────────────────────────────────────── */}
+  return (
+    <div className="relative flex flex-1 flex-col items-center">
+
       <motion.div
         className={cn(
-          "relative flex w-full max-w-[160px] flex-col overflow-hidden rounded-xl border p-3 backdrop-blur-sm",
-          isFeatured
-            ? "border-accent/40 bg-surface/80 shadow-glow-accent"
-            : "border-border bg-surface/40"
+          "relative flex w-full max-w-[160px] cursor-default flex-col overflow-hidden rounded-xl border p-3.5",
+          "bg-[#070910]",
+          isActive && !rm && "hb-breathe-blue"
         )}
-        initial={{ opacity: 0, y: reducedMotion ? 0 : 20 }}
-        animate={inView ? { opacity: 1, y: 0 } : {}}
-        transition={{
-          duration: 0.55,
-          delay: index * 0.1,
-          ease: [0.16, 1, 0.3, 1],
+        style={{
+          borderColor: isActive
+            ? rgba("active", 0.45)
+            : status === "done"
+            ? rgba("done", 0.22)
+            : rgba("pending", 0.22),
+        }}
+        animate={sectionInView ? { opacity: 1, y: 0, filter: "blur(0px)" } : {}}
+        transition={{ duration: 0.8, delay: index * 0.13, ease: EASE }}
+        whileHover={
+          rm ? {} : { y: -6, scale: 1.02, transition: { duration: 0.3, ease: EASE } }
+        }
+        onHoverStart={handleHoverStart}
+        onHoverEnd={() => {
+          setHovered(false);
+          setSwept(false);
         }}
       >
-        {/* Featured glow orb */}
-        {isFeatured && (
+        {isActive && !rm && (
           <div
             aria-hidden="true"
-            className="pointer-events-none absolute -top-6 left-1/2 h-20 w-20 -translate-x-1/2 rounded-full bg-accent opacity-[0.12] blur-2xl"
+            className="hb-glow-drift pointer-events-none absolute left-1/2 top-1/2 h-32 w-32 rounded-full bg-accent blur-2xl"
           />
         )}
 
-        {/* Top highlight line */}
-        <div
+        {swept && !rm && (
+          <div
+            key={sweepKey}
+            aria-hidden="true"
+            className="hb-sweep pointer-events-none absolute inset-0 rounded-xl"
+          />
+        )}
+
+        <motion.div
           aria-hidden="true"
-          className={cn(
-            "absolute inset-x-0 top-0 h-[1px]",
-            isFeatured
-              ? "bg-gradient-to-r from-transparent via-accent/60 to-transparent"
-              : "bg-gradient-to-r from-transparent via-white/[0.07] to-transparent"
-          )}
+          className="pointer-events-none absolute inset-0 rounded-xl"
+          animate={{
+            boxShadow:
+              hovered && !rm
+                ? `inset 0 0 0 1px ${rgba(status, 0.7)}, 0 0 22px ${rgba(status, 0.18)}`
+                : "inset 0 0 0 1px transparent",
+          }}
+          transition={{ duration: 0.35, ease: EASE }}
         />
 
-        {/* Stage number + status dot */}
-        <div className="mb-2 flex items-center justify-between">
-          <span
+        <motion.div
+          aria-hidden="true"
+          className="absolute inset-x-0 top-0 h-[1px]"
+          animate={{
+            background: `linear-gradient(to right, transparent, ${rgba(
+              status,
+              hovered ? 0.75 : isActive ? 0.55 : 0.35
+            )}, transparent)`,
+          }}
+          transition={{ duration: 0.35 }}
+        />
+
+        <motion.div
+          className="relative flex h-full flex-col"
+          animate={{ y: (hovered || isActive) && !rm ? -3 : 0 }}
+          transition={{ duration: 0.45, ease: EASE }}
+        >
+          <div className="mb-4 flex items-center justify-between">
+            <span
+              className="font-mono text-[10px] font-semibold"
+              style={{ color: `rgb(${STATUS_COLOR[status]})` }}
+            >
+              {String(index + 1).padStart(2, "0")}
+            </span>
+            <StatusIcon status={status} rm={rm} />
+          </div>
+
+          <h3
             className={cn(
-              "font-mono text-[10px] font-medium",
-              isFeatured ? "text-accent" : "text-text-tertiary"
+              "text-sm leading-tight text-text-primary",
+              isActive ? "font-bold" : "font-semibold"
             )}
           >
-            {String(index + 1).padStart(2, "0")}
-          </span>
-          {/* Pulsing dot on featured, static on others */}
-          {isFeatured ? (
-            <motion.span
-              className="h-1.5 w-1.5 rounded-full bg-accent"
-              animate={reducedMotion ? {} : { opacity: [1, 0.3, 1] }}
-              transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}
-              aria-hidden="true"
-            />
-          ) : (
-            <span className="h-1.5 w-1.5 rounded-full bg-border" aria-hidden="true" />
-          )}
-        </div>
+            {stage.name}
+          </h3>
 
-        {/* Stage name */}
-        <h3
-          className={cn(
-            "text-sm font-semibold leading-tight",
-            isFeatured ? "text-text-primary" : "text-text-secondary"
-          )}
-        >
-          {stage.name}
-        </h3>
-
-        {/* Status label — terminal log line */}
-        <p
-          className={cn(
-            "mt-1.5 font-mono text-[9px] leading-tight",
-            isFeatured ? "text-accent/80" : "text-text-tertiary"
-          )}
-        >
-          {isFeatured ? `[~] ${stage.statusLabel}` : `[✓] ${stage.statusLabel}`}
-        </p>
+          <p
+            className="mt-3 font-mono text-[9px] font-medium leading-tight"
+            style={{ color: `rgb(${STATUS_COLOR[status]} / 0.9)` }}
+          >
+            {status === "active"
+              ? `[~] ${stage.statusLabel}`
+              : `[✓] ${stage.statusLabel}`}
+          </p>
+        </motion.div>
       </motion.div>
 
-      {/* ── CONNECTOR LINE (hidden on last node) ─────────────────── */}
       {!isLast && (
         <div
           aria-hidden="true"
-          className="absolute top-[52px] hidden h-[1px] w-[calc(100%-160px)] translate-x-[80px] overflow-hidden rounded-full bg-border lg:block"
-          style={{ left: "50%", width: "calc(100% - 80px)", transform: "none", right: 0, left: "calc(80px)" }}
+          className="absolute hidden lg:block"
+          style={{
+            top: 56,
+            left: "calc(80px)",
+            right: 0,
+            height: 1,
+          }}
         >
-          {/* Animated accent fill — grows left-to-right as section enters view.
-              Only fills up to the "Build" node (featured, index 2 = 60% across
-              5 nodes) to suggest "this is where we are now in the process." */}
-          <motion.div
-            className="h-full bg-gradient-to-r from-accent to-accent/30"
-            initial={{ width: "0%" }}
-            animate={inView ? { width: index < 2 ? "100%" : "0%" } : { width: "0%" }}
-            transition={{
-              duration: reducedMotion ? 0 : 0.6,
-              delay: reducedMotion ? 0 : index * 0.15 + 0.4,
-              ease: [0.25, 1, 0.5, 1],
-            }}
-          />
+          <div className="relative h-full w-full overflow-hidden rounded-full bg-border">
+            <motion.div
+              className="absolute inset-y-0 left-0 rounded-full"
+              animate={
+                sectionInView
+                  ? { width: index < featuredIndex ? "100%" : "0%" }
+                  : { width: "0%" }
+              }
+              transition={{
+                duration: rm ? 0 : 0.8,
+                delay: rm ? 0 : index * 0.15 + 0.5,
+                ease: EASE,
+              }}
+              style={{
+                background:
+                  index < featuredIndex
+                    ? `linear-gradient(to right, rgb(${STATUS_COLOR.done}), rgb(${STATUS_COLOR.done} / 0.5))`
+                    : "transparent",
+              }}
+            />
+          </div>
         </div>
       )}
 
-      {/* ── SHORT DESCRIPTION (below card, desktop only) ─────────── */}
       <motion.p
-        className="mt-3 hidden text-center text-[11px] leading-relaxed text-text-tertiary lg:block"
+        className="mt-2 hidden text-center text-[11px] leading-relaxed text-text-tertiary lg:block"
         style={{ maxWidth: 140 }}
-        initial={{ opacity: 0 }}
-        animate={inView ? { opacity: 1 } : {}}
-        transition={{ duration: 0.5, delay: index * 0.1 + 0.25 }}
+        animate={sectionInView ? { opacity: 1 } : {}}
+        transition={{
+          duration: 0.7,
+          delay: index * 0.13 + 0.32,
+          ease: EASE,
+        }}
       >
         {stage.shortDescription.split(" ").slice(0, 8).join(" ")}
         {stage.shortDescription.split(" ").length > 8 ? "…" : ""}
@@ -184,145 +310,170 @@ function StageNode({ stage, index, total, inView, reducedMotion }: StageNodeProp
   );
 }
 
-// ─── MOBILE VERTICAL STAGE ROW ────────────────────────────────────────────────
-// On mobile the horizontal pipeline becomes a vertical left-to-right
-// readable list — each row is a mini card with a left-edge accent line
-// connecting nodes, a cleaner read on small screens than a cramped
-// horizontal layout would be.
-
-function MobileStageRow({
+function MobileRow({
   stage,
   index,
   total,
-  inView,
-  reducedMotion,
-}: StageNodeProps) {
-  const isFeatured = stage.isFeatured;
+  featuredIndex,
+  sectionInView,
+  rm,
+}: NodeProps) {
+  const [hovered, setHovered] = useState(false);
+  const [swept, setSwept] = useState(false);
+  const [sweepKey, setSweepKey] = useState(0);
+  const status = getStatus(index, featuredIndex);
+  const isActive = status === "active";
   const isLast = index === total - 1;
+
+  function handleHoverStart() {
+    setHovered(true);
+    if (!rm) {
+      setSwept(false);
+      requestAnimationFrame(() => {
+        setSweepKey((k) => k + 1);
+        setSwept(true);
+      });
+    }
+  }
 
   return (
     <div className="relative flex gap-4">
-
-      {/* Left-edge track + node dot */}
       <div className="flex flex-col items-center">
-        {/* Node circle */}
         <motion.div
-          className={cn(
-            "relative z-10 flex h-8 w-8 shrink-0 items-center justify-center rounded-full border font-mono text-[10px] font-semibold",
-            isFeatured
-              ? "border-accent/50 bg-surface text-accent shadow-[0_0_12px_rgb(62_123_250/0.2)]"
-              : "border-border bg-surface text-text-tertiary"
-          )}
-          initial={{ opacity: 0, scale: reducedMotion ? 1 : 0.7 }}
-          animate={inView ? { opacity: 1, scale: 1 } : {}}
-          transition={{ duration: 0.4, delay: index * 0.09, ease: [0.34, 1.56, 0.64, 1] }}
+          className="relative z-10 flex h-9 w-9 shrink-0 items-center justify-center rounded-full border bg-[#070910] font-mono text-[10px] font-bold"
+          style={{
+            borderColor: rgba(status, 0.5),
+            color: `rgb(${STATUS_COLOR[status]})`,
+            ...(isActive && !rm
+              ? {
+                  animation: "hb-breathe-blue 5s ease-in-out infinite",
+                  willChange: "transform, box-shadow",
+                }
+              : {}),
+          }}
+          animate={sectionInView ? { opacity: 1, scale: 1, filter: "blur(0px)" } : {}}
+          transition={{ duration: 0.7, delay: index * 0.13, ease: EASE }}
         >
           {String(index + 1).padStart(2, "0")}
-          {/* Pulse ring on featured */}
-          {isFeatured && !reducedMotion && (
-            <motion.span
-              className="absolute inset-0 rounded-full border border-accent/30"
-              animate={{ scale: [1, 1.5], opacity: [0.5, 0] }}
-              transition={{ duration: 1.8, repeat: Infinity, ease: "easeOut" }}
+          {isActive && !rm && (
+            <span
+              className="hb-pulse-ring absolute inset-0 rounded-full border border-accent/40"
               aria-hidden="true"
             />
           )}
         </motion.div>
 
-        {/* Vertical connector line */}
         {!isLast && (
-          <div className="relative mt-1 w-px flex-1 bg-border" style={{ minHeight: 24 }}>
+          <div
+            className="relative mt-1 w-px flex-1 bg-border"
+            style={{ minHeight: 28 }}
+            aria-hidden="true"
+          >
             <motion.div
-              className="absolute inset-x-0 top-0 bg-gradient-to-b from-accent to-transparent"
-              initial={{ height: "0%" }}
-              animate={inView && index < 2 ? { height: "100%" } : { height: "0%" }}
-              transition={{
-                duration: reducedMotion ? 0 : 0.5,
-                delay: reducedMotion ? 0 : index * 0.12 + 0.3,
-                ease: [0.25, 1, 0.5, 1],
+              className="absolute inset-x-0 top-0"
+              style={{
+                background:
+                  index < featuredIndex
+                    ? `linear-gradient(to bottom, rgb(${STATUS_COLOR.done}), transparent)`
+                    : "transparent",
               }}
-              aria-hidden="true"
+              animate={
+                sectionInView && index < featuredIndex
+                  ? { height: "100%" }
+                  : { height: "0%" }
+              }
+              transition={{
+                duration: rm ? 0 : 0.7,
+                delay: rm ? 0 : index * 0.13 + 0.4,
+                ease: EASE,
+              }}
             />
           </div>
         )}
       </div>
 
-      {/* Stage content */}
       <motion.div
-        className={cn(
-          "mb-4 flex-1 overflow-hidden rounded-xl border p-4",
-          isFeatured
-            ? "border-accent/30 bg-surface/60"
-            : "border-border/60 bg-surface/25"
-        )}
-        initial={{ opacity: 0, x: reducedMotion ? 0 : 16 }}
-        animate={inView ? { opacity: 1, x: 0 } : {}}
-        transition={{ duration: 0.5, delay: index * 0.09 + 0.05, ease: [0.16, 1, 0.3, 1] }}
+        className="relative mb-4 flex-1 cursor-default overflow-hidden rounded-xl border bg-[#070910] p-4"
+        style={{ borderColor: rgba(status, 0.3) }}
+        animate={sectionInView ? { opacity: 1, x: 0, filter: "blur(0px)" } : {}}
+        transition={{ duration: 0.75, delay: index * 0.13 + 0.07, ease: EASE }}
+        whileHover={
+          rm ? {} : { y: -3, scale: 1.01, transition: { duration: 0.3, ease: EASE } }
+        }
+        onHoverStart={handleHoverStart}
+        onHoverEnd={() => {
+          setHovered(false);
+          setSwept(false);
+        }}
       >
-        {/* Top accent line on featured */}
-        {isFeatured && (
+        {swept && !rm && (
           <div
+            key={sweepKey}
             aria-hidden="true"
-            className="absolute inset-x-0 top-0 h-[1px] bg-gradient-to-r from-transparent via-accent/50 to-transparent"
+            className="hb-sweep pointer-events-none absolute inset-0 rounded-xl"
           />
         )}
 
-        <div className="flex items-center justify-between">
-          <h3
-            className={cn(
-              "text-sm font-semibold",
-              isFeatured ? "text-text-primary" : "text-text-secondary"
-            )}
-          >
-            {stage.name}
-          </h3>
-          {isFeatured && (
-            <motion.span
-              className="h-1.5 w-1.5 rounded-full bg-accent"
-              animate={reducedMotion ? {} : { opacity: [1, 0.3, 1] }}
-              transition={{ duration: 2, repeat: Infinity }}
-              aria-hidden="true"
-            />
-          )}
-        </div>
+        <div
+          aria-hidden="true"
+          className="absolute inset-x-0 top-0 h-[1px]"
+          style={{
+            background: `linear-gradient(to right, transparent, ${rgba(status, 0.6)}, transparent)`,
+          }}
+        />
 
-        <p className="mt-1.5 text-xs leading-relaxed text-text-secondary">
-          {stage.shortDescription}
-        </p>
-
-        <p
-          className={cn(
-            "mt-2 font-mono text-[9px]",
-            isFeatured ? "text-accent/70" : "text-text-tertiary"
-          )}
+        <motion.div
+          animate={{ y: (hovered || isActive) && !rm ? -2 : 0 }}
+          transition={{ duration: 0.4, ease: EASE }}
         >
-          {isFeatured ? `[~] ${stage.statusLabel}` : `[✓] ${stage.statusLabel}`}
-        </p>
+          <div className="mb-3 flex items-center justify-between">
+            <h3
+              className={cn(
+                "text-sm leading-tight text-text-primary",
+                isActive ? "font-bold" : "font-semibold"
+              )}
+            >
+              {stage.name}
+            </h3>
+            <StatusIcon status={status} rm={rm} />
+          </div>
+          <p className="text-xs leading-relaxed text-text-secondary">
+            {stage.shortDescription}
+          </p>
+          <p
+            className="mt-2.5 font-mono text-[9px] font-medium"
+            style={{ color: `rgb(${STATUS_COLOR[status]} / 0.9)` }}
+          >
+            {status === "active"
+              ? `[~] ${stage.statusLabel}`
+              : `[✓] ${stage.statusLabel}`}
+          </p>
+        </motion.div>
       </motion.div>
     </div>
   );
 }
 
-// ─── SECTION ─────────────────────────────────────────────────────────────────
-
 export function MethodTeaser() {
   const sectionRef = useRef<HTMLElement>(null);
   const headerRef = useRef<HTMLDivElement>(null);
-  const reducedMotion = usePrefersReducedMotion();
+  const rm = usePrefersReducedMotion();
 
   const headerInView = useInView(headerRef, { once: true, margin: "-80px" });
-  const contentInView = useInView(sectionRef, { once: true, margin: "-60px" });
+  const sectionInView = useInView(sectionRef, { once: true, margin: "-60px" });
 
   if (methodStages.length === 0) return null;
 
   const sorted = [...methodStages].sort((a, b) => a.displayOrder - b.displayOrder);
+  const featuredIndex = sorted.findIndex((s) => s.isFeatured);
 
   return (
     <section
       ref={sectionRef}
       className="relative overflow-hidden border-t border-border bg-bg-secondary px-4 py-20 sm:px-6 sm:py-24"
     >
-      {/* Dot-grid continuation — same pattern, different opacity zone */}
+      {!rm && <style dangerouslySetInnerHTML={{ __html: KEYFRAMES }} />}
+
       <div
         aria-hidden="true"
         className="pointer-events-none absolute inset-0"
@@ -337,88 +488,85 @@ export function MethodTeaser() {
         }}
       />
 
-      {/* Ambient glow — single, right-side, subdued */}
-      <div aria-hidden="true" className="pointer-events-none absolute inset-0 overflow-hidden">
-        <div className="absolute -bottom-20 right-[10%] h-[380px] w-[380px] rounded-full bg-accent opacity-[0.04] blur-3xl" />
-      </div>
+      <motion.div
+        aria-hidden="true"
+        className="pointer-events-none absolute -bottom-20 right-[10%] h-[420px] w-[420px] rounded-full bg-accent blur-3xl"
+        animate={{ opacity: sectionInView ? 0.07 : 0.02 }}
+        transition={{ duration: rm ? 0 : 1.8, ease: EASE }}
+      />
+      <motion.div
+        aria-hidden="true"
+        className="pointer-events-none absolute -top-20 left-[5%] h-[300px] w-[300px] rounded-full bg-accent-glow blur-3xl"
+        animate={{ opacity: sectionInView ? 0.04 : 0.01 }}
+        transition={{ duration: rm ? 0 : 2, ease: EASE }}
+      />
 
       <div className="relative mx-auto max-w-7xl">
 
-        {/* Section header */}
         <div ref={headerRef} className="mb-14 sm:mb-16">
           <motion.p
             className="mb-3 font-mono text-xs tracking-widest text-accent sm:text-sm"
-            initial={{ opacity: 0, y: reducedMotion ? 0 : 10 }}
-            animate={headerInView ? { opacity: 1, y: 0 } : {}}
-            transition={{ duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
+            animate={headerInView ? { opacity: 1, y: 0, filter: "blur(0px)" } : {}}
+            transition={{ duration: 0.7, ease: EASE }}
           >
             How We Work
           </motion.p>
-
           <motion.h2
             className="max-w-2xl text-3xl font-bold leading-tight text-text-primary sm:text-4xl lg:text-5xl"
-            initial={{ opacity: 0, y: reducedMotion ? 0 : 14 }}
-            animate={headerInView ? { opacity: 1, y: 0 } : {}}
-            transition={{ duration: 0.6, delay: 0.08, ease: [0.16, 1, 0.3, 1] }}
+            animate={headerInView ? { opacity: 1, y: 0, filter: "blur(0px)" } : {}}
+            transition={{ duration: 0.8, delay: 0.09, ease: EASE }}
           >
             A process built to{" "}
             <span className="bg-gradient-to-r from-accent to-accent-glow bg-clip-text text-transparent">
               remove doubt.
             </span>
           </motion.h2>
-
           <motion.p
-            className="mt-4 max-w-lg text-sm text-text-secondary sm:text-base"
-            initial={{ opacity: 0, y: reducedMotion ? 0 : 10 }}
-            animate={headerInView ? { opacity: 1, y: 0 } : {}}
-            transition={{ duration: 0.5, delay: 0.16, ease: [0.16, 1, 0.3, 1] }}
+            className="mt-4 max-w-[520px] text-sm text-text-secondary sm:text-base"
+            animate={headerInView ? { opacity: 1, y: 0, filter: "blur(0px)" } : {}}
+            transition={{ duration: 0.7, delay: 0.18, ease: EASE }}
           >
-            Five stages. No surprises. Every deliverable defined before
-            a single line gets written.
+            Five stages. No surprises. Every deliverable defined before a single line gets written.
           </motion.p>
         </div>
 
-        {/* ── DESKTOP PIPELINE (lg+) ────────────────────────────── */}
         <div className="relative hidden lg:flex lg:items-start lg:gap-2">
-          {sorted.map((stage, index) => (
-            <StageNode
+          {sorted.map((stage, i) => (
+            <DesktopNode
               key={stage.id}
               stage={stage}
-              index={index}
+              index={i}
               total={sorted.length}
-              inView={contentInView}
-              reducedMotion={reducedMotion}
+              featuredIndex={featuredIndex}
+              sectionInView={sectionInView}
+              rm={rm}
             />
           ))}
         </div>
 
-        {/* ── MOBILE PIPELINE (below lg) ────────────────────────── */}
         <div className="lg:hidden">
-          {sorted.map((stage, index) => (
-            <MobileStageRow
+          {sorted.map((stage, i) => (
+            <MobileRow
               key={stage.id}
               stage={stage}
-              index={index}
+              index={i}
               total={sorted.length}
-              inView={contentInView}
-              reducedMotion={reducedMotion}
+              featuredIndex={featuredIndex}
+              sectionInView={sectionInView}
+              rm={rm}
             />
           ))}
         </div>
 
-        {/* Footer */}
         <motion.div
           className="mt-12 flex flex-col items-center gap-4 sm:flex-row sm:items-center sm:justify-between"
-          initial={{ opacity: 0 }}
-          animate={contentInView ? { opacity: 1 } : {}}
-          transition={{ duration: 0.5, delay: 0.6 }}
+          animate={sectionInView ? { opacity: 1, y: 0 } : {}}
+          transition={{ duration: 0.7, delay: 0.72, ease: EASE }}
         >
-          {/* Build Complete badge */}
           <div className="flex items-center gap-2 font-mono text-xs text-text-tertiary">
             <span className="text-success">✓</span>
             <span>Build Complete — every time.</span>
           </div>
-
           <Link
             href="/method"
             className="group inline-flex items-center gap-2 font-mono text-xs text-text-secondary transition-colors duration-300 hover:text-text-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2 focus-visible:ring-offset-bg-secondary sm:text-sm"
@@ -427,7 +575,7 @@ export function MethodTeaser() {
             <ArrowRight
               size={14}
               aria-hidden="true"
-              className="transition-transform duration-300 group-hover:translate-x-1"
+              className="transition-transform duration-300 group-hover:translate-x-1 group-hover:brightness-125"
             />
           </Link>
         </motion.div>
@@ -436,3 +584,4 @@ export function MethodTeaser() {
     </section>
   );
 }
+

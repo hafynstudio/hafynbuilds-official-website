@@ -93,8 +93,8 @@ export function Footer() {
         </div>
 
         <div className="mt-16 flex flex-col items-center justify-between gap-4 border-t border-border pt-8 text-sm text-text-tertiary md:flex-row">
-          <p>&copy; {year} HAFYN BUILDS. All rights reserved.</p>
-          <p>Part of the HAFYN ecosystem.</p>
+          <p className="text-text-secondary">&copy; {year} HAFYN BUILDS. All rights reserved.</p>
+          <p className="text-text-secondary">Part of the HAFYN ecosystem.</p>
         </div>
       </div>
     </footer>

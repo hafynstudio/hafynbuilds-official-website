@@ -67,14 +67,18 @@ function SpinnerIcon({ reducedMotion }: { reducedMotion: boolean }) {
   );
 }
 
-function CheckIcon() {
+function CheckIcon({ reducedMotion }: { reducedMotion: boolean }) {
   return (
     <motion.svg
       viewBox="0 0 14 14"
       className="h-3 w-3 text-success"
-      initial={{ scale: 0.4, opacity: 0 }}
+      initial={{ scale: reducedMotion ? 1 : 0.4, opacity: 0 }}
       animate={{ scale: 1, opacity: 1 }}
-      transition={{ duration: 0.3, ease: [0.34, 1.56, 0.64, 1] }}
+      transition={
+        reducedMotion
+          ? { duration: 0 }
+          : { duration: 0.3, ease: [0.34, 1.56, 0.64, 1] }
+      }
     >
       <path
         d="M3 7.5L5.5 10L11 4"
@@ -95,16 +99,17 @@ function TrailingCursor() {
 interface RowProps {
   lineNumber: number;
   children: React.ReactNode;
+  reducedMotion: boolean;
 }
 
-function Row({ lineNumber, children }: RowProps) {
+function Row({ lineNumber, children, reducedMotion }: RowProps) {
   return (
     <motion.div
       layout
-      initial={{ opacity: 0, y: 6 }}
+      initial={{ opacity: 0, y: reducedMotion ? 0 : 6 }}
       animate={{ opacity: 1, y: 0 }}
       exit={{ opacity: 0 }}
-      transition={{ duration: 0.25 }}
+      transition={{ duration: reducedMotion ? 0 : 0.25 }}
       className="flex items-baseline gap-2.5"
     >
       <span className="w-3 shrink-0 select-none text-right text-[10px] text-text-primary/[0.06]">
@@ -214,7 +219,11 @@ export function HeroVisual() {
       aria-label="Illustration of an automated build and deployment pipeline"
       initial={{ opacity: 0, y: prefersReducedMotion ? 0 : 16 }}
       animate={{ opacity: 1, y: 0 }}
-      transition={{ delay: HERO_SEQUENCE_DELAYS_S.visualPanel, duration: 0.5 }}
+      transition={
+        prefersReducedMotion
+          ? { duration: 0 }
+          : { delay: HERO_SEQUENCE_DELAYS_S.visualPanel, duration: 0.5 }
+      }
       className="relative isolate w-full overflow-hidden rounded-xl border border-border bg-surface/60 shadow-glass-lg backdrop-blur-md [contain:paint]"
     >
       <div aria-hidden="true" className="p-5 pb-8">
@@ -229,14 +238,20 @@ export function HeroVisual() {
         </div>
 
         <motion.div
-          layout
-          transition={{ duration: ROW_LAYOUT_TRANSITION_S, ease: EASE_OUT_QUART }}
+          transition={{
+            duration: prefersReducedMotion ? 0 : ROW_LAYOUT_TRANSITION_S,
+            ease: EASE_OUT_QUART,
+          }}
           animate={{ opacity: isFading ? 0 : 1 }}
-          className="space-y-2 font-mono text-sm"
+          className="hero-visual-rows-reserve space-y-2 font-mono text-sm"
         >
           <AnimatePresence initial={false}>
             {typedLength > 0 && (
-              <Row key="command" lineNumber={++lineNumber}>
+              <Row
+                key="command"
+                lineNumber={++lineNumber}
+                reducedMotion={prefersReducedMotion}
+              >
                 <span className="text-text-tertiary">
                   {COMMAND_TEXT.slice(0, typedLength)}
                   {commandActive && <TrailingCursor />}
@@ -252,13 +267,17 @@ export function HeroVisual() {
                 const dots = isActive ? ".".repeat(dotsCount) : "...";
 
                 return (
-                  <Row key={label} lineNumber={++lineNumber}>
+                  <Row
+                    key={label}
+                    lineNumber={++lineNumber}
+                    reducedMotion={prefersReducedMotion}
+                  >
                     <span className="flex items-baseline gap-2">
                       <StatusIconSlot>
                         {isActive ? (
                           <SpinnerIcon reducedMotion={prefersReducedMotion} />
                         ) : isDone ? (
-                          <CheckIcon />
+                          <CheckIcon reducedMotion={prefersReducedMotion} />
                         ) : null}
                       </StatusIconSlot>
                       <span className="text-text-secondary">
@@ -285,10 +304,14 @@ export function HeroVisual() {
               })}
 
             {stepIndex === 3 && (
-              <Row key="deployed" lineNumber={++lineNumber}>
+              <Row
+                key="deployed"
+                lineNumber={++lineNumber}
+                reducedMotion={prefersReducedMotion}
+              >
                 <span className="flex items-baseline gap-2">
                   <StatusIconSlot>
-                    <CheckIcon />
+                    <CheckIcon reducedMotion={prefersReducedMotion} />
                   </StatusIconSlot>
                   <span className="font-semibold text-success">Deployed</span>
                 </span>
@@ -311,7 +334,10 @@ export function HeroVisual() {
         <motion.div
           className="h-full bg-gradient-to-r from-accent to-accent-glow"
           animate={{ width: `${progressPercent}%` }}
-          transition={{ duration: 0.4, ease: EASE_OUT_QUART }}
+          transition={{
+            duration: prefersReducedMotion ? 0 : 0.4,
+            ease: EASE_OUT_QUART,
+          }}
         />
       </div>
     </motion.div>

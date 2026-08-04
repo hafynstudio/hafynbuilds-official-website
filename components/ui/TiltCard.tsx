@@ -39,10 +39,22 @@ export function TiltCard({ children, className }: TiltCardProps) {
   const rotateYRaw = useMotionValue(0);
   const rotateX = useSpring(rotateXRaw, TILT_SPRING);
   const rotateY = useSpring(rotateYRaw, TILT_SPRING);
+  // Cached on pointer-enter instead of re-read on every pointermove —
+  // see BUG-009: reading getBoundingClientRect() on every pointermove
+  // event forces a synchronous layout flush against Framer Motion's
+  // pending transform writes from the previous frame's rotateXRaw/
+  // rotateYRaw.set() calls. One measurement per hover session removes
+  // the interleaved read/write thrash entirely.
+  const rectRef = useRef<DOMRect | null>(null);
+
+  function handlePointerEnter() {
+    if (!tiltEnabled || !ref.current) return;
+    rectRef.current = ref.current.getBoundingClientRect();
+  }
 
   function handlePointerMove(e: PointerEvent<HTMLDivElement>) {
-    if (!tiltEnabled || !ref.current) return;
-    const rect = ref.current.getBoundingClientRect();
+    if (!tiltEnabled || !rectRef.current) return;
+    const rect = rectRef.current;
     // Normalise to -0.5 → +0.5 range centred on the card midpoint.
     const px = (e.clientX - rect.left) / rect.width - 0.5;
     const py = (e.clientY - rect.top) / rect.height - 0.5;
@@ -53,11 +65,13 @@ export function TiltCard({ children, className }: TiltCardProps) {
   function handlePointerLeave() {
     rotateXRaw.set(0);
     rotateYRaw.set(0);
+    rectRef.current = null;
   }
 
   return (
     <motion.div
       ref={ref}
+      onPointerEnter={handlePointerEnter}
       onPointerMove={handlePointerMove}
       onPointerLeave={handlePointerLeave}
       style={{

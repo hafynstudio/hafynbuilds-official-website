@@ -1,27 +1,62 @@
 ﻿/**
- * FounderProfile — minimal shape used by Home's FounderTeaser strip.
- * Phase 13 (full Founder page) builds directly on top of this; it is
- * extended with philosophy quotes, full bio, and social links at that
- * point — never replaced.
+ * FounderProfile — extended in Phase 13 (Founder page) on top of the
+ * minimal shape originally created in Phase 5 for Home's FounderTeaser
+ * strip. Existing fields (name, title, tagline, photoUrl,
+ * isTaglinePlaceholder) are untouched -- FounderTeaser.tsx keeps working
+ * unmodified. Everything below isTaglinePlaceholder is new.
  *
- * TAD §9 did not enumerate a Founder interface (only Industry, Package,
- * CurrencyRate, PriceOverride, TeamMember, BlogPost were specified).
- * This is a genuine gap filled in Phase 5. If a conflicting
- * types/founder.ts was created in Phase 1, this version wins — the
- * Phase 1 version had no PRD-specified shape to follow.
+ * Content is real (supplied by Zain Marwat, Phase 13) -- not placeholder.
+ * Only real social profile URLs (data/social-links.ts) remain pending;
+ * see PRD Section 5.
  */
+
+/**
+ * A single block in the founder's narrative, rendered in array order by
+ * FounderNarrative.tsx. Two variants:
+ * - "prose": a standard heading + paragraph(s) section.
+ * - "quote": a large pull-quote treatment, breaking up the prose rhythm.
+ * Storing order in data (not hardcoded JSX structure) means reordering,
+ * inserting, or removing a section/quote later never requires touching
+ * the component -- this is what keeps the page admin-panel-ready.
+ */
+export type FounderNarrativeBlock =
+  | {
+      type: "prose";
+      id: string;
+      heading: string;
+      paragraphs: string[];
+    }
+  | {
+      type: "quote";
+      id: string;
+      quote: string;
+      context?: string;
+    };
+
 export interface FounderProfile {
+  // existing (Phase 5) -- untouched
   name: string;
   title: string;
-  /** Home teaser pull-line only. Full 3–4 philosophy quotes belong to
-   * the Founder page (Phase 13). */
+  /** Home teaser pull-line only. */
   tagline: string;
-  /** null = render the styled gradient placeholder. Swap to a real path
-   * (e.g. "/images/founder.jpg") when the real photo is supplied —
-   * FounderTeaser.tsx branches on null vs. string. */
   photoUrl: string | null;
-  /** true while tagline is provisional copy, not a real founder quote.
-   * No visual difference shown to visitors — flag exists for internal
-   * content-audit grepping without diffing prose by eye. */
   isTaglinePlaceholder: boolean;
+
+  // new for Phase 13 (Founder page)
+  /** Small label above the H1, e.g. "Meet the Founder". */
+  eyebrow: string;
+  /** Opening hero statement -- sets philosophical tone before the bio. */
+  openingStatement: string;
+  /** Ordered prose + pull-quote sections making up the main scroll body. */
+  narrative: FounderNarrativeBlock[];
+  /** "Looking Ahead" -- HAFYN ecosystem long-term vision callback. */
+  ecosystemVision: {
+    heading: string;
+    paragraphs: string[];
+  };
+  /** Final signature statement, paired visually with signature.png. */
+  closingQuote: {
+    quote: string;
+    context?: string;
+  };
 }

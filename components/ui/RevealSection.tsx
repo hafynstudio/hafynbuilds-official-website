@@ -37,10 +37,10 @@ const fullVariants: Variants = {
   },
 };
 
-// Reduced-motion variants — fade only, no positional shift.
+// Reduced-motion variants — instant opacity flip, zero animation cost.
 const reducedVariants: Variants = {
   hidden: { opacity: 0 },
-  visible: { opacity: 1, transition: { duration: REVEAL_DURATION_S } },
+  visible: { opacity: 1, transition: { duration: 0 } },
 };
 
 interface RevealSectionProps {
@@ -84,7 +84,7 @@ export function RevealSection({
       <MotionTag
         ref={ref}
         className={className}
-        initial="hidden"
+        initial={false}
         animate={isInView ? "visible" : "hidden"}
         variants={variants}
       >
@@ -97,12 +97,14 @@ export function RevealSection({
     <MotionTag
       ref={ref}
       className={className}
-      initial="hidden"
+      initial={false}
       animate={isInView ? "visible" : "hidden"}
       variants={{
         hidden: {},
         visible: {
-          transition: { staggerChildren: stagger, delayChildren: delay },
+          transition: prefersReducedMotion
+            ? { staggerChildren: 0, delayChildren: 0 }
+            : { staggerChildren: stagger, delayChildren: delay },
         },
       }}
     >

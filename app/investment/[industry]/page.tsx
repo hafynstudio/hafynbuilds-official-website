@@ -2,6 +2,10 @@
 import type { Metadata } from "next";
 import { industries } from "@/data/industries";
 import { buildMetadata } from "@/lib/seo/metadata";
+import { breadcrumbSchema } from "@/lib/seo/schema";
+
+// TODO(Phase 20): confirm and swap in the final production domain.
+const SITE_URL = "https://hafynbuilds.com";
 
 interface IndustryPageProps {
   params: Promise<{ industry: string }>;
@@ -14,8 +18,6 @@ interface IndustryPageProps {
 // rendering-then-throwing) and avoids rendering a Server Component that
 // throws notFound(), which React 19's dev-only performance profiler
 // mis-times (a framework-internal dev bug, not an application defect).
-// Once Phase 11 populates `industries`, real slugs render normally and
-// unknown slugs still 404 cleanly here.
 export const dynamicParams = false;
 
 export function generateStaticParams() {
@@ -29,7 +31,12 @@ export async function generateMetadata({
   const industry = industries.find((i) => i.id === slug);
 
   return buildMetadata({
-    title: industry?.name ?? "Industry Not Found",
+    title: industry
+      ? `${industry.name} — Packages & Pricing`
+      : "Industry Not Found",
+    description: industry
+      ? `Premium ${industry.name.toLowerCase()} software packages from HAFYN BUILDS. Locally-calibrated pricing across 28 countries — hand-coded, never a template.`
+      : undefined,
     path: `/investment/${slug}`,
   });
 }
@@ -41,13 +48,27 @@ export default async function IndustryPage({ params }: IndustryPageProps) {
   // Defensive guard: with dynamicParams = false this branch is normally
   // unreachable (unknown slugs 404 at the router), but it keeps the page
   // correct if dynamicParams is ever re-enabled.
-  if (!industry) {
-    notFound();
-  }
+  if (!industry) notFound();
+
+  // Phase 17 fix (I1): BreadcrumbList schema added.
+  // Structure: Home > Investment > [Industry Name].
+  // Signals page hierarchy to Google and triggers breadcrumb display
+  // in search results for industry-specific package pages.
+  const breadcrumbJsonLd = breadcrumbSchema([
+    { name: "Home",       url: SITE_URL },
+    { name: "Investment", url: `${SITE_URL}/investment` },
+    { name: industry.name, url: `${SITE_URL}/investment/${industry.id}` },
+  ]);
 
   return (
-    <main>
-      <h1>{industry.name} — built in Phase 12</h1>
-    </main>
+    <>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbJsonLd) }}
+      />
+      <main>
+        <h1>{industry.name} — built in Phase 12</h1>
+      </main>
+    </>
   );
 }

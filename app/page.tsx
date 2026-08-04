@@ -1,13 +1,83 @@
-﻿import type { Metadata } from "next";
+import type { Metadata } from "next";
 import { buildMetadata } from "@/lib/seo/metadata";
 import { Hero } from "@/components/home/Hero";
 import { TrustBar } from "@/components/home/TrustBar";
-import { CapabilitiesTeaser } from "@/components/home/CapabilitiesTeaser";
-import { MethodTeaser } from "@/components/home/MethodTeaser";
-import { FeaturedWork } from "@/components/home/FeaturedWork";
-import { FounderTeaser } from "@/components/home/FounderTeaser";
-import { ValuesSection } from "@/components/home/ValuesSection";
-import { FinalCTA } from "@/components/home/FinalCTA";
+import dynamic from "next/dynamic";
+
+// BUG-007: Below-fold sections are dynamically imported. They share Framer
+// Motion entrance animations that cause CLS when hydrated via next/dynamic
+// with ssr:true — fixed by:
+//   1. Setting initial={false} on RevealSection (BUG-007 CORRECTIVE PASS 2),
+//      which prevents Framer Motion from flashing SSR-applied "hidden"
+//      variant styles during hydration — element stays at its SSR state.
+//   2. Loading placeholders with height reservation on every dynamic import
+//      so page layout never collapses while chunks load.
+const CapabilitiesTeaser = dynamic(
+  () =>
+    import("@/components/home/CapabilitiesTeaser").then(
+      (m) => ({ default: m.CapabilitiesTeaser })
+    ),
+  {
+    loading: () => (
+      <div aria-hidden="true" style={{ minHeight: "1100px", width: "100%" }} />
+    ),
+  }
+);
+const MethodTeaser = dynamic(
+  () =>
+    import("@/components/home/MethodTeaser").then(
+      (m) => ({ default: m.MethodTeaser })
+    ),
+  {
+    loading: () => (
+      <div aria-hidden="true" style={{ minHeight: "800px", width: "100%" }} />
+    ),
+  }
+);
+const FeaturedWork = dynamic(
+  () =>
+    import("@/components/home/FeaturedWork").then(
+      (m) => ({ default: m.FeaturedWork })
+    ),
+  {
+    loading: () => (
+      <div aria-hidden="true" style={{ minHeight: "1500px", width: "100%" }} />
+    ),
+  }
+);
+const FounderTeaser = dynamic(
+  () =>
+    import("@/components/home/FounderTeaser").then(
+      (m) => ({ default: m.FounderTeaser })
+    ),
+  {
+    loading: () => (
+      <div aria-hidden="true" style={{ minHeight: "700px", width: "100%" }} />
+    ),
+  }
+);
+const ValuesSection = dynamic(
+  () =>
+    import("@/components/home/ValuesSection").then(
+      (m) => ({ default: m.ValuesSection })
+    ),
+  {
+    loading: () => (
+      <div aria-hidden="true" style={{ minHeight: "1200px", width: "100%" }} />
+    ),
+  }
+);
+const FinalCTA = dynamic(
+  () =>
+    import("@/components/home/FinalCTA").then(
+      (m) => ({ default: m.FinalCTA })
+    ),
+  {
+    loading: () => (
+      <div aria-hidden="true" style={{ minHeight: "700px", width: "100%" }} />
+    ),
+  }
+);
 
 // Title passed WITHOUT the brand name so buildMetadata applies its normal
 // suffix, producing:

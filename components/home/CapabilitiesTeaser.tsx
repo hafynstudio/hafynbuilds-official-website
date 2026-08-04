@@ -186,10 +186,10 @@ function SaaSInterface({ active }: { active: boolean; reducedMotion: boolean }) 
     <div className="relative w-full overflow-hidden rounded-lg border border-white/[0.07] bg-[#070910]"
       style={{ height: 148 }}>
       <div className="flex h-6 items-center justify-between border-b border-white/[0.06] bg-white/[0.02] px-2.5">
-        <span className="font-mono text-[8px] text-white/25">platform.hafyn.io</span>
+        <span className="font-mono text-[8px] text-text-secondary">platform.hafyn.io</span>
         <motion.span
           className="flex items-center gap-1 font-mono text-[8px]"
-          animate={{ color: active ? rgba(TOKEN.success, 1) : rgba(TOKEN.success, 0.5) }}
+          animate={{ color: active ? rgba(TOKEN.success, 1) : rgba(TOKEN.success, 0.8) }}
           transition={{ duration: 0.4 }}
         >
           <span className="h-1 w-1 rounded-full bg-current" aria-hidden="true" />
@@ -222,7 +222,7 @@ function SaaSInterface({ active }: { active: boolean; reducedMotion: boolean }) 
                     : rgba(TOKEN.white, 0.15),
                 }}
               />
-              <span className="font-mono text-[7px] text-white/30">{pod.label}</span>
+              <span className="font-mono text-[7px] text-text-secondary">{pod.label}</span>
             </div>
             <div className="space-y-0.5">
               <div className="h-1 w-full rounded-full bg-white/[0.07]" />
@@ -256,7 +256,7 @@ function SaaSInterface({ active }: { active: boolean; reducedMotion: boolean }) 
         aria-hidden="true"
       >
         <div className="mb-1 flex items-center justify-between">
-          <span className="font-mono text-[7px] text-white/25">shared platform core</span>
+          <span className="font-mono text-[7px] text-text-secondary">shared platform core</span>
           <div className="flex gap-1">
             <div className="h-1 w-4 rounded-full bg-accent/20" />
             <div className="h-1 w-3 rounded-full bg-white/[0.07]" />
@@ -265,7 +265,7 @@ function SaaSInterface({ active }: { active: boolean; reducedMotion: boolean }) 
         <div className="flex gap-1">
           {["Auth", "DB", "API", "CDN"].map((label) => (
             <div key={label}
-              className="flex-1 rounded-sm border border-white/[0.06] bg-white/[0.02] py-0.5 text-center font-mono text-[6px] text-white/20">
+              className="flex-1 rounded-sm border border-white/[0.06] bg-white/[0.02] py-0.5 text-center font-mono text-[6px] text-text-secondary">
               {label}
             </div>
           ))}
@@ -287,10 +287,10 @@ function AutomationInterface({ active, reducedMotion }: { active: boolean; reduc
     <div className="relative w-full overflow-hidden rounded-lg border border-white/[0.07] bg-[#070910]"
       style={{ height: 148 }}>
       <div className="flex h-6 items-center justify-between border-b border-white/[0.06] bg-white/[0.02] px-2.5">
-        <span className="font-mono text-[8px] text-white/25">automation.pipeline</span>
+        <span className="font-mono text-[8px] text-text-secondary">automation.pipeline</span>
         <motion.div
           className="flex items-center gap-1 font-mono text-[8px]"
-          animate={{ color: active ? rgba(TOKEN.accentGlow, 1) : rgba(TOKEN.accentGlow, 0.4) }}
+          animate={{ color: active ? rgba(TOKEN.accentGlow, 1) : rgba(TOKEN.accentGlow, 0.8) }}
           transition={{ duration: 0.4 }}
         >
           <motion.span
@@ -325,8 +325,8 @@ function AutomationInterface({ active, reducedMotion }: { active: boolean; reduc
                   transition={{ duration: 0.3, delay: i * 0.06 }}
                 />
               </motion.div>
-              <span className="font-mono text-[7px] text-white/30">{node.label}</span>
-              <span className="font-mono text-[6px] text-white/15">{node.sublabel}</span>
+              <span className="font-mono text-[7px] text-text-secondary">{node.label}</span>
+              <span className="font-mono text-[6px] text-text-secondary">{node.sublabel}</span>
             </div>
             {i < nodes.length - 1 && (
               <div className="relative flex-1 px-0.5">
@@ -379,7 +379,7 @@ function AutomationInterface({ active, reducedMotion }: { active: boolean; reduc
             >
               {line.prefix}
             </span>
-            <span className="text-white/30">{line.text}</span>
+            <span className="text-text-secondary">{line.text}</span>
           </motion.div>
         ))}
       </div>
@@ -392,14 +392,14 @@ function EnterpriseInterface({ active }: { active: boolean; reducedMotion: boole
     <div className="relative w-full overflow-hidden rounded-lg border border-white/[0.07] bg-[#070910]"
       style={{ height: 148 }}>
       <div className="flex h-6 items-center justify-between border-b border-white/[0.06] bg-white/[0.02] px-2.5">
-        <span className="font-mono text-[8px] text-white/25">enterprise.architecture</span>
+        <span className="font-mono text-[8px] text-text-secondary">enterprise.architecture</span>
         <div className="flex items-center gap-1.5">
           {["ISO", "SOC2", "GDPR"].map((badge) => (
             <motion.span
               key={badge}
               className="rounded-sm px-1 font-mono text-[6px]"
               animate={{
-                color: active ? rgba(TOKEN.accent, 1) : rgba(TOKEN.white, 0.2),
+                color: active ? rgba(TOKEN.accent, 1) : rgba(TOKEN.white, 0.7),
                 borderColor: active ? rgba(TOKEN.accent, 0.3) : rgba(TOKEN.white, 0.06),
                 backgroundColor: active ? rgba(TOKEN.accent, 0.07) : rgba(TOKEN.accent, 0),
               }}
@@ -542,7 +542,6 @@ function FeaturedCard({
 
   return (
     <motion.div
-      initial={{ opacity: 0, y: reducedMotion ? 0 : 20 }}
       animate={inView ? { opacity: 1, y: 0 } : {}}
       transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
       className="h-full"
@@ -611,7 +610,6 @@ function FeaturedCard({
                 {AI_CODE_LINES.map((line, i) => (
                   <motion.div
                     key={i}
-                    initial={{ opacity: 0, x: reducedMotion ? 0 : -6 }}
                     animate={inView ? { opacity: 1, x: 0 } : {}}
                     transition={{ duration: 0.3, delay: 0.35 + i * 0.055, ease: [0.25, 1, 0.5, 1] }}
                     className={cn(
@@ -674,7 +672,6 @@ function SecondaryCard({
       ref={cardRef}
       className="group relative flex flex-col overflow-hidden rounded-2xl border border-white/[0.07] bg-bg-secondary"
       style={{ boxShadow: "0 1px 2px rgba(0,0,0,0.4), 0 0 0 1px rgba(255,255,255,0.03) inset" }}
-      initial={{ opacity: 0, y: reducedMotion ? 0 : 18 }}
       animate={inView ? { opacity: 1, y: 0 } : {}}
       transition={{ duration: 0.55, delay: index * 0.09, ease: [0.16, 1, 0.3, 1] }}
       whileHover={reducedMotion ? {} : { y: -2 }}
@@ -698,7 +695,6 @@ function SecondaryCard({
         style={{
           background: `linear-gradient(to bottom, ${rgba(TOKEN.accent, 0.55)}, transparent)`,
         }}
-        initial={{ scaleY: 0, originY: 0 }}
         animate={active && !reducedMotion ? { scaleY: 1 } : { scaleY: 0 }}
         transition={{ duration: 0.45, ease: [0.16, 1, 0.3, 1] }}
       />
@@ -707,7 +703,6 @@ function SecondaryCard({
         aria-hidden="true"
         className="pointer-events-none absolute inset-0 z-0 rounded-2xl"
         style={{ boxShadow: `inset 0 0 0 1px ${rgba(TOKEN.accent, 0.16)}` }}
-        initial={{ opacity: 0 }}
         animate={{ opacity: active ? 1 : 0 }}
         transition={{ duration: 0.35 }}
       />
@@ -725,7 +720,6 @@ function SecondaryCard({
         </p>
         <motion.div
           className="mt-3 flex items-center gap-1.5 font-mono text-xs text-accent"
-          initial={{ opacity: 0, y: 3 }}
           animate={active ? { opacity: 1, y: 0 } : { opacity: 0, y: 3 }}
           transition={{ duration: 0.2 }}
           aria-hidden="true"
@@ -777,7 +771,6 @@ export function CapabilitiesTeaser() {
         <div ref={headerRef} className="mb-12 sm:mb-16">
           <motion.p
             className="mb-3 font-mono text-xs tracking-widest text-accent sm:text-sm"
-            initial={{ opacity: 0, y: reducedMotion ? 0 : 10 }}
             animate={headerInView ? { opacity: 1, y: 0 } : {}}
             transition={{ duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
           >
@@ -785,7 +778,6 @@ export function CapabilitiesTeaser() {
           </motion.p>
           <motion.h2
             className="max-w-2xl text-3xl font-bold leading-tight text-text-primary sm:text-4xl lg:text-5xl"
-            initial={{ opacity: 0, y: reducedMotion ? 0 : 14 }}
             animate={headerInView ? { opacity: 1, y: 0 } : {}}
             transition={{ duration: 0.6, delay: 0.08, ease: [0.16, 1, 0.3, 1] }}
           >
@@ -796,7 +788,6 @@ export function CapabilitiesTeaser() {
           </motion.h2>
           <motion.p
             className="mt-4 max-w-lg text-sm text-text-secondary sm:text-base"
-            initial={{ opacity: 0, y: reducedMotion ? 0 : 10 }}
             animate={headerInView ? { opacity: 1, y: 0 } : {}}
             transition={{ duration: 0.5, delay: 0.16, ease: [0.16, 1, 0.3, 1] }}
           >
@@ -826,7 +817,6 @@ export function CapabilitiesTeaser() {
 
         <motion.div
           className="mt-10 flex justify-center sm:mt-12 lg:justify-start"
-          initial={{ opacity: 0 }}
           animate={gridInView ? { opacity: 1 } : {}}
           transition={{ duration: 0.5, delay: 0.55 }}
         >

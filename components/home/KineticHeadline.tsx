@@ -87,10 +87,12 @@ export function KineticHeadline({
         animate="visible"
         variants={{
           visible: {
-            transition: {
-              delayChildren: startDelay,
-              staggerChildren: HERO_WORD_STAGGER_S,
-            },
+            transition: prefersReducedMotion
+              ? { delayChildren: 0, staggerChildren: 0 }
+              : {
+                  delayChildren: startDelay,
+                  staggerChildren: HERO_WORD_STAGGER_S,
+                },
           },
         }}
       >
@@ -118,7 +120,9 @@ export function KineticHeadline({
                   },
                   visible: { opacity: 1, y: 0, rotate: 0 },
                 }}
-                transition={HERO_WORD_TRANSITION}
+                transition={
+                  prefersReducedMotion ? { duration: 0 } : HERO_WORD_TRANSITION
+                }
               >
                 {word.text}
               </motion.span>

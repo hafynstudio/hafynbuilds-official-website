@@ -44,7 +44,8 @@ const VARIANT_STYLES: Record<ButtonVariant, string> = {
     "bg-accent text-text-primary hover:bg-accent-hover hover:shadow-glow-accent",
   secondary:
     "bg-surface border border-border text-text-primary hover:border-border-hover hover:bg-surface-raised",
-  ghost: "bg-transparent text-text-secondary hover:text-text-primary hover:bg-surface/50",
+  ghost:
+    "bg-transparent text-text-secondary hover:text-text-primary hover:bg-surface/50",
 };
 
 const SIZE_STYLES: Record<ButtonSize, string> = {
@@ -55,22 +56,28 @@ const SIZE_STYLES: Record<ButtonSize, string> = {
 
 /** Three-dot loading indicator — deliberately not a generic spinner ring,
  * to stay consistent with the brand's rejection of default/templated UI
- * chrome even in micro-states. Respects reduced-motion via the global
- * animation-duration override in globals.css. */
-function LoadingDots() {
+ * chrome even in micro-states. Reduced-motion is handled explicitly via
+ * the `reducedMotion` prop threaded from Button — Framer Motion's
+ * imperative `animate` prop is not reachable by the CSS animation-duration
+ * override in globals.css, so JS-level gating is required here. */
+function LoadingDots({ reducedMotion }: { reducedMotion: boolean }) {
   return (
     <span className="flex items-center gap-1" aria-hidden="true">
       {[0, 1, 2].map((i) => (
         <motion.span
           key={i}
           className="h-1.5 w-1.5 rounded-full bg-current"
-          animate={{ opacity: [0.3, 1, 0.3] }}
-          transition={{
-            duration: 1,
-            repeat: Infinity,
-            delay: i * 0.15,
-            ease: "easeInOut",
-          }}
+          animate={reducedMotion ? { opacity: 0.7 } : { opacity: [0.3, 1, 0.3] }}
+          transition={
+            reducedMotion
+              ? { duration: 0 }
+              : {
+                  duration: 1,
+                  repeat: Infinity,
+                  delay: i * 0.15,
+                  ease: "easeInOut",
+                }
+          }
         />
       ))}
     </span>
@@ -99,9 +106,23 @@ export function Button({
   const springX = useSpring(x, SPRING_SNAPPY);
   const springY = useSpring(y, SPRING_SNAPPY);
 
-  function handleMouseMove(e: React.MouseEvent) {
+  // Cached on hover-start instead of re-read on every mousemove — see
+  // BUG-009: reading getBoundingClientRect() on every mousemove event
+  // forces a synchronous layout flush against Framer Motion's pending
+  // transform writes from the previous frame's x.set()/y.set() calls.
+  // One measurement per hover session removes the interleaved
+  // read/write thrash entirely. This component is the sitewide primary
+  // CTA, so this fix has the widest reach of the BUG-009 corrections.
+  const rectRef = useRef<DOMRect | null>(null);
+
+  function handleMouseEnter() {
     if (!magneticActive || !elementRef.current) return;
-    const rect = elementRef.current.getBoundingClientRect();
+    rectRef.current = elementRef.current.getBoundingClientRect();
+  }
+
+  function handleMouseMove(e: React.MouseEvent) {
+    if (!magneticActive || !rectRef.current) return;
+    const rect = rectRef.current;
     const relX = e.clientX - (rect.left + rect.width / 2);
     const relY = e.clientY - (rect.top + rect.height / 2);
     x.set((relX / (rect.width / 2)) * MAGNETIC_MAX_PULL_PX);
@@ -111,6 +132,7 @@ export function Button({
   function handleMouseLeave() {
     x.set(0);
     y.set(0);
+    rectRef.current = null;
   }
 
   const isInteractive = variant !== "ghost";
@@ -123,12 +145,12 @@ export function Button({
     VARIANT_STYLES[variant],
     SIZE_STYLES[size],
     fullWidth && "w-full",
-    className
+    className,
   );
 
   const content = (
     <>
-      {isLoading ? <LoadingDots /> : children}
+      {isLoading ? <LoadingDots reducedMotion={prefersReducedMotion} /> : children}
       {/* Border light-sweep — pure CSS, no JS cost. Only meaningful on
           non-ghost variants, which have a visible fill/border to sweep
           across. */}
@@ -144,7 +166,7 @@ export function Button({
   );
 
   const sharedMouseHandlers = magneticActive
-    ? { onMouseMove: handleMouseMove, onMouseLeave: handleMouseLeave }
+    ? { onMouseEnter: handleMouseEnter, onMouseMove: handleMouseMove, onMouseLeave: handleMouseLeave }
     : {};
 
   const interactiveElement = href ? (

@@ -101,7 +101,7 @@ export function Modal({
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            transition={{ duration: 0.2 }}
+            transition={{ duration: prefersReducedMotion ? 0.01 : 0.2 }}
             onClick={onClose}
             aria-hidden="true"
           />

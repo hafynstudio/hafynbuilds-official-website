@@ -38,18 +38,25 @@ export function Skeleton({
       role="status"
       aria-label="Loading"
       className={cn(
-        "animate-shimmer bg-surface bg-[length:200%_100%]",
+        "relative overflow-hidden bg-surface",
         VARIANT_STYLES[variant],
         className
       )}
       style={{
         width,
         height,
-        backgroundImage:
-          "linear-gradient(90deg, transparent, rgb(var(--color-accent-primary) / 0.10), transparent)",
         ...style,
       }}
       {...props}
-    />
+    >
+      {/* Composited shimmer pattern (BUG-024):
+          Parent = static accent-tinted base, overflow-hidden clips child travel.
+          Child = translateX-animated overlay — GPU-composited, zero paint cost.
+          Preserves Skeleton's accent-tint identity. */}
+      <div
+        aria-hidden="true"
+        className="animate-shimmer absolute inset-0 bg-gradient-to-r from-transparent via-accent/10 to-transparent"
+      />
+    </div>
   );
 }

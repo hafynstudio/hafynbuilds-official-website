@@ -1,20 +1,51 @@
 ﻿import type { Metadata } from "next";
-import { Inter, JetBrains_Mono } from "next/font/google";
+import localFont from "next/font/local";
+import dynamic from "next/dynamic";
 import { organizationSchema } from "@/lib/seo/schema";
-import { LoadingScreen } from "@/components/layout/LoadingScreen";
-import { Header } from "@/components/layout/Header";
 import { Footer } from "@/components/layout/Footer";
 import { CursorSpotlight } from "@/components/ui/CursorSpotlight";
+import { CurrencyProvider } from "@/lib/currency/context";
 import "./globals.css";
 
-const inter = Inter({
-  subsets: ["latin"],
+const LoadingScreen = dynamic(
+  () =>
+    import("@/components/layout/LoadingScreen").then(
+      (m) => ({ default: m.LoadingScreen })
+    ),
+);
+
+const Header = dynamic(
+  () =>
+    import("@/components/layout/Header").then(
+      (m) => ({ default: m.Header })
+    ),
+);
+
+// Self-hosted Inter — eliminates the render-blocking fonts.googleapis.com stylesheet
+// request that was adding 170–320ms to mobile LCP. Files copied from @fontsource/inter
+// (latin subset only — site is English-only). CSS variable name unchanged so no
+// downstream component or Tailwind config changes are required.
+const inter = localFont({
+  src: [
+    { path: "../public/fonts/inter-latin-400-normal.woff2", weight: "400", style: "normal" },
+    { path: "../public/fonts/inter-latin-500-normal.woff2", weight: "500", style: "normal" },
+    { path: "../public/fonts/inter-latin-600-normal.woff2", weight: "600", style: "normal" },
+    { path: "../public/fonts/inter-latin-700-normal.woff2", weight: "700", style: "normal" },
+  ],
   variable: "--font-inter",
   display: "swap",
 });
 
-const jetbrainsMono = JetBrains_Mono({
-  subsets: ["latin"],
+// Self-hosted JetBrains Mono — same motivation as Inter above. Four static weight files
+// replace the Google CDN fetch. Weights 400/500/600/700 match the prior explicit weight
+// restriction. CSS variable name unchanged.
+const jetbrainsMono = localFont({
+  src: [
+    { path: "../public/fonts/jetbrains-mono-latin-400-normal.woff2", weight: "400", style: "normal" },
+    { path: "../public/fonts/jetbrains-mono-latin-500-normal.woff2", weight: "500", style: "normal" },
+    { path: "../public/fonts/jetbrains-mono-latin-600-normal.woff2", weight: "600", style: "normal" },
+    { path: "../public/fonts/jetbrains-mono-latin-700-normal.woff2", weight: "700", style: "normal" },
+  ],
   variable: "--font-jetbrains-mono",
   display: "swap",
 });
@@ -34,8 +65,25 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" className={`${inter.variable} ${jetbrainsMono.variable}`}>
-      <body className="flex min-h-screen flex-col">
+    <html
+      lang="en"
+      className={`${inter.variable} ${jetbrainsMono.variable}`}
+      // FIX (audit item 7): Next.js 15+ warns when `scroll-behavior: smooth`
+      // is set via CSS but the html element lacks this data attribute --
+      // without it, Next's router can interrupt an in-flight smooth scroll
+      // on route change, causing a jarring scroll-position jump. This
+      // attribute tells Next's router to respect the CSS-driven smooth
+      // scroll instead of overriding it.
+      data-scroll-behavior="smooth"
+    >
+      {/* FIX (audit item 1, safety net layer): overflow-x-hidden here is a
+          defense-in-depth backstop, not the primary fix -- the actual root
+          cause (WhatsAppCTA's scaled pulse-ring transform contributing to
+          document scrollWidth) is fixed at the component level. This class
+          simply guarantees that even if a future component introduces a
+          similar transform-overflow issue, the page never becomes
+          horizontally scrollable as a result. */}
+      <body className="flex min-h-screen flex-col overflow-x-hidden">
         <a href="#main-content" className="skip-link">
           Skip to main content
         </a>
@@ -47,30 +95,18 @@ export default function RootLayout({
           }}
         />
 
-        {/* Global, page-wide ambient cursor glow — mounted once here so
-            it renders behind normal content but above section
-            backgrounds via mix-blend-mode:screen (see CursorSpotlight.tsx
-            for the full stacking-fix explanation). */}
         <CursorSpotlight />
 
-        <LoadingScreen />
-        <Header />
+        <CurrencyProvider>
+          <LoadingScreen />
+          <Header />
 
-        {/* HERO-REGRESSION FIX: `pt-header` restores the top offset that
-            the page content needs to clear the fixed-position Header —
-            confirmed necessary by Hero's own
-            `min-h-[calc(100dvh-var(--header-height))]` formula, which
-            only makes sense if this wrapper reserves `--header-height`
-            of top padding for a fixed (out-of-flow) header. This class
-            was present in some form in the file's previous state before
-            a corrupted copy/paste (a stray, unmatched closing </div> in
-            what was pasted) lost it; this restores the correct computed
-            spacing regardless of the exact original className used. */}
-        <main id="main-content" className="flex-1 pt-header">
-          {children}
-        </main>
+          <main id="main-content" className="flex-1 overflow-x-hidden pt-header">
+            {children}
+          </main>
 
-        <Footer />
+          <Footer />
+        </CurrencyProvider>
       </body>
     </html>
   );

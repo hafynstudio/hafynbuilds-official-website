@@ -9,15 +9,13 @@ import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/Button";
 import { Logo } from "@/components/ui/Logo";
 import { MobileNav } from "@/components/layout/MobileNav";
+import { CurrencySwitcher } from "@/components/investment/CurrencySwitcher";
 
 // Primary nav per the locked sitemap (PRD §2.1). Home is reachable via
 // the logo and Contact is the dedicated CTA button, so both are
 // intentionally excluded from this list rather than duplicated as plain
-// nav items — consistent with how Vercel/Linear/Stripe structure their
-// own primary nav. Team and Founder are reachable via About/Footer per
-// PRD §2.1, not top nav. This is fixed site architecture (the sitemap is
-// explicitly locked), not admin-editable content, so it lives as a local
-// constant here rather than in /data.
+// nav items. Team and Founder are reachable via About/Footer per
+// PRD §2.1, not top nav.
 const NAV_LINKS = [
   { href: "/about", label: "About" },
   { href: "/capabilities", label: "Capabilities" },
@@ -32,10 +30,6 @@ export function Header() {
   const [isScrolled, setIsScrolled] = useState(false);
   const { scrollY } = useScroll();
 
-  // Motion-value listener avoids a React re-render on every scroll pixel
-  // — state only updates on the single frame the threshold is crossed,
-  // keeping this a discrete, cheap state change rather than a continuous
-  // one (Master Build Prompt: no unbounded re-renders during scroll).
   useMotionValueEvent(scrollY, "change", (latest) => {
     setIsScrolled(latest > 8);
   });
@@ -47,6 +41,15 @@ export function Header() {
   function isActive(href: string) {
     return pathname === href || pathname.startsWith(`${href}/`);
   }
+
+  // CurrencySwitcher only appears on the Investment page and its
+  // sub-routes (e.g. /investment/restaurant in Phase 11). Pricing
+  // context is meaningless anywhere else on the site.
+  //
+  // Rendered at BOTH breakpoints on this route — mobile users need
+  // one-tap access to change currency (hiding it inside the hamburger
+  // would be 2 taps for a critical page-context control).
+  const showCurrencySwitcher = pathname.startsWith("/investment");
 
   return (
     <>
@@ -80,21 +83,27 @@ export function Header() {
             </ul>
           </nav>
 
-          <div className="hidden md:block">
+          {/* Desktop: CurrencySwitcher + Start a Build */}
+          <div className="hidden items-center gap-3 md:flex">
+            {showCurrencySwitcher && <CurrencySwitcher />}
             <Button href="/contact" size="sm">
               Start a Build
             </Button>
           </div>
 
-          <button
-            type="button"
-            onClick={() => setIsMobileNavOpen(true)}
-            aria-label="Open menu"
-            aria-expanded={isMobileNavOpen}
-            className="rounded-md p-2 text-text-primary md:hidden"
-          >
-            <Menu size={24} aria-hidden="true" />
-          </button>
+          {/* Mobile: CurrencySwitcher (if on /investment) + hamburger */}
+          <div className="flex items-center gap-2 md:hidden">
+            {showCurrencySwitcher && <CurrencySwitcher />}
+            <button
+              type="button"
+              onClick={() => setIsMobileNavOpen(true)}
+              aria-label="Open menu"
+              aria-expanded={isMobileNavOpen}
+              className="rounded-md p-2 text-text-primary"
+            >
+              <Menu size={24} aria-hidden="true" />
+            </button>
+          </div>
         </div>
       </header>
 
