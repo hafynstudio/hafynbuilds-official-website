@@ -6,10 +6,13 @@ import Link from "next/link";
 import { usePrefersReducedMotion } from "@/lib/hooks";
 import { EASE_OUT_EXPO, EASE_OUT_QUART } from "@/lib/motion";
 
+// FIX (Phase 2, CONTENT-001 / TRUST-005): "100+ industries" contradicted
+// the shipped catalog (20 with packages); "99.9% uptime SLA" was an
+// unsupported operational guarantee. Replaced with truthful values.
 const STATS = [
   { value: "5",     label: "Core disciplines" },
-  { value: "100+",  label: "Industries served" },
-  { value: "99.9%", label: "Uptime SLA" },
+  { value: "20+",   label: "Industries served" },
+  { value: "24/7",  label: "Monitoring" },
 ];
 
 export function CapabilitiesFinalCTA() {
@@ -83,7 +86,7 @@ export function CapabilitiesFinalCTA() {
           initial={reduced ? { opacity: 1 } : { opacity: 0, y: 10 }}
           animate={inView ? { opacity: 1, y: 0 } : {}}
           transition={{ duration: 0.5, delay: 0.42, ease: EASE_OUT_QUART }}>
-          Industry-specific packages across 100+ verticals. Fixed pricing.
+          Industry-specific packages across 20+ industries. Fixed pricing.
           Zero ambiguity. Built for businesses that move fast.
         </motion.p>
 

@@ -93,7 +93,9 @@ export function AuthorBox({ className }: AuthorBoxProps) {
           {founder.photoUrl ? (
             <Image
               src={founder.photoUrl}
-              alt={`${founder.name} â€” ${founder.title}`}
+              // FIX (Phase 2, A11Y-003): the em dash was stored as corrupted
+              // mojibake ("â€”"), so screen readers announced garbled text.
+              alt={`${founder.name} — ${founder.title}`}
               fill
               sizes="80px"
               className="object-cover object-top"

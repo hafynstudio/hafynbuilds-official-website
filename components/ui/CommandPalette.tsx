@@ -37,6 +37,9 @@ interface CommandPaletteProps {
    * applies `aria-controls` to the input, improving screen-reader UX
    * by explicitly connecting the search input to its results region. */
   resultsId?: string;
+  /** Disables the input (removes it from the tab order, announced as
+   * disabled). Used when there is nothing to search (empty collection). */
+  disabled?: boolean;
 }
 
 export function CommandPalette({
@@ -47,6 +50,7 @@ export function CommandPalette({
   className,
   ariaLabel,
   resultsId,
+  disabled = false,
 }: CommandPaletteProps) {
   const prefersReducedMotion = usePrefersReducedMotion();
   const inputRef = useRef<HTMLInputElement>(null);
@@ -86,6 +90,7 @@ export function CommandPalette({
         placeholder={placeholder}
         value={value}
         onChange={(e) => onChange(e.target.value)}
+        disabled={disabled}
         className={cn(
           // Layout
           "w-full rounded-md py-3 pl-10 pr-12 font-sans text-sm",

@@ -17,7 +17,10 @@ interface TrustStatement {
 // does NOT repeat HeroVisual's stat row; numeric SLA-style claims are
 // excluded until a real, verifiable commitment backs them.
 const TRUST_STATEMENTS: TrustStatement[] = [
-  { text: "100+ industries served", marker: "live" },
+  // FIX (Phase 2, CONTENT-001): "100+ industries served" contradicted the
+  // shipped catalog (20 industries with packages). "20+" is the truthful
+  // count the product currently represents.
+  { text: "20+ industries served", marker: "live" },
   { text: "TypeScript-first engineering" },
   { text: "Security-by-design, not bolted on" },
   { text: "Built for scale from day one" },

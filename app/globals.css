@@ -47,6 +47,19 @@ html {
   ::selection {
     @apply bg-accent/30 text-text-primary;
   }
+
+  /* FIX (Phase 2, A11Y-007): global keyboard-focus fallback. Guarantees a
+     visible focus indicator on every focusable element, even components
+     that don't declare their own focus-visible ring (Header nav links,
+     hamburger, MobileNav links, modal close button, …). Components that
+     ship a custom ring/shadow keep it — their `outline-none` class has
+     higher specificity and suppresses this outline. `:where()` keeps this
+     rule at the lowest possible specificity so it can never mask a
+     component's own focus treatment. */
+  :where(a, button, input, textarea, select, summary, [tabindex]:not([tabindex="-1"])):focus-visible {
+    outline: 2px solid rgb(var(--color-accent-primary));
+    outline-offset: 2px;
+  }
 }
 
 @layer utilities {

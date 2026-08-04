@@ -40,7 +40,10 @@ const CONTENT = {
     href: "/founder",
   },
   founderName: "Zain Marwat",
-  founderTitle: "Founder, CEO & Architect of HAFYN",
+  // FIX (Phase 2, TRUST-002): was "Founder, CEO & Architect of HAFYN" —
+  // contradicted the authoritative title in data/founder.ts and the Person
+  // schema ("Founder, Director & CEO"). Aligned to the authoritative one.
+  founderTitle: "Founder, Director & CEO",
   founderPhoto: "/images/founder.jpg",
   founderInitials: "ZM",
 } as const;

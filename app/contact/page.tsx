@@ -5,6 +5,7 @@ import { WhatsAppCTA } from "@/components/contact/WhatsAppCTA";
 import { SocialGrid } from "@/components/contact/SocialGrid";
 import { ContactHero } from "@/components/contact/ContactHero";
 import { CopyEmailHandler } from "@/components/contact/CopyEmailHandler";
+import { SITE_URL } from "@/lib/site";
 
 // ContactForm is dynamically imported (BUG-005). It carries a 378KB
 // module graph (Zod + react-hook-form + framer-motion) that is not
@@ -26,13 +27,17 @@ const ContactForm = dynamic(
 // and threads through every child component via props (no duplication).
 // ---------------------------------------------------------------------------
 const CONTACT_EMAIL = "hafynbuilds@gmail.com";
-const REPLY_WINDOW  = "30 minutes";
+// FIX (Phase 2, TRUST-007): "within 30 minutes" was a specific response
+// SLA the operation cannot prove. Minimum safe correction: an honest,
+// non-committal reply commitment. The business owner must supply the
+// authoritative SLA if a specific window should ever be advertised again.
+const REPLY_WINDOW = "promptly";
 
 // Optional pre-filled WhatsApp message. Keeps user out of the "what do I
 // even type first?" moment on mobile — signals we already know they came
 // from the site. Kept short so it doesn't feel spammy or presumptuous.
 const WHATSAPP_PREFILL =
-  "Hi HAFYN BUILDS — reaching out via hafynbuilds.com. I'd like to discuss a project.";
+  "Hi HAFYN BUILDS — reaching out via hafynbuilds.vercel.app. I'd like to discuss a project.";
 
 // ---------------------------------------------------------------------------
 // Metadata
@@ -41,7 +46,7 @@ const WHATSAPP_PREFILL =
 export const metadata = buildMetadata({
   title: "Start a Build",
   description:
-    "Ready to build something that matters? Tell us about your project and we will get back to you within 30 minutes. Websites, web apps, software, AI systems, enterprise solutions.",
+    "Ready to build something that matters? Tell us about your project and we will get back to you promptly. Websites, web apps, software, AI systems, enterprise solutions.",
   path: "/contact",
 });
 
@@ -54,8 +59,6 @@ export const metadata = buildMetadata({
 // Rich Results Test to flag a duplicate structured data error.
 // BreadcrumbList schema is kept — it is page-specific and correct here.
 // ---------------------------------------------------------------------------
-
-const SITE_URL = "https://hafynbuilds.com";
 
 const breadcrumb = breadcrumbSchema([
   { name: "Home",    url: SITE_URL },
@@ -209,7 +212,7 @@ function ResponsePromise({ replyWindow }: { replyWindow: string }) {
           <span className="relative inline-flex h-2 w-2 rounded-full bg-success" />
         </span>
         <p className="text-sm font-medium text-text-primary">
-          We reply within {replyWindow}
+          We reply {replyWindow}
         </p>
       </div>
       <p className="mt-1.5 text-sm leading-relaxed text-text-secondary">

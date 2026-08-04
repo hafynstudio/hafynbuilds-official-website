@@ -127,7 +127,7 @@ export function OriginStory() {
                 />
 
                 <p className="text-lg font-medium leading-relaxed text-text-primary sm:text-xl">
-                  "{originStory.founderVoice}"
+                  &ldquo;{originStory.founderVoice}&rdquo;
                 </p>
 
                 <footer className="mt-5 font-mono text-[11px] uppercase tracking-[0.18em] text-text-tertiary">

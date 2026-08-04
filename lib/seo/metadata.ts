@@ -1,10 +1,9 @@
 import type { Metadata } from "next";
 import type { BlogPost } from "@/types/blog-post";
 import type { BlogCategory } from "@/data/blog-posts";
+import { SITE_URL } from "@/lib/site";
 
 const SITE_NAME = "HAFYN BUILDS";
-// TODO(Phase 20): confirm and swap in the final production domain before launch.
-const SITE_URL = "https://hafynbuilds.com";
 const DEFAULT_DESCRIPTION =
   "HAFYN BUILDS is the flagship software engineering & AI company of the HAFYN technology holding group. Engineering the impossible. Building what matters.";
 // TODO: real OG image asset pending -- see Phase 1 handoff doc pending items.

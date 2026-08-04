@@ -77,6 +77,22 @@ export function Footer() {
             <div className="flex flex-wrap gap-4">
               {socialLinks.map((social) => {
                 const Icon = SOCIAL_ICONS[social.platform];
+                // FIX (Phase 2, A11Y-002): placeholder profiles (url === "#")
+                // were rendered as real <a href="#"> links that jumped to the
+                // top of the page. They now render as non-interactive,
+                // non-focusable "coming soon" chips — no dead navigation.
+                if (social.url === "#") {
+                  return (
+                    <span
+                      key={social.platform}
+                      title={`${social.label} — coming soon`}
+                      aria-hidden="true"
+                      className="flex h-10 w-10 cursor-not-allowed items-center justify-center rounded-md border border-border text-text-disabled"
+                    >
+                      <Icon className="h-4 w-4" />
+                    </span>
+                  );
+                }
                 return (
                   <a
                     key={social.platform}

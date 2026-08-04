@@ -6,8 +6,8 @@ import { usePrefersReducedMotion } from "@/lib/hooks";
 import { EASE_OUT_EXPO, EASE_OUT_QUART } from "@/lib/motion";
 
 interface ContactHeroProps {
-  /** Human-readable reply window, e.g. "30 minutes". Threaded from the
-   * page-level constant so this is never hardcoded. */
+  /** Human-readable reply commitment. Threaded from the page-level
+   * constant so this is never hardcoded. */
   replyWindow: string;
 }
 
@@ -132,7 +132,7 @@ export function ContactHero({ replyWindow }: ContactHeroProps) {
           {...fadeUp(0.65)}
         >
           Whether you have a fully-scoped brief or just a rough idea —
-          we want to hear it. We reply within{" "}
+          we want to hear it. We reply{" "}
           <span className="font-medium text-text-primary">{replyWindow}.</span>
         </motion.p>
 
@@ -147,7 +147,7 @@ export function ContactHero({ replyWindow }: ContactHeroProps) {
             <span className="relative inline-flex h-1.5 w-1.5 rounded-full bg-success" />
           </span>
           <span className="text-xs font-medium text-text-secondary">
-            Replies in {replyWindow}
+            Replies {replyWindow}
           </span>
         </motion.div>
       </div>

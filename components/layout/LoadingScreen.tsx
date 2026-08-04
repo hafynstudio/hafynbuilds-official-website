@@ -34,10 +34,17 @@ export function LoadingScreen() {
   const prefersReducedMotion = usePrefersReducedMotion();
 
   useEffect(() => {
-    const alreadyShown = sessionStorage.getItem(SESSION_KEY);
-    if (!alreadyShown) {
+    // FIX (Phase 2, A11Y-004): sessionStorage can throw in privacy-
+    // restricted browsing modes (Safari private / blocked storage). Guarded
+    // so the splash still renders instead of crashing on first visit.
+    try {
+      const alreadyShown = sessionStorage.getItem(SESSION_KEY);
+      if (!alreadyShown) {
+        setIsVisible(true);
+        sessionStorage.setItem(SESSION_KEY, "true");
+      }
+    } catch {
       setIsVisible(true);
-      sessionStorage.setItem(SESSION_KEY, "true");
     }
     setHasChecked(true);
   }, []);

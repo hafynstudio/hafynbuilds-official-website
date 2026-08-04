@@ -22,6 +22,7 @@
   Hotel,
   Palette,
   Factory,
+  Truck,
   type LucideIcon,
 } from "lucide-react";
 
@@ -73,4 +74,8 @@ export const ICON_MAP: Record<string, LucideIcon> = {
   Hotel,
   Palette,
   Factory,
+  // FIX (Phase 2, CONTENT-003): Logistics (data/industries.ts) references
+  // iconOrIllustration "Truck", which was missing from the registry and
+  // rendered a null icon. Added to complete the category set.
+  Truck,
 };

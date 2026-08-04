@@ -16,6 +16,7 @@
 // ---------------------------------------------------------------------------
 
 import { ImageResponse } from "next/og";
+import { SITE_URL } from "@/lib/site";
 
 export const runtime = "edge";
 
@@ -154,7 +155,7 @@ export async function GET() {
             letterSpacing: "0.05em",
           }}
         >
-          hafynbuilds.com
+          {SITE_URL.replace(/^https?:\/\//, "")}
         </p>
       </div>
     ),

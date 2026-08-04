@@ -34,7 +34,7 @@ export const featuredWork: FeaturedWork[] = [
     id: "hafyn-investment-engine",
     name: "Multi-Currency Pricing Engine",
     description:
-      "A fully isolated, admin-driven pricing engine handling 100+ industries, fixed exchange rates across 20+ currencies, per-country price overrides, and IP-based geo-detection — zero third-party API dependency by design.",
+      "A fully isolated, admin-driven pricing engine handling 20+ industries, hand-calibrated per-country pricing across 20+ currencies, per-country price overrides, and IP-based geo-detection — zero third-party API dependency by design.",
     tag: "Internal Build",
     status: "in-progress",
     techStack: ["TypeScript", "Next.js Edge", "Zod", "localStorage"],

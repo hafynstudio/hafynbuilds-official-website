@@ -12,7 +12,7 @@ const PREVIEW_LINES = [
   { text: '});',                             color: 'rgb(161 161 170 / 0.5)' },
   { text: '',                                color: '' },
   { text: "await agent.deploy({ env: 'production' });", color: 'rgb(62 123 250 / 1)' },
-  { text: '// ✓ Agent live — 99.9% uptime SLA',        color: 'rgb(34 197 94 / 0.8)' },
+  { text: '// ✓ Agent live — production monitored',     color: 'rgb(34 197 94 / 0.8)' },
 ];
 
 export function CapabilitiesHero() {
@@ -84,7 +84,7 @@ export function CapabilitiesHero() {
           <span className="font-mono text-[11px] uppercase tracking-[0.2em] text-text-secondary">
             The Build Console
           </span>
-          <span className="font-mono text-[10px] text-text-disabled" aria-hidden="true">// 5 sequences</span>
+          <span className="font-mono text-[10px] text-text-disabled" aria-hidden="true">{"// 5 sequences"}</span>
         </motion.div>
 
         {/* Headline */}
@@ -194,7 +194,7 @@ export function CapabilitiesHero() {
             style={{ borderColor: "rgb(62 123 250 / 0.15)", background: "rgb(62 123 250 / 0.03)" }}
           >
             <span className="text-success font-mono text-[11px]">[✓]</span>
-            <span className="font-mono text-[11px] text-text-secondary">Agent live — 99.9% uptime SLA</span>
+            <span className="font-mono text-[11px] text-text-secondary">Agent live — production monitored</span>
             <span className="ml-auto font-mono text-[10px] text-text-secondary">Scroll to compile ↓</span>
           </div>
         </motion.div>

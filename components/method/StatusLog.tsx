@@ -58,7 +58,7 @@ const STAGE_LOGS: LogLine[][] = [
   // Support
   [
     { id: "s1", text: "> Support contract active.",              type: "system"  },
-    { id: "s2", text: "  Uptime: 99.97% — all systems nominal.", type: "info"    },
+    { id: "s2", text: "  All systems nominal — 24/7 monitoring.", type: "info"    },
     { id: "s3", text: "  Performance budget: within limits.",    type: "info"    },
     { id: "s4", text: "  Next iteration cycle: scheduled.",      type: "info"    },
     { id: "s5", text: "✓ System nominal.",                       type: "success" },
@@ -74,11 +74,17 @@ const TYPE_COLOR: Record<LogLine["type"], string> = {
 
 export function StatusLog({ activeStageIndex, reducedMotion, compact = false }: StatusLogProps) {
   const [visibleLines, setVisibleLines] = useState<LogLine[]>([]);
-  const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  // FIX (Phase 2, CODE-001): previously a single timerRef was overwritten
+  // each iteration, so only the LAST per-line timer was tracked and cleared.
+  // Earlier pending timers kept firing after a stage change and appended
+  // stale lines from the previous stage. All scheduled timers are now
+  // tracked and cleared together.
+  const timersRef = useRef<ReturnType<typeof setTimeout>[]>([]);
 
   useEffect(() => {
     setVisibleLines([]);
-    if (timerRef.current) clearTimeout(timerRef.current);
+    timersRef.current.forEach(clearTimeout);
+    timersRef.current = [];
 
     const lines = STAGE_LOGS[activeStageIndex] ?? [];
 
@@ -88,16 +94,18 @@ export function StatusLog({ activeStageIndex, reducedMotion, compact = false }: 
     }
 
     lines.forEach((line, i) => {
-      timerRef.current = setTimeout(() => {
+      const timer = setTimeout(() => {
         setVisibleLines(prev => {
           if (prev.some(p => p.id === line.id)) return prev;
           return [...prev, line];
         });
       }, i * 260);
+      timersRef.current.push(timer);
     });
 
     return () => {
-      if (timerRef.current) clearTimeout(timerRef.current);
+      timersRef.current.forEach(clearTimeout);
+      timersRef.current = [];
     };
   }, [activeStageIndex, reducedMotion]);
 

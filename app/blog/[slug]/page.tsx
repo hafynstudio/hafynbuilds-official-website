@@ -1,4 +1,5 @@
 import { notFound } from "next/navigation";
+import Link from "next/link";
 import type { Metadata } from "next";
 import Script from "next/script";
 import { RevealSection } from "@/components/ui/RevealSection";
@@ -8,6 +9,7 @@ import { ArticleBody } from "@/components/blog/ArticleBody";
 import { AuthorBox } from "@/components/blog/AuthorBox";
 import { RelatedArticles } from "@/components/blog/RelatedArticles";
 import { buildArticleMetadata } from "@/lib/seo/metadata";
+import { SITE_URL } from "@/lib/site";
 import {
   articleSchema,
   breadcrumbSchema,
@@ -142,7 +144,7 @@ export default async function BlogPostPage({ params }: BlogPostPageProps) {
   // Canonical article URL -- passed down to ShareBar as a prop so the
   // client component never has to reconstruct it from window.location
   // (avoids hydration mismatches on SSR -- Decision D47).
-  const canonicalUrl = `https://hafynbuilds.com/blog/${post.slug}`;
+  const canonicalUrl = `${SITE_URL}/blog/${post.slug}`;
 
   // JSON-LD schema objects -- both injected as separate <script> tags
   // so Google can parse them independently.
@@ -209,30 +211,30 @@ export default async function BlogPostPage({ params }: BlogPostPageProps) {
             <nav aria-label="Breadcrumb" className="mb-6">
               <ol className="flex flex-wrap items-center gap-1.5 font-mono text-[10px] text-text-disabled">
                 <li>
-                  <a
+                  <Link
                     href="/"
                     className="transition-colors duration-fast hover:text-text-tertiary"
                   >
                     Home
-                  </a>
+                  </Link>
                 </li>
                 <li aria-hidden="true">/</li>
                 <li>
-                  <a
+                  <Link
                     href="/blog"
                     className="transition-colors duration-fast hover:text-text-tertiary"
                   >
                     Blog
-                  </a>
+                  </Link>
                 </li>
                 <li aria-hidden="true">/</li>
                 <li>
-                  <a
+                  <Link
                     href={`/blog/category/${category.slug}`}
                     className="transition-colors duration-fast hover:text-text-tertiary"
                   >
                     {category.label}
-                  </a>
+                  </Link>
                 </li>
                 <li aria-hidden="true">/</li>
                 <li

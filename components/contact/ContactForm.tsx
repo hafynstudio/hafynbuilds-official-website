@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, useState, useCallback, Fragment } from "react";
+import { useEffect, useId, useRef, useState, useCallback, Fragment } from "react";
 import { flushSync } from "react-dom";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -67,6 +67,14 @@ const GLASS_CARD = cn(
   "before:bg-gradient-to-r before:from-transparent before:via-white/8 before:to-transparent"
 );
 
+// FIX (Phase 2, A11Y-001): the segmented pickers (Project Type / Budget /
+// Timeline) previously rendered as bare button groups with no group
+// semantics and no selected-state announcement — screen-reader and keyboard
+// users could not tell which option was active. They now use the proper
+// radiogroup pattern: a <fieldset>/<legend> label, role="radio" +
+// aria-checked on each option, roving tabindex, and Arrow-key navigation.
+// The visual design is unchanged — this is semantic HTML over the same
+// buttons.
 function SegmentedControl<T extends string>({
   options,
   value,
@@ -80,23 +88,50 @@ function SegmentedControl<T extends string>({
   label: string;
   error?: string;
 }) {
+  const errorId = useId();
   return (
-    <div className="w-full">
-      <p className="mb-3 text-sm font-medium text-text-secondary">{label}</p>
-      <div className="flex flex-wrap gap-2">
-        {options.map((opt) => {
+    <fieldset className="w-full">
+      <legend className="mb-3 text-sm font-medium text-text-secondary">{label}</legend>
+      <div
+        role="radiogroup"
+        aria-label={label}
+        aria-describedby={error ? errorId : undefined}
+        className="flex flex-wrap gap-2"
+      >
+        {options.map((opt, index) => {
           const active = value === opt.value;
+          // Roving tabindex: the selected option (or the first, when none
+          // is selected yet) is the only tab stop; the rest are reachable
+          // with the Arrow keys.
+          const tabIndex = active || (value === undefined && index === 0) ? 0 : -1;
           return (
             <button
               key={opt.value}
               type="button"
+              role="radio"
+              aria-checked={active}
+              tabIndex={tabIndex}
               onClick={() => onChange(opt.value)}
+              onKeyDown={(e) => {
+                const isLeft = e.key === "ArrowLeft" || e.key === "ArrowUp";
+                const isRight = e.key === "ArrowRight" || e.key === "ArrowDown";
+                if (!isLeft && !isRight) return;
+                e.preventDefault();
+                const dir = isRight ? 1 : -1;
+                const nextIndex = (index + dir + options.length) % options.length;
+                const nextValue = options[nextIndex].value;
+                // Move focus to the sibling option and select it.
+                const siblings = e.currentTarget.parentElement?.children;
+                (siblings?.[nextIndex] as HTMLButtonElement | undefined)?.focus();
+                onChange(nextValue);
+              }}
               className={cn(
                 "min-h-[48px] rounded-lg border px-5 text-sm font-medium transition-all duration-base ease-out-quart sm:min-h-[40px] sm:px-4",
                 "active:scale-[0.96]",
                 active
                   ? "border-accent bg-accent/10 text-accent shadow-[0_0_16px_rgba(62,123,250,0.25)]"
-                  : "border-border bg-surface/60 text-text-secondary hover:border-border-hover hover:text-text-primary"
+                  : "border-border bg-surface/60 text-text-secondary hover:border-border-hover hover:text-text-primary",
+                "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2 focus-visible:ring-offset-bg-elevated"
               )}
             >
               {opt.label}
@@ -105,11 +140,11 @@ function SegmentedControl<T extends string>({
         })}
       </div>
       {error && (
-        <p className="mt-2 text-sm text-error" role="alert">
+        <p id={errorId} className="mt-2 text-sm text-error" role="alert">
           {error}
         </p>
       )}
-    </div>
+    </fieldset>
   );
 }
 
@@ -218,6 +253,7 @@ export function ContactForm({ replyWindow }: ContactFormProps) {
   const stepRef = useRef<HTMLDivElement>(null);
   const firstFieldRefs = useRef<(HTMLElement | null)[]>([null, null, null]);
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const draftTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   const whatsapp = socialLinks.find((l) => l.platform === "whatsapp");
 
@@ -251,8 +287,15 @@ export function ContactForm({ replyWindow }: ContactFormProps) {
   }
 
   const formValues = watch();
+  // FIX (Phase 2, CONV-005): draft autosave is debounced (400ms) so a
+  // single keystroke no longer serializes the entire form to localStorage.
   useEffect(() => {
-    if (!isSuccess) saveDraft(formValues);
+    if (isSuccess) return;
+    if (draftTimerRef.current) clearTimeout(draftTimerRef.current);
+    draftTimerRef.current = setTimeout(() => saveDraft(formValues), 400);
+    return () => {
+      if (draftTimerRef.current) clearTimeout(draftTimerRef.current);
+    };
   }, [formValues, isSuccess]);
 
   useEffect(() => {
@@ -338,7 +381,19 @@ export function ContactForm({ replyWindow }: ContactFormProps) {
       clearDraft();
       setIsSuccess(true);
     } catch (err) {
-      setSubmitError(err instanceof Error ? err.message : "Something went wrong. Please try again.");
+      // FIX (Phase 2, CONV-001): distinguish a network failure (fetch
+      // rejects with a TypeError) from an application error, so the user
+      // always gets an honest, human-readable state — never "Failed to
+      // fetch".
+      if (err instanceof TypeError) {
+        setSubmitError(
+          "We couldn't reach the server. Please check your connection and try again."
+        );
+      } else {
+        setSubmitError(
+          err instanceof Error ? err.message : "Something went wrong. Please try again."
+        );
+      }
     } finally {
       setIsSubmitting(false);
     }
@@ -384,7 +439,7 @@ export function ContactForm({ replyWindow }: ContactFormProps) {
           Your build request is in.
         </h3>
         <p className="mt-3 text-base text-text-secondary sm:text-lg">
-          We&apos;ll be in touch within <span className="font-medium text-text-primary">{replyWindow}</span>.
+          We&apos;ll be in touch <span className="font-medium text-text-primary">{replyWindow}</span>.
         </p>
         {whatsapp && (
           <a
@@ -397,6 +452,7 @@ export function ContactForm({ replyWindow }: ContactFormProps) {
           </a>
         )}
         <button
+          type="button"
           onClick={handleReset}
           className="mt-6 text-sm text-text-tertiary underline underline-offset-4 transition-colors hover:text-text-primary"
         >
@@ -552,7 +608,20 @@ export function ContactForm({ replyWindow }: ContactFormProps) {
 
                   <p className="text-sm text-text-tertiary">
                     Prefer to talk first?{" "}
-                    <a href="#" className="text-text-secondary underline underline-offset-4 transition-colors hover:text-text-primary">Book a call →</a>
+                    {whatsapp ? (
+                      <a
+                        href={`${whatsapp.url}?text=${encodeURIComponent(
+                          "Hi HAFYN, I'd like to book a call about a build."
+                        )}`}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="text-text-secondary underline underline-offset-4 transition-colors hover:text-text-primary"
+                      >
+                        Book a call →
+                      </a>
+                    ) : (
+                      <span className="text-text-secondary">Book a call</span>
+                    )}
                   </p>
 
                   {submitError && (

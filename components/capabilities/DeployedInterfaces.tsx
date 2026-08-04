@@ -26,7 +26,7 @@ function AIDashboardInterface({
   const metrics = [
     { label: "Requests", value: "1,204/hr" },
     { label: "Latency", value: "82ms" },
-    { label: "Uptime", value: "99.9%" },
+    { label: "Monitoring", value: "24/7" },
   ];
 
   const logLines = [

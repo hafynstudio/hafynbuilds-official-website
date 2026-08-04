@@ -259,6 +259,9 @@ export function ShareBar({ title, url }: ShareBarProps) {
           threshold, sharing is likely at any point in the read on mobile.
       ---------------------------------------------------------------- */}
       <div
+        // FIX (Phase 2, A11Y-008): aria-label on a bare <div> is ignored
+        // by screen readers. role="region" exposes the label as a landmark.
+        role="region"
         aria-label="Share this article"
         className={cn(
           "fixed bottom-0 left-0 right-0 z-30 md:hidden",

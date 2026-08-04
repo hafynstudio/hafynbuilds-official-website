@@ -15,9 +15,7 @@
 // ---------------------------------------------------------------------------
 
 import type { MetadataRoute } from "next";
-
-// TODO(Phase 20): confirm and swap in the final production domain.
-const SITE_URL = "https://hafynbuilds.com";
+import { SITE_URL } from "@/lib/site";
 
 export default function robots(): MetadataRoute.Robots {
   return {

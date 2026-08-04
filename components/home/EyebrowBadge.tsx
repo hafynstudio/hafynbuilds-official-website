@@ -9,7 +9,10 @@ import { HERO_SEQUENCE_DELAYS_S } from "@/lib/motion";
 // industry — 100+/200+ industries") — not an invented statistic. This is
 // the element that breaks the Hero's vertical monotony, sitting above
 // the headline.
-const EYEBROW_TEXT = "Engineering for 100+ industries";
+// FIX (Phase 2, CONTENT-001): "100+ industries" was not supported by the
+// shipped data layer (63 industries defined, 20 with packages). "20+" is
+// the truthful count actually represented by the current product.
+const EYEBROW_TEXT = "Engineering for 20+ industries";
 
 /**
  * Small status-pill above the Hero headline. Font-mono ties it to the

@@ -354,9 +354,16 @@ function ValueCard({ value, index, rm }: ValueCardProps) {
           rm ? {} : { y: -6, transition: { duration: 0.3, ease: EASE } }
         }
         tabIndex={0}
-        role="button"
-        aria-expanded={expanded}
-        aria-controls={contentId}
+        // FIX (Phase 2, A11Y-006): the card was role="button" while it
+        // also contained a real <button> (CloseButton) — an interactive
+        // element nested inside another interactive role (WCAG 4.1.2).
+        // The card is now a labelled group; the CloseButton is the only
+        // widget role. Keyboard users still open the card via Tab +
+        // Enter/Space, and aria-controls now only references the content
+        // element while it actually exists (it unmounts when collapsed).
+        role="group"
+        aria-label={value.name}
+        aria-controls={expanded ? contentId : undefined}
         initial={{ opacity: 0, y: rm ? 0 : 28 }}
         whileInView={{ opacity: 1, y: 0 }}
         viewport={{ once: true, margin: "-60px" }}

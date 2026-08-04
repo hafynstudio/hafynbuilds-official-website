@@ -19,7 +19,11 @@ const ROW_LAYOUT_TRANSITION_S = 0.35;
 const PROCESS_LABELS = ["Building", "Optimizing", "Running checks"] as const;
 const PROGRESS_BY_STEP: Record<number, number> = { 0: 25, 1: 60, 2: 90 };
 
-const STATUS_BAR_STATS = ["100+ industries", "24h response", "99.9% uptime"];
+// FIX (Phase 2, CONTENT-001 / TRUST-005 / TRUST-007): the previous status
+// row asserted an unsupported "100+ industries" count, a specific "24h
+// response" SLA, and a "99.9% uptime" guarantee — none verifiable from the
+// current product/operation. Replaced with truthful qualitative statements.
+const STATUS_BAR_STATS = ["20+ industries", "Fast response", "24/7 monitoring"];
 
 function LiveBadgeDot({ reducedMotion }: { reducedMotion: boolean }) {
   return (

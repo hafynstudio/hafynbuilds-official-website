@@ -50,13 +50,27 @@ export function FounderSocials() {
         <RevealItem className="mt-8 flex flex-wrap items-center justify-center gap-4">
           {profiles.map((link) => {
             const Icon = SOCIAL_ICONS[link.platform];
-            const isPlaceholder = link.url === "#";
+            // FIX (Phase 2, A11Y-002): placeholder profiles (url === "#")
+            // rendered as real <Link href="#"> that jumped to page top.
+            // They now render as non-interactive, non-focusable chips.
+            if (link.url === "#") {
+              return (
+                <span
+                  key={link.platform}
+                  title={`${link.label} — coming soon`}
+                  aria-hidden="true"
+                  className="flex h-12 w-12 cursor-not-allowed items-center justify-center rounded-full border border-border bg-surface text-text-disabled"
+                >
+                  <Icon className="h-5 w-5" />
+                </span>
+              );
+            }
             return (
               <Link
                 key={link.platform}
                 href={link.url}
-                target={isPlaceholder ? undefined : "_blank"}
-                rel={isPlaceholder ? undefined : "noopener noreferrer"}
+                target="_blank"
+                rel="noopener noreferrer"
                 aria-label={link.label}
                 className="group relative flex h-12 w-12 items-center justify-center rounded-full border border-border bg-surface transition-all duration-200 hover:-translate-y-0.5 hover:border-accent/40 hover:shadow-glow-accent"
               >

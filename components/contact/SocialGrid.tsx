@@ -116,13 +116,15 @@ export function SocialGrid() {
         );
 
         if (isPlaceholder) {
+          // FIX (Phase 2, A11Y-005): this was a focusable-but-inert span
+          // (tabIndex={0}, no action on activation) — keyboard/SR users
+          // landed on a dead control. It is now a non-focusable, hidden
+          // decorative "coming soon" chip; the profile does not exist yet.
           return (
             <span
               key={link.platform}
-              aria-label={`${label} (coming soon)`}
-              aria-disabled="true"
-              tabIndex={0}
-              className={cardClassName}
+              aria-hidden="true"
+              className={cn(cardClassName, "pointer-events-none")}
             >
               {cardChildren}
             </span>

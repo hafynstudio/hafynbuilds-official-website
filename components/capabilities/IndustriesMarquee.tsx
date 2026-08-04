@@ -1,6 +1,7 @@
 ﻿"use client";
 
 import { useRef } from "react";
+import Link from "next/link";
 import { motion, useInView } from "framer-motion";
 import { usePrefersReducedMotion } from "@/lib/hooks";
 import { INDUSTRY_CATEGORIES } from "@/data/industry-categories";
@@ -29,7 +30,7 @@ export function IndustriesMarquee() {
     return (
       <section ref={ref} aria-label="Industries we serve" className="relative overflow-hidden border-t border-border bg-bg-primary px-6 py-14">
         <p className="mb-8 text-center font-mono text-xs uppercase tracking-[0.22em] text-text-tertiary">
-          Trusted across 100+ industries
+          Trusted across 20+ industries
         </p>
         <div className="mx-auto flex max-w-5xl flex-wrap justify-center gap-2.5">
           {INDUSTRY_CATEGORIES.map((cat) => (
@@ -65,7 +66,7 @@ export function IndustriesMarquee() {
         <div className="flex items-baseline gap-2">
           <span className="bg-clip-text text-4xl font-bold text-transparent sm:text-5xl"
             style={{ backgroundImage: "linear-gradient(135deg, rgb(var(--color-accent-primary)), rgb(var(--color-accent-glow)))" }}>
-            100+
+            20+
           </span>
           <span className="text-xl font-semibold text-text-secondary sm:text-2xl">industries</span>
         </div>
@@ -130,14 +131,14 @@ export function IndustriesMarquee() {
         animate={inView ? { opacity: 1, y: 0 } : {}}
         transition={{ duration: 0.5, delay: 0.5, ease: EASE_OUT_QUART }}
       >
-        <a href="/investment"
+        <Link href="/investment"
           className="group inline-flex items-center gap-2 rounded-full border px-5 py-2.5 font-mono text-xs text-text-secondary transition-all duration-300 hover:border-accent/30 hover:bg-accent/5 hover:text-accent focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2 focus-visible:ring-offset-bg-primary"
           style={{ borderColor: "rgb(var(--color-border) / 0.8)", background: "rgb(var(--color-surface) / 0.4)", backdropFilter: "blur(8px)" }}>
           See pricing by industry
           <svg width="12" height="12" viewBox="0 0 12 12" fill="none" aria-hidden="true" className="transition-transform duration-300 group-hover:translate-x-0.5">
             <path d="M2 6h8M7 3l3 3-3 3" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round" strokeLinejoin="round" />
           </svg>
-        </a>
+        </Link>
       </motion.div>
     </section>
   );

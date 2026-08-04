@@ -36,12 +36,27 @@ export function MobileNav({
   isActive,
 }: MobileNavProps) {
   const panelRef = useRef<HTMLDivElement>(null);
+  const previouslyFocusedRef = useRef<HTMLElement | null>(null);
   const prefersReducedMotion = usePrefersReducedMotion();
 
   useFocusTrap(panelRef, isOpen);
 
   useEffect(() => {
-    if (!isOpen) return;
+    // FIX (Phase 2, A11Y-004): when the panel closes, return focus to the
+    // element that opened it (the header hamburger). Previously focus was
+    // dropped to <body> on close.
+    if (!isOpen) {
+      const restoreTo = previouslyFocusedRef.current;
+      previouslyFocusedRef.current = null;
+      if (restoreTo && typeof restoreTo.focus === "function") {
+        restoreTo.focus({ preventScroll: true });
+      }
+      return;
+    }
+
+    const previouslyFocused = document.activeElement as HTMLElement | null;
+    previouslyFocusedRef.current = previouslyFocused;
+
     const originalOverflow = document.documentElement.style.overflow;
     document.documentElement.style.overflow = "hidden";
 
@@ -126,6 +141,21 @@ export function MobileNav({
           <div className="flex items-center justify-center gap-5 px-8 pb-10">
             {socialLinks.map((social) => {
               const Icon = SOCIAL_ICONS[social.platform];
+              // FIX (Phase 2, A11Y-002): placeholder profiles render as
+              // non-interactive, non-focusable chips instead of href="#"
+              // links that jumped to page top.
+              if (social.url === "#") {
+                return (
+                  <span
+                    key={social.platform}
+                    title={`${social.label} — coming soon`}
+                    aria-hidden="true"
+                    className="cursor-not-allowed text-text-disabled"
+                  >
+                    <Icon className="h-5 w-5" />
+                  </span>
+                );
+              }
               return (
                 <a
                   key={social.platform}

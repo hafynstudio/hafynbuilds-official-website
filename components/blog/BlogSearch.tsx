@@ -57,6 +57,10 @@ export function BlogSearch({
         resultCount={searchQuery.trim().length > 0 ? resultCount : undefined}
         ariaLabel="Search blog articles by title, excerpt, or category"
         resultsId={resultsId}
+        // FIX (Phase 2, A11Y-008): when there are no posts to search, the
+        // input was only mouse-dismissed (pointer-events-none) but stayed
+        // keyboard-focusable. disabled removes it from the tab order too.
+        disabled={isEmpty}
         className={cn(
           isEmpty && "pointer-events-none opacity-40"
         )}

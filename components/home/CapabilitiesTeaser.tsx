@@ -1,6 +1,6 @@
 ﻿"use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState, useSyncExternalStore } from "react";
 import Link from "next/link";
 import { motion, useInView } from "framer-motion";
 import { ArrowRight } from "lucide-react";
@@ -62,17 +62,19 @@ function rgba(triplet: string, alpha: number): string {
  * contents are reconfirmed.
  */
 function useCoarsePointer(): boolean {
-  const [isCoarse, setIsCoarse] = useState(false);
-
-  useEffect(() => {
-    const mql = window.matchMedia("(hover: none), (pointer: coarse)");
-    setIsCoarse(mql.matches);
-    const handler = (e: MediaQueryListEvent) => setIsCoarse(e.matches);
-    mql.addEventListener("change", handler);
-    return () => mql.removeEventListener("change", handler);
-  }, []);
-
-  return isCoarse;
+  // FIX (Phase 2, lint): the previous useState+useEffect implementation
+  // called setState synchronously inside an effect (React Compiler lint
+  // error). Rewritten with useSyncExternalStore — identical behavior
+  // (SSR-safe false, live updates on media-query change), no effect.
+  return useSyncExternalStore(
+    (onStoreChange) => {
+      const mql = window.matchMedia("(hover: none), (pointer: coarse)");
+      mql.addEventListener("change", onStoreChange);
+      return () => mql.removeEventListener("change", onStoreChange);
+    },
+    () => window.matchMedia("(hover: none), (pointer: coarse)").matches,
+    () => false
+  );
 }
 
 // ─── AI SYSTEMS CODE LINES (unchanged) ──────────────────────────────────────
@@ -84,7 +86,7 @@ const AI_CODE_LINES = [
   "});",
   "",
   "await agent.deploy({ env: 'production' });",
-  "// ✓ Agent live — 99.9% uptime SLA",
+  "// ✓ Agent live — production monitored",
 ];
 
 // ─── MINIATURE INTERFACES ────────────────────────────────────────────────────

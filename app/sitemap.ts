@@ -33,9 +33,7 @@
 import type { MetadataRoute } from "next";
 import { blogPosts, BLOG_CATEGORIES } from "@/data/blog-posts";
 import { industries } from "@/data/industries";
-
-// TODO(Phase 20): confirm and swap in the final production domain.
-const SITE_URL = "https://hafynbuilds.com";
+import { SITE_URL } from "@/lib/site";
 
 export default function sitemap(): MetadataRoute.Sitemap {
   // ── Static pages ──────────────────────────────────────────────────────
