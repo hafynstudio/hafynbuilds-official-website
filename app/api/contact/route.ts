@@ -144,7 +144,7 @@ function buildLeadEmail(input: LeadEmailInput): string {
 
   const e = escapeHtml;
 
-  const isHighValue = input.budgetLabel.includes("100k") || input.budgetLabel.includes("250k");
+  const isHighValue = input.budgetLabel.includes("100k – 250k") || input.budgetLabel.includes("250k+");
 
   const compactFields: Array<[string, string]> = [];
 
