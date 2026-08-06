@@ -138,208 +138,348 @@ function emailDivider(): string {
   </tr>`;
 }
 
-/**
- * Premium dark-theme lead notification (HAFYN brand). Table-based, inline
- * styles only, bgcolor alongside background-color for Outlook, inline SVG
- * icons, no gradients / no external assets / no JS. Every piece of
- * user-submitted data passes through escapeHtml() before interpolation.
- */
+/** Clean, readable internal lead notification. Not a marketing email. */
+
 function buildLeadEmail(input: LeadEmailInput): string {
+
   const e = escapeHtml;
-  const isHighValue = isHighValueBudget(input.budgetLabel);
 
-  const mailtoHref =
-    "mailto:" +
-    e(input.email) +
-    "?subject=" +
-    encodeURIComponent(`HAFYN project enquiry from ${input.name}`);
+  const isHighValue = input.budgetLabel.includes("100k") || input.budgetLabel.includes("250k");
 
-  const messageHtml = e(input.message).replace(/\n/g, "<br/>");
+  const compactFields: Array<[string, string]> = [];
 
-  // Gold "high-value lead" badge under the name — draws the founder's eye.
-  const highValueBadge = isHighValue
-    ? `<tr>
-        <td style="padding-top:12px;">
-          <table cellpadding="0" cellspacing="0" border="0" role="presentation">
-            <tr>
-              <td bgcolor="#3a2a06" style="background-color:#3a2a06;border-radius:6px;padding-top:5px;padding-right:11px;padding-bottom:5px;padding-left:11px;font-family:${EMAIL_FONT_STACK};font-size:10px;line-height:14px;font-weight:700;letter-spacing:0.08em;color:#fbbf24;">&#9733;&nbsp;HIGH-VALUE LEAD</td>
-            </tr>
-          </table>
-        </td>
-      </tr>`
-    : "";
+  if (input.phone) compactFields.push(["Phone", e(input.phone)]);
 
-  const budgetValue = isHighValue
-    ? `<span style="color:#fbbf24;font-weight:700;">${e(input.budgetLabel)}&#9733;</span>`
-    : e(input.budgetLabel);
+  compactFields.push(["Timeline", e(input.timelineLabel)]);
 
-  // Fields grid — email full-width (mailto), compact pairs for company/
-  // service and phone/timeline, budget full-width (gold when high value).
-  const fields = `
-      <tr>
-        <td colspan="2" style="padding-top:20px;padding-right:28px;padding-bottom:20px;padding-left:28px;vertical-align:top;">
-          ${fieldBlock("EMAIL", emailIcon("mail"), `<a href="${mailtoHref}" style="color:#e2e8f0;text-decoration:underline;text-decoration-color:#475569;text-underline-offset:3px;">${e(input.email)}</a>`)}
-        </td>
-      </tr>
-      <tr>
-        <td colspan="2" height="1" style="height:1px;font-size:0;line-height:0;background-color:#1e293b;">&nbsp;</td>
-      </tr>
-      <tr>
-        <td style="padding-top:20px;padding-right:16px;padding-bottom:20px;padding-left:28px;vertical-align:top;border-right:1px solid #1e293b;">
-          ${fieldBlock("COMPANY", emailIcon("briefcase"), e(input.company || "—"))}
-        </td>
-        <td style="padding-top:20px;padding-right:28px;padding-bottom:20px;padding-left:16px;vertical-align:top;">
-          ${fieldBlock("REQUESTED SERVICE", emailIcon("tag"), e(input.projectTypeLabel))}
-        </td>
-      </tr>
-      <tr>
-        <td colspan="2" height="1" style="height:1px;font-size:0;line-height:0;background-color:#1e293b;">&nbsp;</td>
-      </tr>
-      <tr>
-        <td style="padding-top:20px;padding-right:16px;padding-bottom:20px;padding-left:28px;vertical-align:top;border-right:1px solid #1e293b;">
-          ${fieldBlock("PHONE", emailIcon("phone"), e(input.phone || "—"))}
-        </td>
-        <td style="padding-top:20px;padding-right:28px;padding-bottom:20px;padding-left:16px;vertical-align:top;">
-          ${fieldBlock("TIMELINE", emailIcon("clock"), e(input.timelineLabel))}
-        </td>
-      </tr>
-      <tr>
-        <td colspan="2" height="1" style="height:1px;font-size:0;line-height:0;background-color:#1e293b;">&nbsp;</td>
-      </tr>
-      <tr>
-        <td colspan="2" style="padding-top:20px;padding-right:28px;padding-bottom:20px;padding-left:28px;vertical-align:top;">
-          ${fieldBlock("BUDGET RANGE", emailIcon("trend"), budgetValue)}
-        </td>
-      </tr>`;
+  const compactRow = compactFields
+
+    .map(
+
+      ([label, value]) => `
+
+        <td width="50%" valign="top" style="padding:0 8px 0 0;">
+
+          <p style="margin:0 0 4px;color:#6b7280;font-size:11px;font-weight:600;letter-spacing:0.06em;text-transform:uppercase;">${label}</p>
+
+          <p style="margin:0;color:#f3f4f6;font-size:15px;font-weight:500;">${value}</p>
+
+        </td>`
+
+    )
+
+    .join("");
 
   return `<!DOCTYPE html>
-<html lang="en" xmlns:v="urn:schemas-microsoft-com:vml" xmlns:w="urn:schemas-microsoft-com:office:word">
+
+<html lang="en">
+
   <head>
-    <meta charset="utf-8" />
+
+    <meta charset="UTF-8" />
+
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
     <meta http-equiv="X-UA-Compatible" content="IE=edge" />
-    <title>New lead — ${e(input.name)}</title>
+
+    <title>New HAFYN Website Lead</title>
+
+    <!--[if mso]>
+
+    <style type="text/css">
+
+      table { border-collapse: collapse; }
+
+    </style>
+
+    <![endif]-->
+
   </head>
-  <body style="margin-top:0;margin-right:0;margin-bottom:0;margin-left:0;padding-top:0;padding-right:0;padding-bottom:0;padding-left:0;background-color:#030712;color:#e2e8f0;font-family:${EMAIL_FONT_STACK};">
-    <span style="display:none;font-size:0;line-height:0;max-height:0;mso-hide:all;opacity:0;color:#030712;visibility:hidden;">New lead — ${e(input.projectTypeLabel)} · ${e(input.name)}</span>
-    <table role="presentation" width="100%" border="0" cellpadding="0" cellspacing="0" bgcolor="#030712" style="width:100%;background-color:#030712;">
+
+  <body style="margin:0;padding:0;background-color:#030712;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;">
+
+    <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" bgcolor="#030712" style="background-color:#030712;">
+
       <tr>
-        <td align="center" bgcolor="#030712" style="background-color:#030712;padding-top:36px;padding-right:16px;padding-bottom:36px;padding-left:16px;">
-          <table role="presentation" width="100%" border="0" cellpadding="0" cellspacing="0" bgcolor="#0b1220" style="width:100%;max-width:600px;background-color:#0b1220;border-top:1px solid #1f2937;border-right:1px solid #1f2937;border-bottom:1px solid #1f2937;border-left:1px solid #1f2937;border-radius:16px;">
+
+        <td align="center" style="padding:40px 16px;">
+
+          <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="max-width:600px;">
+
             <tr>
-              <td height="4" bgcolor="#2563eb" style="height:4px;font-size:0;line-height:0;background-color:#2563eb;border-top-left-radius:16px;border-top-right-radius:16px;">&nbsp;</td>
-            </tr>
-            <tr>
-              <td style="padding-top:26px;padding-right:28px;padding-bottom:0;padding-left:28px;">
-                <table role="presentation" width="100%" border="0" cellpadding="0" cellspacing="0">
+
+              <td style="padding:0 4px 20px;">
+
+                <table role="presentation" cellpadding="0" cellspacing="0" border="0">
+
                   <tr>
-                    <td width="46" style="width:46px;vertical-align:middle;">
-                      <table role="presentation" border="0" cellpadding="0" cellspacing="0">
+
+                    <td width="32" height="32" bgcolor="#2563eb" style="width:32px;height:32px;background-color:#2563eb;border-radius:8px;text-align:center;vertical-align:middle;">
+
+                      <span style="color:#ffffff;font-size:15px;font-weight:700;line-height:32px;font-family:-apple-system,Arial,sans-serif;">H</span>
+
+                    </td>
+
+                    <td style="padding-left:10px;color:#f9fafb;font-size:15px;font-weight:700;letter-spacing:0.02em;">
+
+                      HAFYN <span style="color:#9ca3af;font-weight:400;">BUILDS</span>
+
+                    </td>
+
+                  </tr>
+
+                </table>
+
+              </td>
+
+            </tr>
+
+            <tr>
+
+              <td bgcolor="#0b1220" style="background-color:#0b1220;border:1px solid #1f2937;border-radius:16px;">
+
+                <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0">
+
+                  <tr>
+
+                    <td height="3" bgcolor="#2563eb" style="background-color:#2563eb;font-size:1px;line-height:3px;border-radius:16px 16px 0 0;">&nbsp;</td>
+
+                  </tr>
+
+                  <tr>
+
+                    <td bgcolor="#111827" style="padding:26px 32px;background-color:#111827;border-bottom:1px solid #1f2937;">
+
+                      <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0">
+
                         <tr>
-                          <td width="34" height="34" align="center" bgcolor="#2563eb" style="width:34px;height:34px;background-color:#2563eb;border-radius:9px;font-family:${EMAIL_FONT_STACK};font-size:17px;line-height:34px;font-weight:700;color:#ffffff;">H</td>
+
+                          <td valign="top">
+
+                            <p style="margin:0 0 6px;color:#60a5fa;font-size:12px;font-weight:600;letter-spacing:0.08em;text-transform:uppercase;">&#9993;&nbsp; New build request</p>
+
+                            <h1 style="margin:0;color:#ffffff;font-size:23px;font-weight:700;letter-spacing:-0.01em;">${e(
+
+                              input.name
+
+                            )}</h1>
+
+                          </td>
+
+                          <td align="right" valign="top">
+
+                            ${
+
+                              isHighValue
+
+                                ? `<table role="presentation" cellpadding="0" cellspacing="0" border="0"><tr><td bgcolor="#422006" style="background-color:#422006;border:1px solid #92400e;border-radius:20px;padding:6px 12px;"><span style="color:#fbbf24;font-size:11px;font-weight:700;letter-spacing:0.03em;">&#9733; HIGH-VALUE</span></td></tr></table>`
+
+                                : `<table role="presentation" cellpadding="0" cellspacing="0" border="0"><tr><td bgcolor="#052e16" style="background-color:#052e16;border:1px solid #14532d;border-radius:20px;padding:6px 14px;"><span style="color:#4ade80;font-size:12px;font-weight:600;">&#9679;&nbsp; Lead</span></td></tr></table>`
+
+                            }
+
+                          </td>
+
                         </tr>
+
                       </table>
+
                     </td>
-                    <td style="vertical-align:middle;">
-                      <table role="presentation" border="0" cellpadding="0" cellspacing="0">
-                        <tr>
-                          <td style="font-family:${EMAIL_FONT_STACK};font-size:16px;line-height:22px;font-weight:700;letter-spacing:-0.01em;color:#f8fafc;">HAFYN</td>
-                        </tr>
-                        <tr>
-                          <td style="padding-top:2px;font-family:${EMAIL_FONT_STACK};font-size:11px;line-height:15px;font-weight:600;letter-spacing:0.08em;color:#64748b;">WEBSITE LEAD</td>
-                        </tr>
+
+                  </tr>
+
+                  <tr>
+
+                    <td style="padding:24px 32px 0;">
+
+                      <p style="margin:0 0 4px;color:#6b7280;font-size:11px;font-weight:600;letter-spacing:0.06em;text-transform:uppercase;">&#9993;&nbsp; Email</p>
+
+                      <p style="margin:0 0 18px;"><a href="mailto:${e(
+
+                        input.email
+
+                      )}" style="color:#60a5fa;font-size:15px;font-weight:500;text-decoration:none;">${e(
+
+    input.email
+
+  )}</a></p>
+
+                      ${
+
+                        input.company
+
+                          ? `<p style="margin:0 0 4px;color:#6b7280;font-size:11px;font-weight:600;letter-spacing:0.06em;text-transform:uppercase;">&#128188;&nbsp; Company</p><p style="margin:0 0 18px;color:#f3f4f6;font-size:15px;font-weight:500;">${e(
+
+                              input.company
+
+                            )}</p>`
+
+                          : ""
+
+                      }
+
+                      <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="margin:0 0 18px;">
+
+                        <tr>${compactRow}</tr>
+
                       </table>
-                    </td>
-                    <td align="right" style="vertical-align:middle;">
-                      <table role="presentation" border="0" cellpadding="0" cellspacing="0">
+
+                      <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="margin:0 0 4px;">
+
                         <tr>
-                          <td bgcolor="#0d2f22" style="background-color:#0d2f22;border-radius:999px;padding-top:5px;padding-right:11px;padding-bottom:5px;padding-left:11px;font-family:${EMAIL_FONT_STACK};font-size:10px;line-height:14px;font-weight:700;letter-spacing:0.08em;color:#34d399;">&#9679;&nbsp;LEAD</td>
+
+                          <td width="50%" style="padding:0 8px 0 0;">
+
+                            <p style="margin:0 0 4px;color:#6b7280;font-size:11px;font-weight:600;letter-spacing:0.06em;text-transform:uppercase;">&#128188;&nbsp; Service</p>
+
+                            <p style="margin:0;color:#f3f4f6;font-size:15px;font-weight:500;">${e(
+
+                              input.projectTypeLabel
+
+                            )}</p>
+
+                          </td>
+
+                          <td width="50%">
+
+                            <p style="margin:0 0 4px;color:#6b7280;font-size:11px;font-weight:600;letter-spacing:0.06em;text-transform:uppercase;">&#128176;&nbsp; Budget</p>
+
+                            <p style="margin:0;color:#f3f4f6;font-size:15px;font-weight:500;">${e(
+
+                              input.budgetLabel
+
+                            )}</p>
+
+                          </td>
+
                         </tr>
+
                       </table>
+
                     </td>
+
                   </tr>
-                </table>
-              </td>
-            </tr>
-            ${emailDivider()}
-            <tr>
-              <td style="padding-top:26px;padding-right:28px;padding-bottom:26px;padding-left:28px;">
-                <table role="presentation" width="100%" border="0" cellpadding="0" cellspacing="0">
+
                   <tr>
-                    <td style="font-family:${EMAIL_FONT_STACK};font-size:11px;line-height:15px;font-weight:600;letter-spacing:0.16em;color:#64748b;">NEW WEBSITE LEAD</td>
-                  </tr>
-                  <tr>
-                    <td style="padding-top:9px;font-family:${EMAIL_FONT_STACK};font-size:27px;line-height:33px;font-weight:700;letter-spacing:-0.02em;color:#ffffff;">${e(input.name)}</td>
-                  </tr>
-                  ${highValueBadge}
-                </table>
-              </td>
-            </tr>
-            ${emailDivider()}
-            <tr>
-              <td>
-                <table role="presentation" width="100%" border="0" cellpadding="0" cellspacing="0">
-                  ${fields}
-                </table>
-              </td>
-            </tr>
-            ${emailDivider()}
-            <tr>
-              <td style="padding-top:26px;padding-right:28px;padding-bottom:26px;padding-left:28px;">
-                <table role="presentation" width="100%" border="0" cellpadding="0" cellspacing="0">
-                  <tr>
-                    <td style="font-family:${EMAIL_FONT_STACK};font-size:10px;line-height:14px;letter-spacing:0.09em;font-weight:600;color:#64748b;">${emailIcon("doc")}&nbsp;MESSAGE</td>
-                  </tr>
-                  <tr>
-                    <td style="padding-top:10px;">
-                      <table role="presentation" width="100%" border="0" cellpadding="0" cellspacing="0">
+
+                    <td style="padding:20px 32px 28px;">
+
+                      <p style="margin:0 0 10px;color:#6b7280;font-size:11px;font-weight:600;letter-spacing:0.06em;text-transform:uppercase;">&#128172;&nbsp; Message</p>
+
+                      <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0">
+
                         <tr>
-                          <td width="4" bgcolor="#2563eb" style="width:4px;font-size:0;line-height:0;background-color:#2563eb;">&nbsp;</td>
-                          <td bgcolor="#0f172a" style="background-color:#0f172a;padding-top:16px;padding-right:18px;padding-bottom:16px;padding-left:16px;font-family:${EMAIL_FONT_STACK};font-size:14px;line-height:22px;color:#cbd5e1;">${messageHtml}</td>
+
+                          <td bgcolor="#111827" style="background-color:#111827;border:1px solid #1f2937;border-left:3px solid #2563eb;border-radius:8px;padding:16px 18px;">
+
+                            <p style="margin:0;color:#e5e7eb;font-size:15px;line-height:1.6;">${e(
+
+                              input.message
+
+                            ).replace(/\n/g, "<br/>")}</p>
+
+                          </td>
+
                         </tr>
+
                       </table>
+
                     </td>
+
                   </tr>
-                </table>
-              </td>
-            </tr>
-            ${emailDivider()}
-            <tr>
-              <td style="padding-top:24px;padding-right:28px;padding-bottom:28px;padding-left:28px;">
-                <table role="presentation" width="100%" border="0" cellpadding="0" cellspacing="0">
+
                   <tr>
-                    <td align="center">
-                      <!--[if mso]>
-                      <v:roundrect xmlns:v="urn:schemas-microsoft-com:vml" xmlns:w="urn:schemas-microsoft-com:office:word" href="${mailtoHref}" style="height:46px;v-text-anchor:middle;width:240px;" arcsize="10%" stroke="f" fillcolor="#2563eb">
-                        <w:anchorlock/>
-                        <center style="color:#ffffff;font-family:${EMAIL_FONT_STACK};font-size:14px;font-weight:700;">Reply to ${e(input.name)}&nbsp;&rarr;</center>
-                      </v:roundrect>
-                      <![endif]-->
-                      <a href="${mailtoHref}" style="display:inline-block;background-color:#2563eb;color:#ffffff;font-family:${EMAIL_FONT_STACK};font-size:14px;line-height:20px;font-weight:700;text-decoration:none;padding-top:13px;padding-right:28px;padding-bottom:13px;padding-left:28px;border-radius:8px;">Reply to ${e(input.name)}&nbsp;&rarr;</a>
+
+                    <td style="padding:0 32px 32px;">
+
+                      <table role="presentation" cellpadding="0" cellspacing="0" border="0">
+
+                        <tr>
+
+                          <td bgcolor="#2563eb" style="background-color:#2563eb;border-radius:8px;">
+
+                            <a href="mailto:${e(
+
+                              input.email
+
+                            )}" style="display:inline-block;padding:12px 22px;color:#ffffff;font-size:14px;font-weight:600;text-decoration:none;font-family:-apple-system,Arial,sans-serif;">Reply to ${e(
+
+    input.name
+
+  )} &rarr;</a>
+
+                          </td>
+
+                        </tr>
+
+                      </table>
+
                     </td>
+
                   </tr>
+
+                  <tr>
+
+                    <td bgcolor="#080d17" style="padding:16px 32px;background-color:#080d17;border-top:1px solid #1f2937;border-radius:0 0 16px 16px;">
+
+                      <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0">
+
+                        <tr>
+
+                          <td style="color:#6b7280;font-size:12px;">Submitted ${e(input.submittedAt)}</td>
+
+                          <td align="right" style="color:#6b7280;font-size:12px;">
+
+                            <a href="${e(
+
+                              input.source
+
+                            )}" style="color:#6b7280;text-decoration:none;">${e(input.source).replace(
+
+    /^https?:\/\//,
+
+    ""
+
+  )}</a>
+
+                          </td>
+
+                        </tr>
+
+                      </table>
+
+                    </td>
+
+                  </tr>
+
                 </table>
+
               </td>
+
             </tr>
-            ${emailDivider()}
+
             <tr>
-              <td style="padding-top:20px;padding-right:28px;padding-bottom:28px;padding-left:28px;">
-                <table role="presentation" width="100%" border="0" cellpadding="0" cellspacing="0">
-                  <tr>
-                    <td style="font-family:${EMAIL_FONT_STACK};font-size:11px;line-height:16px;color:#64748b;">Submitted ${e(input.submittedAt)}</td>
-                  </tr>
-                  <tr>
-                    <td style="padding-top:4px;font-family:${EMAIL_FONT_STACK};font-size:11px;line-height:16px;color:#475569;">Source: ${e(input.source)} &nbsp;&middot;&nbsp; HAFYN BUILDS &mdash; web &middot; software &middot; AI systems</td>
-                  </tr>
-                </table>
+
+              <td style="padding:20px 4px 0;text-align:center;">
+
+                <p style="margin:0;color:#4b5563;font-size:12px;">HAFYN BUILDS &middot; Building tomorrow. Engineering excellence.</p>
+
               </td>
+
             </tr>
+
           </table>
+
         </td>
+
       </tr>
+
     </table>
+
   </body>
+
 </html>`;
+
 }
 
 // ---------------------------------------------------------------------------
