@@ -9,19 +9,18 @@ import { contactSchema } from "@/lib/contact-schema";
 // (never in the browser, never in NEXT_PUBLIC_*). No API key / provider
 // internals / user data ever reach the client or the logs.
 //
-// Test mode defaults (Resend's official test endpoints):
-//   RESEND_FROM_EMAIL = HAFYN <onboarding@resend.dev>
-//   RESEND_TO_EMAIL   = delivered@resend.dev
-// These are overridable via env so production can switch to a verified
-// sending domain (e.g. lead@hafynbuilds.com) with zero code changes — but
-// only AFTER that domain is actually owned and verified in Resend. The
-// Vercel hostname (hafynbuilds.vercel.app) is never used as a sending
+// Defaults:
+//   RESEND_FROM_EMAIL = HAFYN <onboarding@resend.dev>  (Resend test sender)
+//   RESEND_TO_EMAIL   = hafynbuilds@gmail.com          (real lead inbox)
+// These are overridable via env so an environment can swap values (e.g. a
+// verified sending domain, or a different inbox) with zero code changes.
+// The Vercel hostname (hafynbuilds.vercel.app) is never used as a sending
 // domain.
 // ---------------------------------------------------------------------------
 const RESEND_API_KEY = process.env.RESEND_API_KEY;
 const RESEND_FROM_EMAIL =
   process.env.RESEND_FROM_EMAIL ?? "HAFYN <onboarding@resend.dev>";
-const RESEND_TO_EMAIL = process.env.RESEND_TO_EMAIL ?? "delivered@resend.dev";
+const RESEND_TO_EMAIL = process.env.RESEND_TO_EMAIL ?? "hafynbuilds@gmail.com";
 
 let resendClient: Resend | null = null;
 
