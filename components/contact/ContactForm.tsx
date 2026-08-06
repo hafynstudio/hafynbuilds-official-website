@@ -7,7 +7,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { motion, AnimatePresence } from "framer-motion";
 import { Input } from "@/components/ui/Input";
 import { Button } from "@/components/ui/Button";
-import { contactSchema, type ContactFormData } from "@/app/api/contact/route";
+import { contactSchema, type ContactFormData } from "@/lib/contact-schema";
 import { usePrefersReducedMotion, useMediaQuery } from "@/lib/hooks";
 import { EASE_OUT_EXPO, EASE_OUT_QUART, FRAMER_COLOR_TOKENS, rgbaToken } from "@/lib/motion";
 import { cn } from "@/lib/utils";
