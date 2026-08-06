@@ -50,10 +50,18 @@ const jetbrainsMono = localFont({
   display: "swap",
 });
 
+// Title strategy: buildMetadata() in lib/seo/metadata.ts is the single
+// composer of page titles — it appends the " | HAFYN BUILDS" brand suffix
+// exactly once. This layout's title.template MUST stay inert ("%s" only):
+// Next applies a parent template on top of a page's own title string, so a
+// template of "%s | HAFYN BUILDS" would turn buildMetadata's already-branded
+// "About | HAFYN BUILDS" into "About | HAFYN BUILDS | HAFYN BUILDS".
+// title.default remains the fallback for routes with no metadata export
+// (e.g. the 404 page).
 export const metadata: Metadata = {
   title: {
     default: "HAFYN BUILDS — Engineering the Impossible. Building What Matters.",
-    template: "%s | HAFYN BUILDS",
+    template: "%s",
   },
   description:
     "HAFYN BUILDS is the flagship software engineering & AI company of the HAFYN technology holding group, founded by Zain Marwat.",
