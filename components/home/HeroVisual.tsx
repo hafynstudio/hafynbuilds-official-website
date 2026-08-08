@@ -114,13 +114,38 @@ function Row({ lineNumber, children, reducedMotion }: RowProps) {
       animate={{ opacity: 1, y: 0 }}
       exit={{ opacity: 0 }}
       transition={{ duration: reducedMotion ? 0 : 0.25 }}
-      className="flex items-baseline gap-2.5"
+      className="flex items-center gap-2.5"
     >
       <span className="w-3 shrink-0 select-none text-right text-[10px] text-text-primary/[0.06]">
         {lineNumber}
       </span>
       <span className="flex-1">{children}</span>
     </motion.div>
+  );
+}
+
+/**
+ * Static, non-animated twin of `Row`, used to reserve the Proof of Work
+ * terminal's maximum (5-row) footprint. Rendered `invisible` inside the rows
+ * viewport, it gives the viewport a deterministic height that is independent
+ * of the animation state, while the real animated rows are layered on top as
+ * an absolutely-positioned overlay — so they can never reflow the card or
+ * anything below it.
+ */
+function ReservedRow({
+  lineNumber,
+  children,
+}: {
+  lineNumber: number;
+  children: React.ReactNode;
+}) {
+  return (
+    <div className="flex items-center gap-2.5">
+      <span className="w-3 shrink-0 select-none text-right text-[10px] text-text-primary/[0.06]">
+        {lineNumber}
+      </span>
+      <span className="flex-1">{children}</span>
+    </div>
   );
 }
 
@@ -241,14 +266,48 @@ export function HeroVisual() {
           </span>
         </div>
 
-        <motion.div
-          transition={{
-            duration: prefersReducedMotion ? 0 : ROW_LAYOUT_TRANSITION_S,
-            ease: EASE_OUT_QUART,
-          }}
-          animate={{ opacity: isFading ? 0 : 1 }}
-          className="hero-visual-rows-reserve space-y-2 font-mono text-sm"
-        >
+        <div className="relative">
+          {/* Fixed-height animation viewport (BUG-020, this pass): the
+              invisible 5-row "max state" placeholder below defines the
+              viewport's height, so it is deterministic and independent of
+              the animation state. The real animated rows are layered on top
+              as an absolutely-positioned overlay and can never change the
+              height of the card / content below it. */}
+          <div
+            aria-hidden="true"
+            className="invisible space-y-2 font-mono text-sm leading-5"
+          >
+            <ReservedRow lineNumber={1}>
+              <span className="text-text-tertiary">{COMMAND_TEXT}</span>
+            </ReservedRow>
+            {PROCESS_LABELS.map((label, index) => (
+              <ReservedRow key={label} lineNumber={index + 2}>
+                <span className="flex items-baseline gap-2">
+                  <StatusIconSlot>
+                    <span aria-hidden="true" />
+                  </StatusIconSlot>
+                  <span className="text-text-secondary">{label}...</span>
+                </span>
+              </ReservedRow>
+            ))}
+            <ReservedRow lineNumber={5}>
+              <span className="flex items-baseline gap-2">
+                <StatusIconSlot>
+                  <span aria-hidden="true" />
+                </StatusIconSlot>
+                <span className="font-semibold text-success">Deployed</span>
+              </span>
+            </ReservedRow>
+          </div>
+
+          <motion.div
+            transition={{
+              duration: prefersReducedMotion ? 0 : ROW_LAYOUT_TRANSITION_S,
+              ease: EASE_OUT_QUART,
+            }}
+            animate={{ opacity: isFading ? 0 : 1 }}
+            className="absolute inset-x-0 top-0 space-y-2 font-mono text-sm leading-5"
+          >
           <AnimatePresence initial={false}>
             {typedLength > 0 && (
               <Row
@@ -322,7 +381,8 @@ export function HeroVisual() {
               </Row>
             )}
           </AnimatePresence>
-        </motion.div>
+          </motion.div>
+        </div>
 
         <div className="mt-5 flex flex-wrap items-center gap-x-2 gap-y-1.5 border-t border-white/10 pt-3.5 font-mono text-xs text-text-secondary">
           {STATUS_BAR_STATS.map((stat, index) => (

@@ -141,18 +141,19 @@
 }
 
 /* ==========================================================================
-   HeroVisual Terminal Rows — Height Reservation (BUG-020)
-   Reserves space for the maximum row count (5 rows) from first paint so
-   the terminal card never changes height during the type→process→deploy→
-   reset animation cycle. Without this, the card grows and collapses as
-   rows are added/removed, causing Hero's items-center flex layout to
-   recalculate vertical centering position — recorded by Lighthouse as a
-   0.018 CLS event on the Hero content wrapper (desktop only: mobile uses
-   flex-col so the centering recalculation does not affect sibling position).
+   HeroVisual Terminal Rows — Fixed-Height Animation Viewport (BUG-020)
+   The terminal card's height is now pinned by an invisible always-present
+   5-row "max state" placeholder rendered inside a `position: relative`
+   viewport in the component (see HeroVisual.tsx). The real animated rows
+   are layered on top of that placeholder as an absolutely-positioned
+   overlay, so adding/removing rows can never change the viewport height,
+   the card height, or the position of content below the card.
 
-   Calculation: 5 rows × 20px (text-sm line-height) + 4 gaps × 8px
-   (space-y-2) = 132px = 8.25rem.
+   No CSS rule is required here: the placeholder's normal-flow height
+   reserves exactly the maximum rendered footprint (no magic numbers), and
+   the animated overlay is taken out of flow via the `absolute` utility.
+   The previous `min-height`-based reservation is intentionally removed —
+   a `min-height` is only a floor, so the container could still grow when
+   the animated content exceeded the hard-coded `rem` value (e.g. font or
+   line-wrap differences at intermediate widths).
    ========================================================================== */
-.hero-visual-rows-reserve {
-  min-height: 8.25rem;
-}

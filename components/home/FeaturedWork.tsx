@@ -127,14 +127,22 @@ function TechCycleTerminal({ inView, rm }: { inView: boolean; rm: boolean }) {
         </AnimatePresence>
         <span style={{ color: `rgb(${SYNTAX.gray})` }}>&nbsp;{tech.comment}</span>
       </div>
-      <AnimatePresence>
-        {phase === "done" && (
-          <motion.div animate={{ opacity: 1 }} exit={{ opacity: 0 }} transition={{ duration: rm ? 0 : 0.25 }} className="mt-2 flex items-center gap-1.5 text-[11px]">
-            <span style={{ color: `rgb(${SYNTAX.green})` }}>✔</span>
-            <span style={{ color: `rgb(${SYNTAX.green})` }}>Built</span>
-          </motion.div>
-        )}
-      </AnimatePresence>
+      {/* Layout-stability: the "✓ Built" row is always rendered so its slot is
+          permanently reserved; only opacity is animated. Mounting/unmounting it
+          on phase === "done" used to change the terminal's layout height and
+          shift the content below (chips, metric) — now the footprint is fixed
+          from first paint. Enter is instant (duration 0), exit fades 0.25s —
+          identical to the previous conditional mount behavior. */}
+      <motion.div
+        initial={false}
+        animate={{ opacity: phase === "done" ? 1 : 0 }}
+        transition={phase === "done" ? { duration: 0 } : { duration: rm ? 0 : 0.25 }}
+        className="mt-2 flex items-center gap-1.5 text-[11px]"
+        aria-hidden={phase !== "done"}
+      >
+        <span style={{ color: `rgb(${SYNTAX.green})` }}>✔</span>
+        <span style={{ color: `rgb(${SYNTAX.green})` }}>Built</span>
+      </motion.div>
       <div className="mt-3 flex items-center gap-1">
         {TECH_CYCLE.map((_, i) => <span key={i} className="h-1 rounded-full transition-all duration-500" style={{ width: i === cycleIndex ? 16 : 4, background: i === cycleIndex ? `rgb(${tech.color})` : "rgb(var(--color-border))" }} />)}
       </div>
