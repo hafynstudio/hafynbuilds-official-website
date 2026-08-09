@@ -19,13 +19,29 @@ const isDev = process.env.NODE_ENV === "development";
 // 'unsafe-eval' is required only in development (React dev uses eval for
 // error reconstruction); it is absent from the production policy.
 // ---------------------------------------------------------------------------
+// GA4 allowlist: Google Analytics 4 (loaded via @next/third-parties
+// GoogleAnalytics in app/layout.tsx) requires the gtag.js loader from
+// googletagmanager.com (script-src) and sends events to Google's Analytics
+// collection endpoints (connect-src for /g/collect beacons, img-src as a
+// fallback beacon). These three GA endpoints are the minimal, canonical set
+// needed for GA4 tracking to reach the browser; everything else stays strict.
+const gaScriptHosts = ["https://www.googletagmanager.com"];
+const gaConnectHosts = [
+  "https://www.google-analytics.com",
+  "https://analytics.google.com",
+  "https://stats.g.doubleclick.net",
+];
+const gaImageHosts = ["https://www.google-analytics.com"];
+
 const cspHeader = [
   "default-src 'self'",
-  "script-src 'self' 'unsafe-inline'" + (isDev ? " 'unsafe-eval'" : ""),
+  "script-src 'self' 'unsafe-inline'" +
+    (isDev ? " 'unsafe-eval'" : "") +
+    gaScriptHosts.map((h) => ` ${h}`).join(""),
   "style-src 'self' 'unsafe-inline'",
-  "img-src 'self' blob: data:",
+  "img-src 'self' blob: data:" + gaImageHosts.map((h) => ` ${h}`).join(""),
   "font-src 'self'",
-  "connect-src 'self'",
+  "connect-src 'self'" + gaConnectHosts.map((h) => ` ${h}`).join(""),
   "object-src 'none'",
   "base-uri 'self'",
   "form-action 'self'",

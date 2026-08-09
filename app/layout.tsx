@@ -1,6 +1,7 @@
 ﻿import type { Metadata } from "next";
 import localFont from "next/font/local";
 import dynamic from "next/dynamic";
+import { GoogleAnalytics } from "@next/third-parties/google";
 import { organizationSchema } from "@/lib/seo/schema";
 import { Footer } from "@/components/layout/Footer";
 import { CursorSpotlight } from "@/components/ui/CursorSpotlight";
@@ -115,6 +116,17 @@ export default function RootLayout({
 
           <Footer />
         </CurrencyProvider>
+
+        {/* Google Analytics 4 — injected via the official @next/third-parties
+            integration. This is the Next.js-recommended approach for App
+            Router: it hydrates the gtag loader on route change so page views
+            are tracked automatically across client-side navigation (no manual
+            pageview events needed). gaId comes from NEXT_PUBLIC_GA_ID; if the
+            env var is missing at build time (e.g. an env that forgot to set
+            it) it renders nothing rather than crashing the page. */}
+        {process.env.NEXT_PUBLIC_GA_ID ? (
+          <GoogleAnalytics gaId={process.env.NEXT_PUBLIC_GA_ID} />
+        ) : null}
       </body>
     </html>
   );
