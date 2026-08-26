@@ -73,7 +73,7 @@ export function CapabilitiesHero() {
             backdropFilter: "blur(14px)",
             boxShadow: "inset 0 0 0 1px rgb(var(--color-border) / 0.8), 0 0 28px rgb(62 123 250 / 0.1)",
           }}
-          initial={reduced ? { opacity: 1 } : { opacity: 0, y: 10 }}
+          initial={false}
           animate={inView ? { opacity: 1, y: 0 } : {}}
           transition={{ duration: 0.55, delay: 0.1, ease: EASE_OUT_QUART }}
         >
@@ -101,7 +101,7 @@ export function CapabilitiesHero() {
             <span key={i} className="block overflow-hidden">
               <motion.span
                 className="block"
-                initial={reduced ? { y: 0, opacity: 1 } : { y: "108%", opacity: 0 }}
+                initial={false}
                 animate={inView ? { y: 0, opacity: 1 } : {}}
                 transition={reduced
                   ? { duration: 0.01 }
@@ -124,7 +124,7 @@ export function CapabilitiesHero() {
         {/* Subtext */}
         <motion.p
           className="mx-auto mt-7 max-w-md text-base leading-relaxed text-text-secondary sm:text-lg"
-          initial={reduced ? { opacity: 1 } : { opacity: 0, y: 10 }}
+          initial={false}
           animate={inView ? { opacity: 1, y: 0 } : {}}
           transition={{ duration: 0.55, delay: 0.65, ease: EASE_OUT_QUART }}
         >
@@ -139,7 +139,7 @@ export function CapabilitiesHero() {
             borderColor: "rgb(62 123 250 / 0.22)",
             boxShadow: "0 0 0 1px rgb(62 123 250 / 0.06), 0 24px 60px rgb(0 0 0 / 0.55), 0 0 80px rgb(62 123 250 / 0.08)",
           }}
-          initial={reduced ? { opacity: 1, y: 0 } : { opacity: 0, y: 24 }}
+          initial={false}
           animate={inView ? { opacity: 1, y: 0 } : {}}
           transition={{ duration: 0.7, delay: 0.8, ease: EASE_OUT_EXPO }}
         >
@@ -170,7 +170,7 @@ export function CapabilitiesHero() {
                 key={i}
                 className={line.text === "" ? "h-[1.8em]" : "whitespace-pre"}
                 style={{ color: line.color || undefined }}
-                initial={reduced ? { opacity: 1, x: 0 } : { opacity: 0, x: -8 }}
+                initial={false}
                 animate={inView ? { opacity: 1, x: 0 } : {}}
                 transition={{ duration: 0.3, delay: 0.9 + i * 0.07, ease: EASE_OUT_QUART }}
               >

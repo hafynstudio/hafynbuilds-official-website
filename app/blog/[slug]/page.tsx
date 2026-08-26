@@ -298,7 +298,7 @@ export default async function BlogPostPage({ params }: BlogPostPageProps) {
                   )}
                 >
                   <Image
-                    src="/images/founder.jpg"
+                    src="/images/founder.webp"
                     alt="Zain Marwat"
                     width={32}
                     height={32}

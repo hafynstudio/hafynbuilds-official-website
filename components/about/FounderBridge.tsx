@@ -44,7 +44,7 @@ const CONTENT = {
   // contradicted the authoritative title in data/founder.ts and the Person
   // schema ("Founder, Director & CEO"). Aligned to the authoritative one.
   founderTitle: "Founder, Director & CEO",
-  founderPhoto: "/images/founder.jpg",
+  founderPhoto: "/images/founder.webp",
   founderInitials: "ZM",
 } as const;
 

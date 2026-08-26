@@ -37,7 +37,7 @@ export function Signature({
       style={{ maxWidth: "min(100%, 220px)" }}
     >
       <Image
-        src="/images/signature.png"
+        src="/images/signature.webp"
         alt="Zain Marwat signature"
         width={INTRINSIC_W}
         height={INTRINSIC_H}

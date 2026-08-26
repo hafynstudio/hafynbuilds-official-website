@@ -1,12 +1,12 @@
 ﻿"use client";
 
+import dynamic from "next/dynamic";
 import { motion } from "framer-motion";
 import { Button } from "@/components/ui/Button";
 import { AmbientGlow } from "@/components/home/AmbientGlow";
 import { BlinkingCursor } from "@/components/home/BlinkingCursor";
 import { EyebrowBadge } from "@/components/home/EyebrowBadge";
 import { HeroGrainOverlay } from "@/components/home/HeroGrainOverlay";
-import { HeroVisual } from "@/components/home/HeroVisual";
 import {
   KineticHeadline,
   type HeadlineWord,
@@ -15,6 +15,19 @@ import { ParallaxGrid } from "@/components/home/ParallaxGrid";
 import { ScrollIndicator } from "@/components/home/ScrollIndicator";
 import { usePrefersReducedMotion } from "@/lib/hooks";
 import { EASE_OUT_EXPO, HERO_SEQUENCE_DELAYS_S } from "@/lib/motion";
+
+const HeroVisual = dynamic(
+  () => import("@/components/home/HeroVisual").then((m) => ({ default: m.HeroVisual })),
+  {
+    ssr: false,
+    loading: () => (
+      <div
+        aria-hidden="true"
+        className="min-h-[22rem] w-full rounded-2xl border border-border bg-bg-elevated/70 shadow-card-rest lg:min-h-[26rem]"
+      />
+    ),
+  }
+);
 
 const HEADLINE_WORDS: HeadlineWord[] = [
   { text: "Engineering", variant: "heavy" },

@@ -7,7 +7,7 @@ export const founder: FounderProfile = {
   title: "Founder, Director & CEO",
   tagline:
     "We don't build software to launch it. We build systems that still create value years later.",
-  photoUrl: "/images/founder.jpg",
+  photoUrl: "/images/founder.webp",
   isTaglinePlaceholder: false,
 
   eyebrow: "Meet the Founder",

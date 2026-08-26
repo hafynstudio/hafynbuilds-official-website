@@ -81,7 +81,7 @@ export function FounderHero() {
         {/* Portrait */}
         <motion.div
           style={{ y: portraitY }}
-          initial={{ opacity: 1, y: rm ? 0 : 20 }}
+          initial={false}
           animate={inView ? { opacity: 1, y: 0 } : {}}
           transition={{ duration: 0.8, ease: [0.22, 1, 0.36, 1] }}
           className="relative mx-auto w-full max-w-[380px] lg:mx-0 lg:max-w-[460px]"
@@ -116,7 +116,7 @@ export function FounderHero() {
         {/* Text content */}
         <div>
           <motion.div
-            initial={{ opacity: 0, y: rm ? 0 : 8 }}
+            initial={false}
             animate={inView ? { opacity: 1, y: 0 } : {}}
             transition={{ duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
             className="mb-5 flex items-center gap-2.5"
@@ -138,7 +138,7 @@ export function FounderHero() {
               <motion.span
                 key={i}
                 className="mr-3 inline-block"
-                initial={{ opacity: 0, y: rm ? 0 : 16 }}
+                initial={false}
                 animate={inView ? { opacity: 1, y: 0 } : {}}
                 transition={{
                   ...HERO_WORD_TRANSITION,
@@ -151,7 +151,7 @@ export function FounderHero() {
           </h1>
 
           <motion.p
-            initial={{ opacity: 0, y: rm ? 0 : 10 }}
+            initial={false}
             animate={inView ? { opacity: 1, y: 0 } : {}}
             transition={{ duration: 0.5, delay: 0.3, ease: [0.22, 1, 0.36, 1] }}
             className="mt-3 text-lg font-medium text-accent sm:text-xl"
@@ -160,7 +160,7 @@ export function FounderHero() {
           </motion.p>
 
           <motion.p
-            initial={{ opacity: 0, y: rm ? 0 : 10 }}
+            initial={false}
             animate={inView ? { opacity: 1, y: 0 } : {}}
             transition={{ duration: 0.6, delay: 0.42, ease: [0.22, 1, 0.36, 1] }}
             className="mt-8 max-w-[540px] text-base leading-relaxed text-text-secondary sm:text-lg"

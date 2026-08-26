@@ -271,7 +271,7 @@ export function AboutHero() {
             <span className="block overflow-hidden">
               <motion.span
                 className="block"
-                initial={reduced ? { y: 0, opacity: 1 } : { y: "105%", opacity: 0 }}
+                initial={false}
                 animate={isInView ? { y: 0, opacity: 1 } : {}}
                 transition={
                   reduced
@@ -286,7 +286,7 @@ export function AboutHero() {
             <span className="mt-1 block overflow-hidden">
               <motion.span
                 className="block"
-                initial={reduced ? { y: 0, opacity: 1 } : { y: "105%", opacity: 0 }}
+                initial={false}
                 animate={isInView ? { y: 0, opacity: 1 } : {}}
                 transition={
                   reduced

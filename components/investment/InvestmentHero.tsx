@@ -63,7 +63,7 @@ export function InvestmentHero() {
 
       <motion.div
         variants={prefersReduced ? undefined : STAGGER}
-        initial={prefersReduced ? undefined : "hidden"}
+        initial={false}
         animate={prefersReduced ? undefined : "visible"}
         className="relative mx-auto max-w-5xl"
       >

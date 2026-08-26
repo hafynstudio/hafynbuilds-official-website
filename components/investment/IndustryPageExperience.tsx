@@ -22,7 +22,7 @@ export function IndustryPageExperience({
   const hasGeneratedHeroImage = generatedIndustryImageIds.includes(
     industry.id as (typeof generatedIndustryImageIds)[number]
   );
-  const imagePath = `/images/industries/${industry.id}.png`;
+  const imagePath = `/images/industries/${industry.id}.webp`;
 
   return (
     <article className="min-h-screen bg-bg-deep">

@@ -295,9 +295,9 @@ function MobilePipeline() {
         >
           Live Deploy
         </p>
-        <h2 className="pb-2 text-3xl font-bold leading-[1.15] text-text-primary sm:text-4xl">
+        <h1 className="pb-2 text-3xl font-bold leading-[1.15] text-text-primary sm:text-4xl">
           How we build.
-        </h2>
+        </h1>
       </div>
 
       <div className="relative mb-8">
@@ -357,9 +357,9 @@ function StaticPipeline() {
         >
           Our Method
         </p>
-        <h2 className="pb-2 text-3xl font-bold leading-[1.15] text-text-primary sm:text-4xl">
+        <h1 className="pb-2 text-3xl font-bold leading-[1.15] text-text-primary sm:text-4xl">
           How we build.
-        </h2>
+        </h1>
       </div>
 
       <div role="list" aria-label="Delivery stages">

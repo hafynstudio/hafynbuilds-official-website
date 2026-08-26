@@ -61,9 +61,9 @@ export function LoadingScreen() {
     // values from whichever variant is last-applied, skipping the risen
     // state entirely). One variant name active at a time is predictable
     // and correct.
-    const riseTimer = setTimeout(() => setSkylineStage("risen"), 600);
-    const collapseTimer = setTimeout(() => setSkylineStage("collapsed"), 1900);
-    const dismissTimer = setTimeout(() => setIsDismissed(true), 2600);
+    const riseTimer = setTimeout(() => setSkylineStage("risen"), 180);
+    const collapseTimer = setTimeout(() => setSkylineStage("collapsed"), 600);
+    const dismissTimer = setTimeout(() => setIsDismissed(true), 900);
 
     const originalOverflow = document.documentElement.style.overflow;
     document.documentElement.style.overflow = "hidden";
@@ -89,7 +89,7 @@ export function LoadingScreen() {
   // also never the full ~2.6s animated timeline.
   useEffect(() => {
     if (!isVisible || !prefersReducedMotion) return;
-    const timer = setTimeout(() => setIsDismissed(true), 500);
+    const timer = setTimeout(() => setIsDismissed(true), 250);
     return () => clearTimeout(timer);
   }, [isVisible, prefersReducedMotion]);
 
@@ -103,7 +103,7 @@ export function LoadingScreen() {
         <motion.div
           className="fixed inset-0 z-loading-screen flex items-center justify-center bg-bg-primary"
           exit={{ opacity: 0 }}
-          transition={{ duration: prefersReducedMotion ? 0 : 0.5, ease: [0.76, 0, 0.24, 1] }}
+          transition={{ duration: prefersReducedMotion ? 0 : 0.25, ease: [0.76, 0, 0.24, 1] }}
           role="status"
           aria-label="HAFYN BUILDS is loading"
         >

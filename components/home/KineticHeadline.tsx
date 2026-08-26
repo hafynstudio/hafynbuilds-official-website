@@ -80,10 +80,12 @@ export function KineticHeadline({
 
   return (
     <h1 className={className} aria-label={fullText}>
+      {/* The critical H1 remains paintable during hydration; the existing
+          visible animation target is retained without an SSR-hidden state. */}
       <motion.span
         aria-hidden="true"
         className="inline"
-        initial="hidden"
+        initial={false}
         animate="visible"
         variants={{
           visible: {
@@ -112,6 +114,7 @@ export function KineticHeadline({
               )}
               <motion.span
                 className={cn("inline-block", VARIANT_CLASSES[word.variant])}
+                initial={false}
                 variants={{
                   hidden: {
                     opacity: 0,

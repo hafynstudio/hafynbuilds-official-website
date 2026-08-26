@@ -29,7 +29,7 @@ export function ContactHero({ replyWindow }: ContactHeroProps) {
   const reduced = usePrefersReducedMotion();
 
   const fadeUp = (delay: number) => ({
-    initial: reduced ? { opacity: 1, y: 0 } : { opacity: 0, y: 16 },
+    initial: false,
     animate: isInView
       ? { opacity: 1, y: 0 }
       : reduced
@@ -90,7 +90,7 @@ export function ContactHero({ replyWindow }: ContactHeroProps) {
           <span className="block overflow-hidden pb-1">
             <motion.span
               className="block"
-              initial={reduced ? { y: 0, opacity: 1 } : { y: "105%", opacity: 0 }}
+              initial={false}
               animate={isInView ? { y: 0, opacity: 1 } : {}}
               transition={
                 reduced
@@ -105,7 +105,7 @@ export function ContactHero({ replyWindow }: ContactHeroProps) {
           <span className="block overflow-hidden pb-1">
             <motion.span
               className="block"
-              initial={reduced ? { y: 0, opacity: 1 } : { y: "105%", opacity: 0 }}
+              initial={false}
               animate={isInView ? { y: 0, opacity: 1 } : {}}
               transition={
                 reduced

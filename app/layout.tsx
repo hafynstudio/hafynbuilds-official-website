@@ -1,7 +1,7 @@
 ﻿import type { Metadata } from "next";
 import localFont from "next/font/local";
 import dynamic from "next/dynamic";
-import { GoogleAnalytics } from "@next/third-parties/google";
+import Script from "next/script";
 import { organizationSchema } from "@/lib/seo/schema";
 import { Footer } from "@/components/layout/Footer";
 import { CursorSpotlight } from "@/components/ui/CursorSpotlight";
@@ -117,15 +117,25 @@ export default function RootLayout({
           <Footer />
         </CurrencyProvider>
 
-        {/* Google Analytics 4 — injected via the official @next/third-parties
-            integration. This is the Next.js-recommended approach for App
-            Router: it hydrates the gtag loader on route change so page views
-            are tracked automatically across client-side navigation (no manual
-            pageview events needed). gaId comes from NEXT_PUBLIC_GA_ID; if the
-            env var is missing at build time (e.g. an env that forgot to set
-            it) it renders nothing rather than crashing the page. */}
+        {/* Google Analytics 4 is deliberately lazy-loaded. It remains enabled
+            when configured, but it no longer competes with the first paint or
+            hero hydration on mobile. The lazyOnload strategy preserves the
+            existing analytics behavior after the page is interactive. */}
         {process.env.NEXT_PUBLIC_GA_ID ? (
-          <GoogleAnalytics gaId={process.env.NEXT_PUBLIC_GA_ID} />
+          <>
+            <Script
+              src={`https://www.googletagmanager.com/gtag/js?id=${process.env.NEXT_PUBLIC_GA_ID}`}
+              strategy="lazyOnload"
+            />
+            <Script id="hafyn-google-analytics" strategy="lazyOnload">
+              {`
+                window.dataLayer = window.dataLayer || [];
+                function gtag(){window.dataLayer.push(arguments);}
+                gtag('js', new Date());
+                gtag('config', '${process.env.NEXT_PUBLIC_GA_ID}', { send_page_view: true });
+              `}
+            </Script>
+          </>
         ) : null}
       </body>
     </html>

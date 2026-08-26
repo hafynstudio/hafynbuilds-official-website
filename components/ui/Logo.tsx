@@ -53,7 +53,7 @@ function Mark() {
       }}
     >
       <Image
-        src="/images/logo.png"
+        src="/images/logo.webp"
         alt=""
         width={1024}
         height={1024}
