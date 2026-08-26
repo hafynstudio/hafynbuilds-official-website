@@ -1,5 +1,6 @@
 ﻿"use client";
 
+import Link from "next/link";
 import { motion } from "framer-motion";
 import { ArrowRight } from "lucide-react";
 import { cn } from "@/lib/utils";
@@ -13,68 +14,46 @@ import type { Industry, IndustryVisualTheme } from "@/types/industry";
 // hex values. warm/clean/professional reuse existing tokens;
 // elegant/vibrant use the 2 new tokens added to the system in Phase 11.
 const THEME_ICON_CLASS: Record<IndustryVisualTheme, string> = {
-  warm:         "text-badge-founding",
-  clean:        "text-accent-glow",
+  warm: "text-badge-founding",
+  clean: "text-accent-glow",
   professional: "text-accent",
-  elegant:      "text-theme-elegant",
-  vibrant:      "text-theme-vibrant",
+  elegant: "text-theme-elegant",
+  vibrant: "text-theme-vibrant",
 };
 
 const THEME_GLOW_CLASS: Record<IndustryVisualTheme, string> = {
-  warm:         "group-hover:shadow-[0_0_40px_rgba(245,158,11,0.12)]",
-  clean:        "group-hover:shadow-[0_0_40px_rgba(34,211,238,0.12)]",
+  warm: "group-hover:shadow-[0_0_40px_rgba(245,158,11,0.12)]",
+  clean: "group-hover:shadow-[0_0_40px_rgba(34,211,238,0.12)]",
   professional: "group-hover:shadow-[0_0_40px_rgba(62,123,250,0.12)]",
-  elegant:      "group-hover:shadow-[0_0_40px_rgba(244,165,178,0.12)]",
-  vibrant:      "group-hover:shadow-[0_0_40px_rgba(192,111,247,0.12)]",
+  elegant: "group-hover:shadow-[0_0_40px_rgba(244,165,178,0.12)]",
+  vibrant: "group-hover:shadow-[0_0_40px_rgba(192,111,247,0.12)]",
 };
 
 const THEME_BORDER_CLASS: Record<IndustryVisualTheme, string> = {
-  warm:         "group-hover:border-badge-founding/25",
-  clean:        "group-hover:border-accent-glow/25",
+  warm: "group-hover:border-badge-founding/25",
+  clean: "group-hover:border-accent-glow/25",
   professional: "group-hover:border-accent/25",
-  elegant:      "group-hover:border-theme-elegant/25",
-  vibrant:      "group-hover:border-theme-vibrant/25",
+  elegant: "group-hover:border-theme-elegant/25",
+  vibrant: "group-hover:border-theme-vibrant/25",
 };
 
 const THEME_DOT_CLASS: Record<IndustryVisualTheme, string> = {
-  warm:         "bg-badge-founding",
-  clean:        "bg-accent-glow",
+  warm: "bg-badge-founding",
+  clean: "bg-accent-glow",
   professional: "bg-accent",
-  elegant:      "bg-theme-elegant",
-  vibrant:      "bg-theme-vibrant",
+  elegant: "bg-theme-elegant",
+  vibrant: "bg-theme-vibrant",
 };
 
 interface IndustryCardProps {
   industry: Industry;
-  /** Called when the card is activated (click or keyboard Enter/Space).
-   * Phase 12 will wire this to open the IndustryModal. In Phase 11 the
-   * handler is connected at the IndustryExplorer level and can be a
-   * no-op — the card itself is fully interactive and accessible either
-   * way. */
-  onSelect: (industry: Industry) => void;
-  /** Visual entrance delay for stagger effect — passed from the parent
-   * grid, varies by card index. */
+  /** Visual entrance delay for stagger effect — passed from the parent grid. */
   entranceDelay?: number;
 }
 
-export function IndustryCard({
-  industry,
-  onSelect,
-  entranceDelay = 0,
-}: IndustryCardProps) {
+export function IndustryCard({ industry, entranceDelay = 0 }: IndustryCardProps) {
   const IconComponent = ICON_MAP[industry.iconOrIllustration];
   const prefersReducedMotion = usePrefersReducedMotion();
-
-  function handleActivate() {
-    onSelect(industry);
-  }
-
-  function handleKeyDown(e: React.KeyboardEvent) {
-    if (e.key === "Enter" || e.key === " ") {
-      e.preventDefault();
-      handleActivate();
-    }
-  }
 
   return (
     <motion.div
@@ -86,19 +65,15 @@ export function IndustryCard({
           ? { duration: 0 }
           : { duration: 0.4, delay: entranceDelay, ease: EASE_OUT_QUART }
       }
-      // layout — enables smooth positional reflow when the grid filters
-      // (cards animate to new positions rather than jumping).
       layout
       layoutId={`industry-card-${industry.id}`}
     >
-      <div
-        role="button"
-        tabIndex={0}
+      <Link
+        href={`/investment/${industry.id}`}
         aria-label={`View packages for ${industry.name}`}
-        onClick={handleActivate}
-        onKeyDown={handleKeyDown}
+        data-industry-slug={industry.id}
         className={cn(
-          // Base glass-surface (consistent with site-wide Card pattern)
+          // Native link semantics make the whole visual card keyboard and crawler discoverable.
           "group relative flex cursor-pointer flex-col gap-4 rounded-card p-6",
           "border border-border-hairline bg-bg-elevated",
           "shadow-card-rest",
@@ -111,7 +86,7 @@ export function IndustryCard({
           // Theme-specific border + glow on hover
           THEME_BORDER_CLASS[industry.visualTheme],
           THEME_GLOW_CLASS[industry.visualTheme],
-          // Focus-visible ring (keyboard navigation)
+          // Visible keyboard focus ring
           "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2 focus-visible:ring-offset-bg-deep"
         )}
       >
@@ -176,7 +151,7 @@ export function IndustryCard({
             )}
           />
         </div>
-      </div>
+      </Link>
     </motion.div>
   );
 }

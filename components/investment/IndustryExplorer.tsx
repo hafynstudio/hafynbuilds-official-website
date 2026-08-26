@@ -13,7 +13,6 @@ import {
   searchIndustries,
 } from "@/lib/industries/provider";
 import { INDUSTRY_CATEGORIES } from "@/data/industry-categories";
-import type { Industry } from "@/types/industry";
 
 // Stagger timing for the card grid entrance (PRD §3.2: 80–100ms steps).
 const CARD_STAGGER_S = 0.05;
@@ -27,16 +26,7 @@ const STAGGER_CAP_INDEX = 12;
 const ALL_CATEGORY_VALUE = null;
 const ALL_CATEGORY_LABEL = "All";
 
-interface IndustryExplorerProps {
-  /** Called when a card is selected. Phase 11: can be a no-op.
-   * Phase 12: will open the IndustryModal with the selected industry.
-   * The Explorer never changes — only the handler wired here. */
-  onIndustrySelect?: (industry: Industry) => void;
-}
-
-export function IndustryExplorer({
-  onIndustrySelect,
-}: IndustryExplorerProps) {
+export function IndustryExplorer() {
   const [query, setQuery] = useState("");
   const [activeCategory, setActiveCategory] = useState<string | null>(
     ALL_CATEGORY_VALUE
@@ -78,13 +68,6 @@ export function IndustryExplorer({
       setQuery("");
     });
   }, []);
-
-  const handleCardSelect = useCallback(
-    (industry: Industry) => {
-      onIndustrySelect?.(industry);
-    },
-    [onIndustrySelect]
-  );
 
   const isEmpty = visibleIndustries.length === 0;
   const hasActiveFilter = query.trim().length > 0 || activeCategory !== null;
@@ -238,7 +221,6 @@ export function IndustryExplorer({
               <div key={industry.id} role="listitem">
                 <IndustryCard
                   industry={industry}
-                  onSelect={handleCardSelect}
                   entranceDelay={
                     Math.min(index, STAGGER_CAP_INDEX) * CARD_STAGGER_S
                   }
