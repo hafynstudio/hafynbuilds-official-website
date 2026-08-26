@@ -110,7 +110,6 @@ export function CompileSequence({
     let glowQueued = false;
 
     const unsub = progress.on("change", (v: number) => {
-      const fullLineData = capability.codeLines;
       const allLines     = fullText.split("\n");
 
       // ── 1. Typewriter reveal (direct DOM via ref) ─────────────────────

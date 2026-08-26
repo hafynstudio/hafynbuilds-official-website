@@ -82,16 +82,12 @@ export function StatusLog({ activeStageIndex, reducedMotion, compact = false }: 
   const timersRef = useRef<ReturnType<typeof setTimeout>[]>([]);
 
   useEffect(() => {
-    setVisibleLines([]);
     timersRef.current.forEach(clearTimeout);
     timersRef.current = [];
 
     const lines = STAGE_LOGS[activeStageIndex] ?? [];
 
-    if (reducedMotion) {
-      setVisibleLines(lines);
-      return;
-    }
+    if (reducedMotion) return;
 
     lines.forEach((line, i) => {
       const timer = setTimeout(() => {
@@ -143,7 +139,10 @@ export function StatusLog({ activeStageIndex, reducedMotion, compact = false }: 
         style={{ height: "calc(100% - 28px)" }}
       >
         <AnimatePresence initial={false}>
-          {visibleLines.map((line) => (
+          {(reducedMotion
+            ? STAGE_LOGS[activeStageIndex] ?? []
+            : visibleLines
+          ).map((line) => (
             <motion.p
               key={line.id}
               initial={reducedMotion ? false : { opacity: 0, x: -8 }}

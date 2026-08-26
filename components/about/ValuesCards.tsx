@@ -258,7 +258,7 @@ function CloseButton({
 
 // ─── EXPAND TOGGLE BUTTON ─────────────────────────────────────────────────────
 
-function ExpandToggle({ rm }: { rm: boolean }) {
+function ExpandToggle() {
   return (
     <div
       aria-hidden="true"
@@ -454,7 +454,7 @@ function ValueCard({ value, index, rm }: ValueCardProps) {
                     // so this visual indicator doesn't need its own accessible role
                     aria-hidden="true"
                   >
-                    <ExpandToggle rm={rm} />
+                    <ExpandToggle />
                   </motion.div>
                 )}
               </AnimatePresence>

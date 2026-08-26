@@ -21,9 +21,15 @@ interface ArticleGridProps {
   /** When true, search/filter is active — changes empty state messaging
    * from "no articles yet" to "no results found." */
   isFiltered: boolean;
+  /** When true, the featured article is already rendered above the grid. */
+  hasFeaturedPost?: boolean;
 }
 
-export function ArticleGrid({ posts, isFiltered }: ArticleGridProps) {
+export function ArticleGrid({
+  posts,
+  isFiltered,
+  hasFeaturedPost = false,
+}: ArticleGridProps) {
   const prefersReducedMotion = usePrefersReducedMotion();
 
   // ─── Empty state ─────────────────────────────────────────────────────────
@@ -61,12 +67,16 @@ export function ArticleGrid({ posts, isFiltered }: ArticleGridProps) {
           <p className="font-sans text-base font-medium text-text-secondary">
             {isFiltered
               ? "No articles found."
-              : "No articles yet."}
+              : hasFeaturedPost
+                ? "Featured insight is above."
+                : "No articles yet."}
           </p>
           <p className="max-w-sm font-sans text-sm text-text-tertiary">
             {isFiltered
               ? "Try adjusting your search or clearing the filters."
-              : "We\u2019re writing something worth reading. Check back soon."}
+              : hasFeaturedPost
+                ? "More articles are coming soon."
+                : "We\u2019re writing something worth reading. Check back soon."}
           </p>
         </div>
       </motion.div>

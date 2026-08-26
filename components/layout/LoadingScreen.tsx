@@ -1,8 +1,8 @@
 ﻿"use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
-import { usePrefersReducedMotion } from "@/lib/hooks";
+import { useIsClient, usePrefersReducedMotion } from "@/lib/hooks";
 
 const SESSION_KEY = "hafyn-loading-shown";
 // Arbitrary but deliberate massing — a simple wireframe skyline
@@ -28,26 +28,28 @@ const skylineVariants = {
  * refresh within the same browser tab.
  */
 export function LoadingScreen() {
-  const [hasChecked, setHasChecked] = useState(false);
-  const [isVisible, setIsVisible] = useState(false);
+  const isClient = useIsClient();
+  const [isDismissed, setIsDismissed] = useState(false);
   const [skylineStage, setSkylineStage] = useState<SkylineStage>("hidden");
   const prefersReducedMotion = usePrefersReducedMotion();
+  const shouldShow = useMemo(() => {
+    if (!isClient) return false;
+    try {
+      return !sessionStorage.getItem(SESSION_KEY);
+    } catch {
+      return true;
+    }
+  }, [isClient]);
+  const isVisible = shouldShow && !isDismissed;
 
   useEffect(() => {
-    // FIX (Phase 2, A11Y-004): sessionStorage can throw in privacy-
-    // restricted browsing modes (Safari private / blocked storage). Guarded
-    // so the splash still renders instead of crashing on first visit.
+    if (!isClient || !shouldShow) return;
     try {
-      const alreadyShown = sessionStorage.getItem(SESSION_KEY);
-      if (!alreadyShown) {
-        setIsVisible(true);
-        sessionStorage.setItem(SESSION_KEY, "true");
-      }
+      sessionStorage.setItem(SESSION_KEY, "true");
     } catch {
-      setIsVisible(true);
+      // Storage can be blocked in privacy-restricted browsing modes.
     }
-    setHasChecked(true);
-  }, []);
+  }, [isClient, shouldShow]);
 
   useEffect(() => {
     if (!isVisible || prefersReducedMotion) return;
@@ -61,13 +63,13 @@ export function LoadingScreen() {
     // and correct.
     const riseTimer = setTimeout(() => setSkylineStage("risen"), 600);
     const collapseTimer = setTimeout(() => setSkylineStage("collapsed"), 1900);
-    const dismissTimer = setTimeout(() => setIsVisible(false), 2600);
+    const dismissTimer = setTimeout(() => setIsDismissed(true), 2600);
 
     const originalOverflow = document.documentElement.style.overflow;
     document.documentElement.style.overflow = "hidden";
 
     function skip() {
-      setIsVisible(false);
+      setIsDismissed(true);
     }
     window.addEventListener("keydown", skip);
     window.addEventListener("click", skip);
@@ -87,14 +89,13 @@ export function LoadingScreen() {
   // also never the full ~2.6s animated timeline.
   useEffect(() => {
     if (!isVisible || !prefersReducedMotion) return;
-    const timer = setTimeout(() => setIsVisible(false), 500);
+    const timer = setTimeout(() => setIsDismissed(true), 500);
     return () => clearTimeout(timer);
   }, [isVisible, prefersReducedMotion]);
 
-  // Nothing renders until we've confirmed (client-side) whether this
-  // session has already seen the sequence — avoids any flash of the
-  // overlay for returning-within-session visitors.
-  if (!hasChecked) return null;
+  // Nothing renders until the SSR-safe client snapshot is available. The
+  // session flag itself is memoized for this mount so subsequent animation
+  // state changes cannot hide the splash early.
 
   return (
     <AnimatePresence>

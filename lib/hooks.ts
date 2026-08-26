@@ -1,6 +1,13 @@
 ﻿"use client";
 
-import { useEffect, useRef, useState, type RefObject } from "react";
+import {
+  useCallback,
+  useEffect,
+  useRef,
+  useState,
+  useSyncExternalStore,
+  type RefObject,
+} from "react";
 
 /**
  * Subscribes to a CSS media query and returns whether it currently
@@ -8,22 +15,35 @@ import { useEffect, useRef, useState, type RefObject } from "react";
  * fine-pointer detection gating (magnetic buttons, ParallaxGrid's
  * cursor-reactive spotlight — both meaningless on touch devices).
  */
+const getServerMediaQuerySnapshot = () => false;
+const subscribeToClient = () => () => {};
+const getClientSnapshot = () => true;
+const getServerClientSnapshot = () => false;
+
+export function useIsClient(): boolean {
+  return useSyncExternalStore(
+    subscribeToClient,
+    getClientSnapshot,
+    getServerClientSnapshot
+  );
+}
+
 export function useMediaQuery(query: string): boolean {
-  const [matches, setMatches] = useState(false);
+  const subscribe = useCallback(
+    (onStoreChange: () => void) => {
+      const mediaQueryList = window.matchMedia(query);
+      mediaQueryList.addEventListener("change", onStoreChange);
+      return () => mediaQueryList.removeEventListener("change", onStoreChange);
+    },
+    [query]
+  );
+  const getSnapshot = useCallback(() => window.matchMedia(query).matches, [query]);
 
-  useEffect(() => {
-    const mediaQueryList = window.matchMedia(query);
-    setMatches(mediaQueryList.matches);
-
-    const handleChange = (event: MediaQueryListEvent) => {
-      setMatches(event.matches);
-    };
-
-    mediaQueryList.addEventListener("change", handleChange);
-    return () => mediaQueryList.removeEventListener("change", handleChange);
-  }, [query]);
-
-  return matches;
+  return useSyncExternalStore(
+    subscribe,
+    getSnapshot,
+    getServerMediaQuerySnapshot
+  );
 }
 
 /**
@@ -130,18 +150,18 @@ export function useLazyMount(
 ): { sentinelRef: React.RefObject<HTMLDivElement | null>; shouldMount: boolean } {
   const [shouldMount, setShouldMount] = useState(false);
   const sentinelRef = useRef<HTMLDivElement | null>(null);
+  const rootMargin = options?.rootMargin ?? "200px";
 
-  // SSR-safe fallback: IntersectionObserver is only checked post-hydration,
-  // so server and client agree on shouldMount=false during the first render.
   useEffect(() => {
+    if (shouldMount) return;
+
     if (typeof IntersectionObserver === "undefined") {
-      setShouldMount(true);
+      const fallbackTimer = window.setTimeout(() => setShouldMount(true), 0);
+      return () => window.clearTimeout(fallbackTimer);
     }
-  }, []);
 
-  useEffect(() => {
     const el = sentinelRef.current;
-    if (!el || shouldMount) return;
+    if (!el) return;
 
     const observer = new IntersectionObserver(
       ([entry]) => {
@@ -150,14 +170,12 @@ export function useLazyMount(
           observer.disconnect();
         }
       },
-      { rootMargin: options?.rootMargin ?? "200px" }
+      { rootMargin }
     );
 
     observer.observe(el);
-
     return () => observer.disconnect();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [options?.rootMargin]);
+  }, [rootMargin, shouldMount]);
 
   return { sentinelRef, shouldMount };
 }

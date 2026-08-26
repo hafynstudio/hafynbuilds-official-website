@@ -113,10 +113,11 @@ export function BlogExperience({
           </span>
         </div>
 
-        <ArticleGrid
-          posts={gridPosts}
-          isFiltered={isFiltered}
-        />
+          <ArticleGrid
+            posts={gridPosts}
+            isFiltered={isFiltered}
+            hasFeaturedPost={Boolean(featuredPost)}
+          />
       </section>
 
       <NewsletterCTA />

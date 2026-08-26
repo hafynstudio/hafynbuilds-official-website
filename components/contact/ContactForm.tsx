@@ -2,13 +2,17 @@
 
 import { useEffect, useId, useRef, useState, useCallback, Fragment } from "react";
 import { flushSync } from "react-dom";
-import { useForm } from "react-hook-form";
+import { useForm, useWatch } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { motion, AnimatePresence } from "framer-motion";
 import { Input } from "@/components/ui/Input";
 import { Button } from "@/components/ui/Button";
 import { contactSchema, type ContactFormData } from "@/lib/contact-schema";
-import { usePrefersReducedMotion, useMediaQuery } from "@/lib/hooks";
+import {
+  useIsClient,
+  useMediaQuery,
+  usePrefersReducedMotion,
+} from "@/lib/hooks";
 import { EASE_OUT_EXPO, EASE_OUT_QUART, FRAMER_COLOR_TOKENS, rgbaToken } from "@/lib/motion";
 import { cn } from "@/lib/utils";
 import { socialLinks } from "@/data/social-links";
@@ -246,7 +250,7 @@ export function ContactForm({ replyWindow }: ContactFormProps) {
   const [submitError, setSubmitError] = useState<string | null>(null);
   const [attachmentError, setAttachmentError] = useState<string | null>(null);
   const [attachedFile, setAttachedFile] = useState<File | null>(null);
-  const [mounted, setMounted] = useState(false);
+  const isClient = useIsClient();
 
   const prefersReducedMotion = usePrefersReducedMotion();
   const isMobile = useMediaQuery("(max-width: 767px)");
@@ -257,16 +261,14 @@ export function ContactForm({ replyWindow }: ContactFormProps) {
 
   const whatsapp = socialLinks.find((l) => l.platform === "whatsapp");
 
-  useEffect(() => setMounted(true), []);
 
   const {
+    control,
     register,
     handleSubmit,
     trigger,
-    watch,
     setValue,
     reset,
-    getValues,
     formState: { errors, dirtyFields, touchedFields },
   } = useForm<ContactFormData>({
     resolver: zodResolver(contactSchema),
@@ -286,7 +288,10 @@ export function ContactForm({ replyWindow }: ContactFormProps) {
     return dirtyFields[field] && touchedFields[field] ? errors[field]?.message : undefined;
   }
 
-  const formValues = watch();
+  const formValues = useWatch({ control });
+  const projectType = useWatch({ control, name: "projectType" });
+  const budgetRange = useWatch({ control, name: "budgetRange" });
+  const timeline = useWatch({ control, name: "timeline" });
   // FIX (Phase 2, CONV-005): draft autosave is debounced (400ms) so a
   // single keystroke no longer serializes the entire form to localStorage.
   useEffect(() => {
@@ -536,9 +541,9 @@ export function ContactForm({ replyWindow }: ContactFormProps) {
 
               {step === 1 && (
                 <motion.div key="step-1" variants={stepVariants} initial="initial" animate="animate" exit="exit" className="space-y-7">
-                  <SegmentedControl label="Project Type *" options={PROJECT_TYPES} value={watch("projectType")} onChange={(v) => setValue("projectType", v, { shouldValidate: true })} error={errors.projectType?.message} />
-                  <SegmentedControl label="Budget Range *" options={BUDGET_RANGES} value={watch("budgetRange")} onChange={(v) => setValue("budgetRange", v, { shouldValidate: true })} error={errors.budgetRange?.message} />
-                  <SegmentedControl label="Timeline *" options={TIMELINES} value={watch("timeline")} onChange={(v) => setValue("timeline", v, { shouldValidate: true })} error={errors.timeline?.message} />
+                  <SegmentedControl label="Project Type *" options={PROJECT_TYPES} value={projectType} onChange={(v) => setValue("projectType", v, { shouldValidate: true })} error={errors.projectType?.message} />
+                  <SegmentedControl label="Budget Range *" options={BUDGET_RANGES} value={budgetRange} onChange={(v) => setValue("budgetRange", v, { shouldValidate: true })} error={errors.budgetRange?.message} />
+                  <SegmentedControl label="Timeline *" options={TIMELINES} value={timeline} onChange={(v) => setValue("timeline", v, { shouldValidate: true })} error={errors.timeline?.message} />
                 </motion.div>
               )}
 
@@ -651,7 +656,7 @@ export function ContactForm({ replyWindow }: ContactFormProps) {
           inside the position-relative wrapper. Uses `sticky bottom-0` so
           it scrolls away with the form container instead of overlapping
           Footer (BUG 3 fix). */}
-      {mounted && isMobile && mobileActionBar}
+      {isClient && isMobile && mobileActionBar}
     </div>
   );
 }

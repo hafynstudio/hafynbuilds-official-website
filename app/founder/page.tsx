@@ -46,8 +46,6 @@ export default function FounderPage() {
     <>
       <script
         type="application/ld+json"
-        // eslint-disable-next-line react/no-danger -- standard Next.js
-        // App Router pattern for injecting JSON-LD structured data.
         dangerouslySetInnerHTML={{ __html: JSON.stringify(schema) }}
       />
       <main>

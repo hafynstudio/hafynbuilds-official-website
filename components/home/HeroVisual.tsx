@@ -171,11 +171,7 @@ export function HeroVisual() {
   const [isFading, setIsFading] = useState(false);
 
   useEffect(() => {
-    if (prefersReducedMotion) {
-      setTypedLength(COMMAND_TEXT.length);
-      setStepIndex(3);
-      return;
-    }
+    if (prefersReducedMotion) return;
 
     let cancelled = false;
     const timeouts: ReturnType<typeof setTimeout>[] = [];
@@ -236,9 +232,17 @@ export function HeroVisual() {
     return () => clearInterval(interval);
   }, [prefersReducedMotion]);
 
-  const commandActive = stepIndex === null && typedLength > 0;
+  const renderedTypedLength = prefersReducedMotion
+    ? COMMAND_TEXT.length
+    : typedLength;
+  const renderedStepIndex = prefersReducedMotion ? 3 : stepIndex;
+  const commandActive = renderedStepIndex === null && renderedTypedLength > 0;
   const progressPercent =
-    stepIndex === null ? 0 : stepIndex === 3 ? 100 : PROGRESS_BY_STEP[stepIndex];
+    renderedStepIndex === null
+      ? 0
+      : renderedStepIndex === 3
+        ? 100
+        : PROGRESS_BY_STEP[renderedStepIndex];
 
   let lineNumber = 0;
 
@@ -309,24 +313,24 @@ export function HeroVisual() {
             className="absolute inset-x-0 top-0 space-y-2 font-mono text-sm leading-5"
           >
           <AnimatePresence initial={false}>
-            {typedLength > 0 && (
+            {renderedTypedLength > 0 && (
               <Row
                 key="command"
                 lineNumber={++lineNumber}
                 reducedMotion={prefersReducedMotion}
               >
                 <span className="text-text-tertiary">
-                  {COMMAND_TEXT.slice(0, typedLength)}
+                  {COMMAND_TEXT.slice(0, renderedTypedLength)}
                   {commandActive && <TrailingCursor />}
                 </span>
               </Row>
             )}
 
-            {stepIndex !== null &&
+            {renderedStepIndex !== null &&
               PROCESS_LABELS.map((label, index) => {
-                if (stepIndex < index) return null;
-                const isActive = stepIndex === index;
-                const isDone = stepIndex > index;
+                if (renderedStepIndex < index) return null;
+                const isActive = renderedStepIndex === index;
+                const isDone = renderedStepIndex > index;
                 const dots = isActive ? ".".repeat(dotsCount) : "...";
 
                 return (
@@ -366,7 +370,7 @@ export function HeroVisual() {
                 );
               })}
 
-            {stepIndex === 3 && (
+            {renderedStepIndex === 3 && (
               <Row
                 key="deployed"
                 lineNumber={++lineNumber}

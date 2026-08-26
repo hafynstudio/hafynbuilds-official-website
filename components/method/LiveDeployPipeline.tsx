@@ -144,7 +144,6 @@ function AnimatedPipeline() {
       ro.disconnect();
       ctx.revert();
     };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const panelH = `calc(100vh - ${HEADER_PX}px)`;
@@ -196,9 +195,9 @@ function AnimatedPipeline() {
               {/* leading-[1.15] + pb-2 protects descenders and bold-cap
                   curves (W, B) from being clipped at the viewport edge
                   even before the track has translated. */}
-              <h2 className="pb-2 text-3xl font-bold leading-[1.15] text-text-primary sm:text-4xl lg:text-5xl">
+              <h1 className="pb-2 text-3xl font-bold leading-[1.15] text-text-primary sm:text-4xl lg:text-5xl">
                 How we build.
-              </h2>
+              </h1>
             </div>
 
             <div role="list" aria-label="Delivery stages">
@@ -225,7 +224,11 @@ function AnimatedPipeline() {
 
         {/* ── RIGHT: status log — fixed in place, not part of the track ── */}
         <div className="w-80 shrink-0 xl:w-96" aria-label="Deployment status log">
-          <StatusLog activeStageIndex={Math.max(0, activeIndex)} reducedMotion={false} />
+          <StatusLog
+            key={`desktop-${Math.max(0, activeIndex)}`}
+            activeStageIndex={Math.max(0, activeIndex)}
+            reducedMotion={false}
+          />
 
           <div
             className="mt-6 flex items-center gap-2"
@@ -298,7 +301,12 @@ function MobilePipeline() {
       </div>
 
       <div className="relative mb-8">
-        <StatusLog activeStageIndex={activeIndex} reducedMotion={false} compact />
+        <StatusLog
+          key={`compact-${activeIndex}`}
+          activeStageIndex={activeIndex}
+          reducedMotion={false}
+          compact
+        />
       </div>
 
       <div role="list" aria-label="Delivery stages" className="relative">

@@ -337,11 +337,9 @@ function FounderCTA() {
 
 function ContentPanel({
   inView,
-  rm,
   mobile = false,
 }: {
   inView: boolean;
-  rm: boolean;
   mobile?: boolean;
 }) {
   const headingLines = [
@@ -564,7 +562,7 @@ export function FounderTeaser() {
           <div className="mb-8 w-full max-w-[280px]">
             <PortraitCard inView={mobileInView} rm={rm} mobile />
           </div>
-          <ContentPanel inView={mobileInView} rm={rm} mobile />
+          <ContentPanel inView={mobileInView} mobile />
         </div>
       </div>
 
@@ -581,7 +579,7 @@ export function FounderTeaser() {
               <PortraitCard inView={desktopInView} rm={rm} mobile={false} />
             </div>
 
-            <ContentPanel inView={desktopInView} rm={rm} mobile={false} />
+            <ContentPanel inView={desktopInView} mobile={false} />
           </div>
         </div>
       </div>

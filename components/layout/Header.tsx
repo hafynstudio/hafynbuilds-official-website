@@ -1,6 +1,6 @@
 ﻿"use client";
 
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useMotionValueEvent, useScroll } from "framer-motion";
@@ -26,6 +26,10 @@ const NAV_LINKS = [
 
 export function Header() {
   const pathname = usePathname();
+  return <HeaderShell key={pathname} pathname={pathname} />;
+}
+
+function HeaderShell({ pathname }: { pathname: string }) {
   const [isMobileNavOpen, setIsMobileNavOpen] = useState(false);
   const [isScrolled, setIsScrolled] = useState(false);
   const { scrollY } = useScroll();
@@ -34,9 +38,6 @@ export function Header() {
     setIsScrolled(latest > 8);
   });
 
-  useEffect(() => {
-    setIsMobileNavOpen(false);
-  }, [pathname]);
 
   function isActive(href: string) {
     return pathname === href || pathname.startsWith(`${href}/`);

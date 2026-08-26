@@ -84,7 +84,6 @@ export function HorizontalCinematic({
           const slotSize = 1 / n;
           for (let i = 0; i < n; i++) {
             const slotStart = i * slotSize;
-            const slotEnd   = (i + 1) * slotSize;
             // Content should complete by end of DWELL (0.85 of slot)
             const contentEnd = slotStart + slotSize * (1 - DEPART_FRACTION);
 

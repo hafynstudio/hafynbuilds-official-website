@@ -1,12 +1,16 @@
 ﻿"use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 import { AnimatePresence, motion } from "framer-motion";
 import { Search, X, MapPin } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useCurrency } from "@/lib/currency/context";
-import { useFocusTrap, usePrefersReducedMotion } from "@/lib/hooks";
+import {
+  useFocusTrap,
+  useIsClient,
+  usePrefersReducedMotion,
+} from "@/lib/hooks";
 import { EASE_OUT_EXPO } from "@/lib/motion";
 
 // First-visit currency selection experience.
@@ -32,41 +36,44 @@ export function CurrencyModal() {
     currentPricing,
   } = useCurrency();
   const prefersReduced = usePrefersReducedMotion();
+  const isClient = useIsClient();
   const [query, setQuery] = useState("");
-  const [mounted, setMounted] = useState(false);
-  const [selected, setSelected] = useState(currentPricing.countryCode);
+  const [selectedOverride, setSelectedOverride] = useState<string | null>(null);
+  const selected = selectedOverride ?? currentPricing.countryCode;
   const panelRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
 
   useFocusTrap(panelRef, isModalOpen);
 
-  // createPortal requires document — mount flag guards SSR/first render.
-  useEffect(() => setMounted(true), []);
+  // createPortal requires document — client availability is provided by the
+  // shared SSR-safe external-store hook below.
 
-  // Sync local selection state with the context's current pricing.
-  // Covers: (a) user changes currency via switcher while modal was
-  // dismissed, then reopens modal — highlight should show current choice.
+  // Reset search + focus the input when the modal opens. The state reset is
+  // scheduled with the opening frame instead of written synchronously in the
+  // effect body.
   useEffect(() => {
-    setSelected(currentPricing.countryCode);
-  }, [currentPricing.countryCode]);
-
-  // Reset search + focus the search input every time modal opens.
-  useEffect(() => {
-    if (isModalOpen) {
+    if (!isModalOpen) return;
+    const frame = requestAnimationFrame(() => {
       setQuery("");
-      requestAnimationFrame(() => inputRef.current?.focus());
-    }
+      inputRef.current?.focus();
+    });
+    return () => cancelAnimationFrame(frame);
   }, [isModalOpen]);
+
+  const dismiss = useCallback(() => {
+    setSelectedOverride(null);
+    closeModal();
+  }, [closeModal]);
 
   // Escape-to-close. Focus-trap (Tab cycling) lives in useFocusTrap.
   useEffect(() => {
     if (!isModalOpen) return;
     function handleKey(e: KeyboardEvent) {
-      if (e.key === "Escape") closeModal();
+      if (e.key === "Escape") dismiss();
     }
     document.addEventListener("keydown", handleKey);
     return () => document.removeEventListener("keydown", handleKey);
-  }, [isModalOpen, closeModal]);
+  }, [isModalOpen, dismiss]);
 
   // Body-scroll lock. Save/restore prior overflow value in case something
   // else is already stacking overlays.
@@ -87,9 +94,10 @@ export function CurrencyModal() {
 
   function handleConfirm() {
     selectCountry(selected);
+    setSelectedOverride(null);
   }
 
-  if (!mounted) return null;
+  if (!isClient) return null;
 
   return createPortal(
     <AnimatePresence>
@@ -102,7 +110,7 @@ export function CurrencyModal() {
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             transition={{ duration: prefersReduced ? 0.01 : 0.25 }}
-            onClick={closeModal}
+            onClick={dismiss}
             aria-hidden="true"
           />
 
@@ -164,7 +172,7 @@ export function CurrencyModal() {
               </div>
               <button
                 type="button"
-                onClick={closeModal}
+                onClick={dismiss}
                 aria-label="Close currency selector"
                 className="ml-4 shrink-0 rounded-md p-1.5 text-text-secondary transition-colors duration-fast hover:bg-surface hover:text-text-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
               >
@@ -222,7 +230,7 @@ export function CurrencyModal() {
                         type="button"
                         role="option"
                         aria-selected={isSelected}
-                        onClick={() => setSelected(country.countryCode)}
+                        onClick={() => setSelectedOverride(country.countryCode)}
                         className={cn(
                           "flex items-center gap-3 rounded-lg border px-3 py-2.5 text-left transition-all duration-fast",
                           "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-1 focus-visible:ring-offset-bg-secondary",

@@ -82,62 +82,6 @@ interface LeadEmailInput {
   source: string;
 }
 
-const EMAIL_FONT_STACK =
-  "-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif";
-
-/**
- * Small inline-stroke icons for field labels. Inline SVG with explicit
- * width/height so they render in Gmail/Outlook.com (no external image, no
- * emoji font dependency). Outlook for Windows degrades to no icon but the
- * label text still carries the meaning.
- */
-function emailIcon(
-  kind: "mail" | "phone" | "briefcase" | "clock" | "tag" | "trend" | "doc"
-): string {
-  const paths: Record<string, string> = {
-    mail: '<path d="M3 5h18v14H3z" /><path d="m3 6 9 7 9-7" />',
-    phone:
-      '<path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6A19.79 19.79 0 0 1 2.08 4.18 2 2 0 0 1 4.06 2h3a2 2 0 0 1 2 1.72c.13.96.36 1.9.7 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.91.34 1.85.57 2.81.7A2 2 0 0 1 22 16.92z" />',
-    briefcase:
-      '<rect x="3" y="7" width="18" height="13" rx="2" /><path d="M8 7V5a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2" /><path d="M3 13h18" />',
-    clock: '<circle cx="12" cy="12" r="9" /><path d="M12 7v5l3 2" />',
-    tag: '<path d="M20.59 13.41 13.42 20.6a2 2 0 0 1-2.83 0L3 13V3h10l7.59 7.59a2 2 0 0 1 0 2.82Z" /><circle cx="7.5" cy="7.5" r="1.5" />',
-    trend: '<path d="m3 17 6-6 4 4 8-8" /><path d="M14 7h7v7" />',
-    doc: '<path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" /><path d="M14 2v6h6" />',
-  };
-  return (
-    '<svg width="13" height="13" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" style="display:inline-block;vertical-align:-2px;">' +
-    '<g stroke="#60a5fa" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">' +
-    paths[kind] +
-    "</g></svg>"
-  );
-}
-
-/** True only for the two top budget bands — PKR 100k–250k and PKR 250k+. */
-const HIGH_VALUE_BUDGET = /(100k\s*–\s*250k|250k\+)/;
-function isHighValueBudget(budgetLabel: string): boolean {
-  return HIGH_VALUE_BUDGET.test(budgetLabel);
-}
-
-/** One field = small-caps muted label above a high-contrast value. */
-function fieldBlock(label: string, glyph: string, valueHtml: string): string {
-  return `<table cellpadding="0" cellspacing="0" border="0" role="presentation" width="100%">
-              <tr>
-                <td style="font-family:${EMAIL_FONT_STACK};font-size:10px;line-height:14px;letter-spacing:0.09em;font-weight:600;color:#64748b;">${glyph}&nbsp;${label}</td>
-              </tr>
-              <tr>
-                <td style="padding-top:7px;font-family:${EMAIL_FONT_STACK};font-size:14px;line-height:21px;font-weight:500;color:#e2e8f0;">${valueHtml}</td>
-              </tr>
-            </table>`;
-}
-
-/** Thin 1px slate rule between sections. */
-function emailDivider(): string {
-  return `<tr>
-    <td height="1" style="height:1px;font-size:0;line-height:0;background-color:#1e293b;border-top:1px solid #1e293b;">&nbsp;</td>
-  </tr>`;
-}
-
 /** Clean, readable internal lead notification. Not a marketing email. */
 
 function buildLeadEmail(input: LeadEmailInput): string {

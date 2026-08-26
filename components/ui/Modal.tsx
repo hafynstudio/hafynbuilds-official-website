@@ -1,11 +1,16 @@
 ﻿"use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef } from "react";
 import { createPortal } from "react-dom";
 import { AnimatePresence, motion, type PanInfo } from "framer-motion";
 import { X } from "lucide-react";
 import { cn } from "@/lib/utils";
-import { useFocusTrap, useMediaQuery, usePrefersReducedMotion } from "@/lib/hooks";
+import {
+  useFocusTrap,
+  useIsClient,
+  useMediaQuery,
+  usePrefersReducedMotion,
+} from "@/lib/hooks";
 import { SPRING_SMOOTH } from "@/lib/motion";
 
 interface ModalProps {
@@ -38,12 +43,11 @@ export function Modal({
   const prefersReducedMotion = usePrefersReducedMotion();
   const panelRef = useRef<HTMLDivElement>(null);
   const previouslyFocusedElement = useRef<Element | null>(null);
-  const [mounted, setMounted] = useState(false);
+  const isClient = useIsClient();
 
   useFocusTrap(panelRef, isOpen);
 
   // Portals must only render client-side (no document in SSR).
-  useEffect(() => setMounted(true), []);
 
   // Lock body scroll while open; restore the exact previous value on
   // close rather than assuming "visible", in case another overlay is
@@ -82,7 +86,7 @@ export function Modal({
     return () => document.removeEventListener("keydown", handleKeyDown);
   }, [isOpen, onClose]);
 
-  if (!mounted) return null;
+  if (!isClient) return null;
 
   function handleDragEnd(_: unknown, info: PanInfo) {
     if (info.offset.y > 120 || info.velocity.y > 500) onClose();

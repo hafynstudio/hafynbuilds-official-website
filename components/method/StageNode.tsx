@@ -1,10 +1,10 @@
 ﻿"use client";
 
-import { useRef, useState } from "react";
+import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { CheckCircle, ChevronDown, Clock, Users, Package } from "lucide-react";
 import type { MethodStage } from "@/types/method-stage";
-import { EASE_OUT_EXPO, EASE_OUT_QUART, rgbaToken, FRAMER_COLOR_TOKENS } from "@/lib/motion";
+import { EASE_OUT_EXPO, EASE_OUT_QUART } from "@/lib/motion";
 
 interface StageNodeProps {
   stage: MethodStage;

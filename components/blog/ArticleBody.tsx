@@ -297,7 +297,6 @@ export function ArticleBody({ html, className }: ArticleBodyProps) {
       // If/when the data source moves to a CMS accepting external user input,
       // replace sanitizeHtml() with DOMPurify -- this component's interface
       // stays identical.
-      // eslint-disable-next-line react/no-danger
       dangerouslySetInnerHTML={{ __html: sanitizedHtml }}
     />
   );

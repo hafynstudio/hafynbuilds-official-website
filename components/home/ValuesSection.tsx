@@ -3,7 +3,6 @@
 import { useRef } from "react";
 import { motion, useInView } from "framer-motion";
 import { companyValues } from "@/data/values";
-import { usePrefersReducedMotion } from "@/lib/hooks";
 
 // ─── CONSTANTS ────────────────────────────────────────────────────────────────
 
@@ -52,21 +51,13 @@ const VALUE_META: Record<string, {
 
 function ValueCard({
   value,
-  index,
-  rm,
 }: {
   value: (typeof companyValues)[0];
-  index: number;
-  rm: boolean;
 }) {
   const cardRef = useRef<HTMLDivElement>(null);
   // Each card fires independently on scroll — mobile cinema effect
   const inView = useInView(cardRef, { once: true, margin: "-30px" });
   const meta = VALUE_META[value.id] ?? VALUE_META.excellence;
-
-  // Alternate cards: even ones come from left, odd from right
-  // — creates a natural zigzag feel on mobile scroll
-  const xOffset = rm ? 0 : index % 2 === 0 ? -24 : 24;
 
   return (
     <motion.div
@@ -210,7 +201,6 @@ function ValueCard({
  */
 export function ValuesSection() {
   const sectionRef = useRef<HTMLElement>(null);
-  const rm = usePrefersReducedMotion();
   const headerInView = useInView(sectionRef, { once: true, margin: "-60px" });
 
   if (companyValues.length === 0) return null;
@@ -290,12 +280,10 @@ export function ValuesSection() {
 
         {/* Bento grid */}
         <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
-          {sorted.map((value, i) => (
+          {sorted.map((value) => (
             <ValueCard
               key={value.id}
               value={value}
-              index={i}
-              rm={rm}
             />
           ))}
         </div>

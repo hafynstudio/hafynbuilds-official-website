@@ -1,7 +1,6 @@
 import { notFound } from "next/navigation";
 import Link from "next/link";
 import type { Metadata } from "next";
-import Script from "next/script";
 import { RevealSection } from "@/components/ui/RevealSection";
 import { ReadingProgress } from "@/components/blog/ReadingProgress";
 import { ShareBar } from "@/components/blog/ShareBar";
@@ -163,12 +162,12 @@ export default async function BlogPostPage({ params }: BlogPostPageProps) {
           Breadcrumb schema: signals page hierarchy, triggers breadcrumb
           display in Google search results.
       ---------------------------------------------------------------- */}
-      <Script
+      <script
         id="article-schema"
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(articleJsonLd) }}
       />
-      <Script
+      <script
         id="breadcrumb-schema"
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbJsonLd) }}
