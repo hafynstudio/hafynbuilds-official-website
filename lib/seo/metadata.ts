@@ -6,8 +6,14 @@ import { SITE_URL } from "@/lib/site";
 const SITE_NAME = "HAFYN BUILDS";
 const DEFAULT_DESCRIPTION =
   "HAFYN BUILDS is the flagship software engineering & AI company of the HAFYN technology holding group. Engineering the impossible. Building what matters.";
-// TODO: real OG image asset pending -- see Phase 1 handoff doc pending items.
-const DEFAULT_OG_IMAGE = "/og-image.png";
+const DEFAULT_OG_IMAGE_ROUTE = "/og-image.png";
+
+function routeOgImage(title: string, path: string): string {
+  const url = new URL(DEFAULT_OG_IMAGE_ROUTE, SITE_URL);
+  url.searchParams.set("title", title);
+  url.searchParams.set("route", path);
+  return `${url.pathname}${url.search}`;
+}
 
 interface BuildMetadataArgs {
   title: string;
@@ -36,7 +42,7 @@ export function buildMetadata({
   title,
   description = DEFAULT_DESCRIPTION,
   path,
-  ogImage = DEFAULT_OG_IMAGE,
+  ogImage,
   noIndex = false,
   ogType = "website",
   publishedTime,
@@ -49,9 +55,10 @@ export function buildMetadata({
   // Resolve OG image to an absolute URL. next/og requires absolute URLs.
   // If the caller passes a relative path (e.g. "/images/blog/cover.jpg"),
   // we prefix with SITE_URL. If already absolute, use as-is.
-  const absoluteOgImage = ogImage.startsWith("http")
-    ? ogImage
-    : `${SITE_URL}${ogImage}`;
+  const resolvedOgImage = ogImage ?? routeOgImage(title, path);
+  const absoluteOgImage = resolvedOgImage.startsWith("http")
+    ? resolvedOgImage
+    : `${SITE_URL}${resolvedOgImage}`;
 
   return {
     title: fullTitle,
@@ -108,7 +115,7 @@ export function buildArticleMetadata(
   post: BlogPost,
   category: BlogCategory
 ): Metadata {
-  const ogImage = post.coverImage || DEFAULT_OG_IMAGE;
+  const ogImage = post.coverImage || undefined;
 
   return buildMetadata({
     title: post.title,

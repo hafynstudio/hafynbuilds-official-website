@@ -34,9 +34,9 @@ const FounderBridge = dynamic(() =>
 // with buildMetadata() (Phase 17 audit fix C4) so this page has correct
 // structured metadata identical to all other pages in the system.
 export const metadata: Metadata = buildMetadata({
-  title: "About",
+  title: "About HAFYN: Software & AI Engineering",
   description:
-    "HAFYN BUILDS is a premium software engineering and AI company founded by Zain Marwat. Learn our origin story, mission, values, and the HAFYN ecosystem vision.",
+    "Learn how HAFYN BUILDS combines software engineering, AI, and product thinking. Explore our origin, mission, values, and ecosystem vision led by Zain Marwat.",
   path: "/about",
 });
 

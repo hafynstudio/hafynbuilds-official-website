@@ -2,9 +2,9 @@
 import { InvestmentExperience } from "@/components/investment/InvestmentExperience";
 
 export const metadata = buildMetadata({
-  title: "Investment",
+  title: "Custom Website Packages, Plans & Pricing",
   description:
-    "Locally-calibrated pricing across 28 countries. Every website hand-coded — never a template. Choose your package or explore industry-specific solutions.",
+    "Compare HAFYN BUILDS website packages and pricing across 28 countries. Choose a hand-coded foundation for your business or an industry-specific build.",
   path: "/investment",
 });
 

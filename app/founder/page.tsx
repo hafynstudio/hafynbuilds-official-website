@@ -16,7 +16,7 @@ import { FounderSocials } from "@/components/founder/FounderSocials";
 export const metadata = buildMetadata({
   title: "Zain Marwat — Founder, Director & CEO",
   description:
-    "Meet Zain Marwat, Founder, Director & CEO of HAFYN. A self-taught engineer building technology that delivers lasting competitive advantage — not just software that works.",
+    "Meet Zain Marwat, Founder, Director & CEO of HAFYN BUILDS. His engineering-led approach turns ambitious ideas into software and AI systems that last today.",
   path: "/founder",
 });
 

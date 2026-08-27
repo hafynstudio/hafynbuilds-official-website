@@ -9,9 +9,9 @@ import { DeferredHomeSections } from "@/components/home/DeferredHomeSections";
 // "Engineering the Impossible. Building What Matters. | HAFYN BUILDS"
 // The motto leads; the brand name closes — correct for homepage SEO.
 export const metadata: Metadata = buildMetadata({
-  title: "Engineering the Impossible. Building What Matters.",
+  title: "Software Engineering, AI & Digital Products",
   description:
-    "HAFYN BUILDS is the flagship software engineering & AI company of the HAFYN technology holding group, founded by Zain Marwat. Web apps, software, AI systems, automation, and enterprise solutions.",
+    "HAFYN BUILDS engineers web apps, AI systems, and automation for companies. Explore digital products and enterprise software built to last, from idea to launch.",
   path: "/",
 });
 

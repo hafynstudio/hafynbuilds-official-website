@@ -78,15 +78,15 @@ export default function sitemap(): MetadataRoute.Sitemap {
   // All 9 are real, public, indexable marketing pages, canonical via
   // lib/seo/metadata.ts alternates.canonical. lastModified = stable fallback.
   const staticRoutes: MetadataRoute.Sitemap = [
-    { url: SITE_URL, lastModified: SITE_LAUNCH_DATE },
-    { url: `${SITE_URL}/about`, lastModified: SITE_LAUNCH_DATE },
-    { url: `${SITE_URL}/team`, lastModified: SITE_LAUNCH_DATE },
-    { url: `${SITE_URL}/capabilities`, lastModified: SITE_LAUNCH_DATE },
-    { url: `${SITE_URL}/method`, lastModified: SITE_LAUNCH_DATE },
-    { url: `${SITE_URL}/investment`, lastModified: SITE_LAUNCH_DATE },
-    { url: `${SITE_URL}/founder`, lastModified: SITE_LAUNCH_DATE },
-    { url: `${SITE_URL}/blog`, lastModified: SITE_LAUNCH_DATE },
-    { url: `${SITE_URL}/contact`, lastModified: SITE_LAUNCH_DATE },
+    { url: SITE_URL, lastModified: SITE_LAUNCH_DATE, changeFrequency: "monthly", priority: 1 },
+    { url: `${SITE_URL}/about`, lastModified: SITE_LAUNCH_DATE, changeFrequency: "monthly", priority: 0.8 },
+    { url: `${SITE_URL}/team`, lastModified: SITE_LAUNCH_DATE, changeFrequency: "monthly", priority: 0.7 },
+    { url: `${SITE_URL}/capabilities`, lastModified: SITE_LAUNCH_DATE, changeFrequency: "monthly", priority: 0.8 },
+    { url: `${SITE_URL}/method`, lastModified: SITE_LAUNCH_DATE, changeFrequency: "monthly", priority: 0.8 },
+    { url: `${SITE_URL}/investment`, lastModified: SITE_LAUNCH_DATE, changeFrequency: "monthly", priority: 0.9 },
+    { url: `${SITE_URL}/founder`, lastModified: SITE_LAUNCH_DATE, changeFrequency: "monthly", priority: 0.7 },
+    { url: `${SITE_URL}/blog`, lastModified: SITE_LAUNCH_DATE, changeFrequency: "monthly", priority: 0.8 },
+    { url: `${SITE_URL}/contact`, lastModified: SITE_LAUNCH_DATE, changeFrequency: "monthly", priority: 0.7 },
   ];
 
   // ── Blog article pages ────────────────────────────────────────────────
@@ -99,6 +99,8 @@ export default function sitemap(): MetadataRoute.Sitemap {
     .map((post) => ({
       url: `${SITE_URL}/blog/${post.slug}`,
       lastModified: new Date(post.publishedAt),
+      changeFrequency: "monthly",
+      priority: 0.7,
     }));
 
   // ── Blog category pages ───────────────────────────────────────────────
@@ -110,6 +112,8 @@ export default function sitemap(): MetadataRoute.Sitemap {
     (category) => ({
       url: `${SITE_URL}/blog/category/${category.slug}`,
       lastModified: SITE_LAUNCH_DATE,
+      changeFrequency: "monthly",
+      priority: 0.5,
     })
   );
 
@@ -121,6 +125,8 @@ export default function sitemap(): MetadataRoute.Sitemap {
     (industry) => ({
       url: `${SITE_URL}/investment/${industry.id}`,
       lastModified: SITE_LAUNCH_DATE,
+      changeFrequency: "monthly",
+      priority: 0.7,
     })
   );
 

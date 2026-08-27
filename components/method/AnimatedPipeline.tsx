@@ -167,6 +167,8 @@ export function AnimatedPipeline() {
               </h1>
             </div>
 
+            <h2 className="sr-only">Five-stage delivery pipeline</h2>
+
             <div role="list" aria-label="Delivery stages">
               {methodStages.map((stage, i) => (
                 <div key={stage.id} role="listitem">

@@ -3,9 +3,9 @@ import { blogPosts, getFeaturedPost } from "@/data/blog-posts";
 import { BlogExperience } from "@/components/blog/BlogExperience";
 
 export const metadata = buildMetadata({
-  title: "Insights",
+  title: "Practical Software Engineering & AI Insights",
   description:
-    "Engineering notes, AI insights, product thinking, and lessons from real builds. The HAFYN BUILDS blog — written by the team that ships the work.",
+    "Read practical software engineering, AI, and product insights from HAFYN BUILDS—deep-dives and lessons from designing and shipping real systems that matter.",
   path: "/blog",
 });
 

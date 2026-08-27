@@ -6,9 +6,9 @@ import { CommunicationSection } from "@/components/method/CommunicationSection";
 import { MethodBridgeCTA } from "@/components/method/MethodBridgeCTA";
 
 export const metadata: Metadata = buildMetadata({
-  title: "Method — How We Build",
+  title: "How We Build Software & AI Products",
   description:
-    "HAFYN BUILDS' 5-stage delivery process: Discovery, Design, Build, Launch, and Support. No surprises — just engineering-first execution with full transparency.",
+    "See the HAFYN BUILDS five-stage process for software and AI projects: discovery, design, build, launch, and support with transparent engineering decisions.",
   path: "/method",
 });
 

@@ -11,9 +11,9 @@ import { capabilities } from "@/data/capabilities";
 // for this page. Description now reflects actual page content so Google
 // can generate a relevant search snippet.
 export const metadata = buildMetadata({
-  title: "Capabilities",
+  title: "Web Apps, AI & Software Engineering Services",
   description:
-    "HAFYN BUILDS delivers web apps, SaaS platforms, AI systems, business automation, and enterprise software. Five core capability areas — each engineered to last.",
+    "Explore HAFYN BUILDS capabilities across web apps, SaaS, AI systems, automation, and enterprise software—digital products engineered to last for serious teams.",
   path: "/capabilities",
 });
 

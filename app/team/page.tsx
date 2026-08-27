@@ -21,9 +21,9 @@ import { TeamGrid } from "@/components/team/TeamGrid";
 // back to the generic site description, which gives Google no
 // differentiating signal for this page vs. any other page on the site.
 export const metadata = buildMetadata({
-  title: "Team",
+  title: "HAFYN Builders & Engineering Team Studio",
   description:
-    "Meet the team behind HAFYN BUILDS — led by Founder, Director & CEO Zain Marwat. The engineers, designers, and builders shipping world-class software and AI systems.",
+    "Meet the HAFYN BUILDS team: engineers, designers, and product thinkers led by Zain Marwat, building dependable software and AI systems for ambitious teams.",
   path: "/team",
 });
 

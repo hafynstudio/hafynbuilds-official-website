@@ -4,9 +4,11 @@
 // static asset is needed and the image is generated at request time
 // with zero external dependencies.
 //
-// This is the DEFAULT og image used by buildMetadata() as the fallback
-// for all pages that don't supply a page-specific cover image. Individual
-// blog articles with real cover images override this via buildArticleMetadata().
+// This is the generated OG fallback used by buildMetadata() when a page does
+// not supply a real cover image. The metadata builder passes the route title and
+// path so the resulting image is genuinely route-specific rather than one
+// generic graphic reused across every page. Individual blog articles with real
+// cover images override this via buildArticleMetadata().
 //
 // TODO(Phase 20 / post-launch): replace this with a real branded static
 // asset (/public/og-image.png) designed by the brand team. The route
@@ -23,7 +25,16 @@ export const runtime = "edge";
 export const contentType = "image/png";
 export const size = { width: 1200, height: 630 };
 
-export async function GET() {
+export async function GET(request: Request) {
+  const url = new URL(request.url);
+  const route = url.searchParams.get("route") || "/";
+  const title = url.searchParams.get("title") || "Engineering the Impossible.";
+  const subtitle = route.startsWith("/investment/")
+    ? "Industry-specific software packages & digital experiences."
+    : route === "/"
+      ? "Software engineering, AI, and digital products."
+      : "Software, AI, and digital products built to last.";
+
   return new ImageResponse(
     (
       <div
@@ -119,28 +130,28 @@ export async function GET() {
           {/* Main headline */}
           <h1
             style={{
-              fontSize: "64px",
+              fontSize: title.length > 38 ? "52px" : "64px",
               fontWeight: 700,
               lineHeight: 1.05,
               color: "#F8FAFC",
               margin: 0,
-              maxWidth: "800px",
+              maxWidth: "900px",
             }}
           >
-            Engineering the Impossible.
+            {title}
           </h1>
 
           {/* Sub-headline */}
-          <p
-            style={{
-              fontSize: "28px",
-              fontWeight: 400,
-              color: "rgba(248,250,252,0.5)",
-              margin: 0,
-            }}
-          >
-            Building What Matters.
-          </p>
+            <p
+              style={{
+                fontSize: "28px",
+                fontWeight: 400,
+                color: "rgba(248,250,252,0.5)",
+                margin: 0,
+              }}
+            >
+              {subtitle}
+            </p>
         </div>
 
         {/* Bottom row — URL */}
@@ -155,7 +166,7 @@ export async function GET() {
             letterSpacing: "0.05em",
           }}
         >
-          {SITE_URL.replace(/^https?:\/\//, "")}
+          {route === "/" ? SITE_URL.replace(/^https?:\/\//, "") : `${SITE_URL.replace(/^https?:\/\//, "")}${route}`}
         </p>
       </div>
     ),

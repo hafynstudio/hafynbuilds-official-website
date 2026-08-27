@@ -30,9 +30,9 @@ const WHATSAPP_PREFILL =
 // ---------------------------------------------------------------------------
 
 export const metadata = buildMetadata({
-  title: "Start a Build",
+  title: "Start a Software Project with HAFYN",
   description:
-    "Ready to build something that matters? Tell us about your project and we will get back to you promptly. Websites, web apps, software, AI systems, enterprise solutions.",
+    "Tell HAFYN BUILDS what you need: a website, web app, software platform, AI system, or automation project. Start a build conversation today with our team.",
   path: "/contact",
 });
 
