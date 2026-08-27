@@ -6,7 +6,7 @@ import type { Industry } from "@/types/industry";
 import { SITE_NAME, SITE_URL } from "@/lib/site";
 
 export const ORGANIZATION_ID = `${SITE_URL}/#organization`;
-export const PERSON_ID = `${SITE_URL}/#zain-marwat`;
+export const PERSON_ID = `${SITE_URL}/founder#person`;
 export const WEBSITE_ID = `${SITE_URL}/#website`;
 export const LOGO_ID = `${SITE_URL}/#logo`;
 
@@ -156,9 +156,12 @@ interface BreadcrumbItem {
 }
 
 export function breadcrumbSchema(items: BreadcrumbItem[]) {
+  const pageUrl = items.at(-1)?.url ?? SITE_URL;
+
   return {
     "@context": "https://schema.org",
     "@type": "BreadcrumbList",
+    "@id": `${pageUrl}#breadcrumb`,
     itemListElement: items.map((item, index) => ({
       "@type": "ListItem",
       position: index + 1,
