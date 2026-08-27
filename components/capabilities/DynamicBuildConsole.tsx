@@ -1,7 +1,8 @@
 "use client";
 
-import dynamic from "next/dynamic";
+import { useEffect, useState } from "react";
 import { useLazyMount } from "@/lib/hooks";
+import type { BuildConsole } from "@/components/capabilities/BuildConsole";
 
 function LoadingSkeleton() {
   return (
@@ -20,24 +21,12 @@ function LoadingSkeleton() {
   );
 }
 
-const BuildConsoleClient = dynamic(
-  () =>
-    import("@/components/capabilities/BuildConsole").then(
-      (m) => ({ default: m.BuildConsole })
-    ),
-  {
-    ssr: false,
-    loading: () => <LoadingSkeleton />,
-  }
-);
+type BuildConsoleComponent = typeof BuildConsole;
 
 /**
- * DynamicBuildConsole — keeps a full-height reserved slot while deferring
- * the build-console client graph until the user reaches the console. This
- * applies to touch and fine-pointer devices: the mobile path no longer
- * downloads the five-panel interactive runtime during initial hydration.
- * The reserved slot is already the loading skeleton's full viewport height,
- * so delaying the client component cannot collapse the page.
+ * Keeps a full-height reserved slot while deferring the build-console client
+ * graph until the user reaches the console. The import is imperative rather
+ * than a top-level next/dynamic declaration, preventing an initial preload.
  */
 export function DynamicBuildConsole({
   panelCount = 5,
@@ -45,6 +34,19 @@ export function DynamicBuildConsole({
   panelCount?: number;
 }) {
   const { sentinelRef, shouldMount } = useLazyMount({ rootMargin: "0px" });
+  const [BuildConsoleClient, setBuildConsoleClient] =
+    useState<BuildConsoleComponent | null>(null);
+
+  useEffect(() => {
+    if (!shouldMount || BuildConsoleClient) return;
+    let active = true;
+    void import("@/components/capabilities/BuildConsole").then((module) => {
+      if (active) setBuildConsoleClient(() => module.BuildConsole);
+    });
+    return () => {
+      active = false;
+    };
+  }, [shouldMount, BuildConsoleClient]);
 
   return (
     <div
@@ -52,7 +54,7 @@ export function DynamicBuildConsole({
       className="capabilities-console-reserve"
       style={{ "--panel-count": panelCount } as React.CSSProperties}
     >
-      {shouldMount ? <BuildConsoleClient /> : <LoadingSkeleton />}
+      {BuildConsoleClient ? <BuildConsoleClient /> : <LoadingSkeleton />}
     </div>
   );
 }

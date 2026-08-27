@@ -3,7 +3,7 @@
 import dynamic from "next/dynamic";
 import { useEffect, useRef, useState } from "react";
 import { methodStages } from "@/data/method-stages";
-import { usePrefersReducedMotion, useCoarsePointer } from "@/lib/hooks";
+import { usePrefersReducedMotion, useCoarsePointer, useIsClient } from "@/lib/hooks";
 import { StageNode } from "@/components/method/StageNode";
 import { StatusLog } from "@/components/method/StatusLog";
 import { BuildComplete } from "@/components/method/BuildComplete";
@@ -28,10 +28,11 @@ const N = methodStages.length;
  * evaluate ScrollTrigger during initial hydration.
  */
 export function LiveDeployPipeline() {
+  const isClient = useIsClient();
   const reducedMotion = usePrefersReducedMotion();
   const isCoarsePointer = useCoarsePointer();
 
-  if (reducedMotion) return <StaticPipeline />;
+  if (!isClient || reducedMotion) return <StaticPipeline />;
   if (isCoarsePointer) return <MobilePipeline />;
   return <AnimatedPipeline />;
 }

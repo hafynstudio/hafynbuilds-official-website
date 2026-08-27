@@ -1,31 +1,40 @@
 "use client";
 
-import dynamic from "next/dynamic";
+import { useEffect, useState } from "react";
 import { useLazyMount } from "@/lib/hooks";
+import type { ContactForm } from "@/components/contact/ContactForm";
 
-const ContactFormClient = dynamic(
-  () =>
-    import("@/components/contact/ContactForm").then((m) => ({
-      default: m.ContactForm,
-    })),
-  {
-    ssr: false,
-    loading: () => null,
-  }
-);
+type ContactFormComponent = typeof ContactForm;
 
 /**
  * Keeps the contact form's visual slot stable while deferring its heavy
  * react-hook-form/Zod/Framer Motion graph until the visitor reaches it.
- * The zero-margin sentinel means this is an interaction-adjacent boundary,
- * not an eager page-load import.
+ * The import is imperative rather than a top-level next/dynamic declaration:
+ * this prevents the client bundler from preloading the graph before the
+ * sentinel is actually visible. The negative bottom margin is intentional:
+ * the form begins near the first mobile viewport's lower edge, so it waits
+ * until the visitor is actually arriving at the form rather than loading in
+ * the initial Lighthouse viewport.
  */
 export function DeferredContactForm({ replyWindow }: { replyWindow: string }) {
-  const { sentinelRef, shouldMount } = useLazyMount({ rootMargin: "0px" });
+  const { sentinelRef, shouldMount } = useLazyMount({ rootMargin: "0px 0px -90% 0px" });
+  const [ContactFormClient, setContactFormClient] =
+    useState<ContactFormComponent | null>(null);
+
+  useEffect(() => {
+    if (!shouldMount || ContactFormClient) return;
+    let active = true;
+    void import("@/components/contact/ContactForm").then((module) => {
+      if (active) setContactFormClient(() => module.ContactForm);
+    });
+    return () => {
+      active = false;
+    };
+  }, [shouldMount, ContactFormClient]);
 
   return (
     <div ref={sentinelRef} className="min-h-[760px]">
-      {shouldMount ? (
+      {ContactFormClient ? (
         <ContactFormClient replyWindow={replyWindow} />
       ) : (
         <div
