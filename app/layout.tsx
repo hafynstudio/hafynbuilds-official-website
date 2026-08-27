@@ -1,7 +1,8 @@
-﻿import type { Metadata } from "next";
+import type { Metadata } from "next";
 import localFont from "next/font/local";
 import dynamic from "next/dynamic";
 import Script from "next/script";
+import { Analytics } from "@vercel/analytics/next";
 import { organizationSchema } from "@/lib/seo/schema";
 import { JsonLd } from "@/components/seo/JsonLd";
 import { Footer } from "@/components/layout/Footer";
@@ -139,6 +140,9 @@ export default function RootLayout({
             `}
           </Script>
         ) : null}
+
+        {/* Vercel Web Analytics */}
+        <Analytics />
       </body>
     </html>
   );
