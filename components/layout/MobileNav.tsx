@@ -2,14 +2,12 @@
 
 import { useEffect, useRef } from "react";
 import Link from "next/link";
-import { AnimatePresence, motion } from "framer-motion";
 import { X } from "lucide-react";
 import { Button } from "@/components/ui/Button";
 import { Logo } from "@/components/ui/Logo";
 import { SOCIAL_ICONS } from "@/components/ui/icons/SocialIcons";
 import { socialLinks } from "@/data/social-links";
-import { useFocusTrap, usePrefersReducedMotion } from "@/lib/hooks";
-import { EASE_ENTRANCE, MOTION_DURATION_S } from "@/lib/motion";
+import { useFocusTrap } from "@/lib/hooks";
 
 interface NavLink {
   href: string;
@@ -38,7 +36,6 @@ export function MobileNav({
 }: MobileNavProps) {
   const panelRef = useRef<HTMLDivElement>(null);
   const previouslyFocusedRef = useRef<HTMLElement | null>(null);
-  const prefersReducedMotion = usePrefersReducedMotion();
 
   useFocusTrap(panelRef, isOpen);
 
@@ -75,20 +72,16 @@ export function MobileNav({
     };
   }, [isOpen, onClose]);
 
+  if (!isOpen) return null;
+
   return (
-    <AnimatePresence>
-      {isOpen && (
-        <motion.div
+        <div
           ref={panelRef}
           role="dialog"
           aria-modal="true"
           aria-label="Site navigation"
           tabIndex={-1}
-          initial={{ opacity: 0, y: prefersReducedMotion ? 0 : -16 }}
-          animate={{ opacity: 1, y: 0 }}
-          exit={{ opacity: 0, y: prefersReducedMotion ? 0 : -16 }}
-          transition={{ duration: prefersReducedMotion ? 0 : MOTION_DURATION_S.medium, ease: EASE_ENTRANCE }}
-          className="fixed inset-0 z-modal flex flex-col bg-bg-primary md:hidden"
+          className="mobile-nav-panel fixed inset-0 z-modal flex flex-col bg-bg-primary md:hidden"
         >
           <div className="flex h-header items-center justify-between px-6">
             <Logo />
@@ -108,15 +101,10 @@ export function MobileNav({
           >
             <ul className="space-y-2">
               {navLinks.map((link, index) => (
-                <motion.li
+                <li
                   key={link.href}
-                  initial={{ opacity: 0, y: prefersReducedMotion ? 0 : 12 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{
-                    delay: prefersReducedMotion ? 0 : MOTION_DURATION_S.staggerStep * index,
-                    duration: prefersReducedMotion ? 0 : MOTION_DURATION_S.medium,
-                    ease: EASE_ENTRANCE,
-                  }}
+                  className="mobile-nav-item"
+                  style={{ animationDelay: `${index * 0.048}s` }}
                 >
                   <Link
                     href={link.href}
@@ -129,7 +117,7 @@ export function MobileNav({
                   >
                     {link.label}
                   </Link>
-                </motion.li>
+                </li>
               ))}
             </ul>
 
@@ -170,8 +158,6 @@ export function MobileNav({
               );
             })}
           </div>
-        </motion.div>
-      )}
-    </AnimatePresence>
+        </div>
   );
 }

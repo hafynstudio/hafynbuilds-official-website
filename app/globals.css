@@ -124,6 +124,105 @@ html {
   50%      { opacity: 0; }
 }
 
+/* LoadingScreen motion is CSS-only so the first-visit splash does not retain
+   the full Framer Motion runtime in every route's initial client graph. */
+.loading-screen {
+  opacity: 1;
+  transition: opacity 250ms cubic-bezier(0.76, 0, 0.24, 1);
+}
+
+.loading-screen-exiting {
+  opacity: 0;
+}
+
+.loading-letter {
+  display: inline-block;
+  opacity: 0;
+  transform: translateY(16px);
+  animation: hafyn-loading-letter-in 400ms cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+@keyframes hafyn-loading-letter-in {
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.loading-skyline-bar {
+  display: block;
+  width: 0.75rem;
+  transform: scaleY(0);
+  transform-origin: bottom;
+  opacity: 0;
+  animation-duration: 400ms;
+  animation-timing-function: cubic-bezier(0.76, 0, 0.24, 1);
+  animation-fill-mode: both;
+}
+
+.loading-skyline-bar-risen {
+  animation-name: hafyn-loading-skyline-rise;
+}
+
+.loading-skyline-bar-collapsed {
+  animation-name: hafyn-loading-skyline-collapse;
+}
+
+@keyframes hafyn-loading-skyline-rise {
+  to {
+    opacity: 1;
+    transform: scaleY(1);
+  }
+}
+
+@keyframes hafyn-loading-skyline-collapse {
+  to {
+    opacity: 0;
+    transform: scaleY(0);
+  }
+}
+
+.package-card-entrance {
+  opacity: 0;
+  transform: translateY(18px);
+  animation: hafyn-package-card-in 520ms cubic-bezier(0.25, 1, 0.5, 1) var(--package-card-delay, 0s) forwards;
+}
+
+.mobile-nav-panel {
+  animation: hafyn-mobile-nav-in 320ms cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+.mobile-nav-item {
+  opacity: 0;
+  transform: translateY(12px);
+  animation: hafyn-mobile-nav-item-in 320ms cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+@keyframes hafyn-mobile-nav-in {
+  from {
+    opacity: 0;
+    transform: translateY(-16px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes hafyn-mobile-nav-item-in {
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes hafyn-package-card-in {
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
 @media (prefers-reduced-motion: reduce) {
   *,
   *::before,

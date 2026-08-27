@@ -87,6 +87,7 @@ export function Logo({ className, asLink = true }: LogoProps) {
   return (
     <Link
       href="/"
+      prefetch={false}
       aria-label="HAFYN BUILDS — Home"
       className="shrink-0"
     >

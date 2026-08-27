@@ -2,9 +2,7 @@
 
 import Link from "next/link";
 import { Check } from "lucide-react";
-import { motion } from "framer-motion";
 import { cn } from "@/lib/utils";
-import { EASE_OUT_QUART } from "@/lib/motion";
 import { usePrefersReducedMotion } from "@/lib/hooks";
 import { useCurrency } from "@/lib/currency/context";
 import { resolveIndustryPrice } from "@/lib/currency/industry-engine";
@@ -43,15 +41,14 @@ export function PackageCard({ pkg, index }: PackageCardProps) {
   const isPricingAvailable = resolved !== null;
 
   return (
-    <motion.article
-      initial={prefersReducedMotion ? { opacity: 0 } : { opacity: 0, y: 18 }}
-      animate={prefersReducedMotion ? { opacity: 1 } : { opacity: 1, y: 0 }}
-      transition={
+    <article
+      style={
         prefersReducedMotion
-          ? { duration: 0 }
-          : { duration: MOTION_DURATION_S.large, delay: index * MOTION_DURATION_S.staggerStep, ease: EASE_OUT_QUART }
+          ? undefined
+          : ({ "--package-card-delay": `${index * MOTION_DURATION_S.staggerStep}s` } as React.CSSProperties)
       }
       className={cn(
+        !prefersReducedMotion && "package-card-entrance",
         "group relative flex h-full flex-col rounded-card border p-6",
         "bg-bg-elevated shadow-card-rest",
         "transition-[border-color,background-color,box-shadow,transform] duration-base ease-out-quart",
@@ -164,6 +161,6 @@ export function PackageCard({ pkg, index }: PackageCardProps) {
           {isPricingAvailable ? "Discuss This Build" : "Request Exact Quote"}
         </Link>
       </footer>
-    </motion.article>
+    </article>
   );
 }

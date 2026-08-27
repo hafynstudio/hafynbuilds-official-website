@@ -1,15 +1,18 @@
 ﻿"use client";
 
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
+import dynamic from "next/dynamic";
 import { usePathname } from "next/navigation";
-import { useMotionValueEvent, useScroll } from "framer-motion";
 import { Menu } from "lucide-react";
 import { cn } from "@/lib/utils";
-import { Button } from "@/components/ui/Button";
 import { Logo } from "@/components/ui/Logo";
-import { MobileNav } from "@/components/layout/MobileNav";
 import { CurrencySwitcher } from "@/components/investment/CurrencySwitcher";
+
+const MobileNav = dynamic(
+  () => import("@/components/layout/MobileNav").then((m) => ({ default: m.MobileNav })),
+  { ssr: false }
+);
 
 // Primary nav per the locked sitemap (PRD §2.1). Home is reachable via
 // the logo and Contact is the dedicated CTA button, so both are
@@ -32,15 +35,24 @@ export function Header() {
 function HeaderShell({ pathname }: { pathname: string }) {
   const [isMobileNavOpen, setIsMobileNavOpen] = useState(false);
   const [isScrolled, setIsScrolled] = useState(false);
-  const { scrollY } = useScroll();
+  const mobileMenuTriggerRef = useRef<HTMLButtonElement>(null);
 
-  useMotionValueEvent(scrollY, "change", (latest) => {
-    setIsScrolled(latest > 8);
-  });
-
+  useEffect(() => {
+    const updateScrolledState = () => setIsScrolled(window.scrollY > 8);
+    updateScrolledState();
+    window.addEventListener("scroll", updateScrolledState, { passive: true });
+    return () => window.removeEventListener("scroll", updateScrolledState);
+  }, []);
 
   function isActive(href: string) {
     return pathname === href || pathname.startsWith(`${href}/`);
+  }
+
+  function closeMobileNav() {
+    setIsMobileNavOpen(false);
+    requestAnimationFrame(() => {
+      mobileMenuTriggerRef.current?.focus({ preventScroll: true });
+    });
   }
 
   // CurrencySwitcher only appears on the Investment page and its
@@ -69,6 +81,7 @@ function HeaderShell({ pathname }: { pathname: string }) {
                 <li key={link.href}>
                   <Link
                     href={link.href}
+                    prefetch={false}
                     aria-current={isActive(link.href) ? "page" : undefined}
                     className={cn(
                       "text-sm font-medium transition-colors duration-fast",
@@ -87,15 +100,20 @@ function HeaderShell({ pathname }: { pathname: string }) {
           {/* Desktop: CurrencySwitcher + Start a Build */}
           <div className="hidden items-center gap-3 md:flex">
             {showCurrencySwitcher && <CurrencySwitcher />}
-            <Button href="/contact" size="sm">
+            <Link
+              href="/contact"
+              prefetch={false}
+              className="inline-flex h-9 items-center justify-center gap-2 rounded-md bg-accent px-4 text-sm font-medium text-text-primary transition-colors duration-fast hover:bg-accent-hover hover:shadow-glow-accent focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2 focus-visible:ring-offset-bg-primary"
+            >
               Start a Build
-            </Button>
+            </Link>
           </div>
 
           {/* Mobile: CurrencySwitcher (if on /investment) + hamburger */}
           <div className="flex items-center gap-2 md:hidden">
             {showCurrencySwitcher && <CurrencySwitcher />}
             <button
+              ref={mobileMenuTriggerRef}
               type="button"
               onClick={() => setIsMobileNavOpen(true)}
               aria-label="Open menu"
@@ -108,12 +126,14 @@ function HeaderShell({ pathname }: { pathname: string }) {
         </div>
       </header>
 
-      <MobileNav
-        isOpen={isMobileNavOpen}
-        onClose={() => setIsMobileNavOpen(false)}
-        navLinks={NAV_LINKS}
-        isActive={isActive}
-      />
+      {isMobileNavOpen && (
+        <MobileNav
+          isOpen={isMobileNavOpen}
+          onClose={closeMobileNav}
+          navLinks={NAV_LINKS}
+          isActive={isActive}
+        />
+      )}
     </>
   );
 }
