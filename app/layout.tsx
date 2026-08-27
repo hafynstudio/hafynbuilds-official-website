@@ -117,25 +117,35 @@ export default function RootLayout({
           <Footer />
         </CurrencyProvider>
 
-        {/* Google Analytics 4 is deliberately lazy-loaded. It remains enabled
-            when configured, but it no longer competes with the first paint or
-            hero hydration on mobile. The lazyOnload strategy preserves the
-            existing analytics behavior after the page is interactive. */}
+        {/* Google Analytics 4 remains enabled, but Chrome traces showed its
+            initial download/evaluation and TimerFire calls competing with
+            route hydration. Queue the same page-view config during idle time
+            and load the external script no earlier than the five-second
+            timeout, preserving analytics while protecting the initial main
+            thread budget. */}
         {process.env.NEXT_PUBLIC_GA_ID ? (
-          <>
-            <Script
-              src={`https://www.googletagmanager.com/gtag/js?id=${process.env.NEXT_PUBLIC_GA_ID}`}
-              strategy="lazyOnload"
-            />
-            <Script id="hafyn-google-analytics" strategy="lazyOnload">
-              {`
-                window.dataLayer = window.dataLayer || [];
-                function gtag(){window.dataLayer.push(arguments);}
-                gtag('js', new Date());
-                gtag('config', '${process.env.NEXT_PUBLIC_GA_ID}', { send_page_view: true });
-              `}
-            </Script>
-          </>
+          <Script id="hafyn-google-analytics" strategy="lazyOnload">
+            {`
+              (function () {
+                var gaId = '${process.env.NEXT_PUBLIC_GA_ID}';
+                function loadAnalytics() {
+                  window.dataLayer = window.dataLayer || [];
+                  window.gtag = window.gtag || function () { window.dataLayer.push(arguments); };
+                  window.gtag('js', new Date());
+                  window.gtag('config', gaId, { send_page_view: true });
+                  var script = document.createElement('script');
+                  script.async = true;
+                  script.src = 'https://www.googletagmanager.com/gtag/js?id=' + encodeURIComponent(gaId);
+                  document.head.appendChild(script);
+                }
+                if ('requestIdleCallback' in window) {
+                  window.requestIdleCallback(loadAnalytics, { timeout: 5000 });
+                } else {
+                  window.setTimeout(loadAnalytics, 5000);
+                }
+              })();
+            `}
+          </Script>
         ) : null}
       </body>
     </html>
