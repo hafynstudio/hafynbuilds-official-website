@@ -1,7 +1,7 @@
 ﻿"use client";
 
 import { useEffect, useRef } from "react";
-import { usePrefersReducedMotion } from "@/lib/hooks";
+import { usePrefersReducedMotion, useViewportActivity } from "@/lib/hooks";
 
 /**
  * Subtle animated circuit/network texture drawn on Canvas2D.
@@ -13,6 +13,7 @@ import { usePrefersReducedMotion } from "@/lib/hooks";
  */
 export function CircuitBackground() {
   const canvasRef = useRef<HTMLCanvasElement>(null);
+  const { isVisible } = useViewportActivity<HTMLCanvasElement>(canvasRef, "0px");
   const reducedMotion = usePrefersReducedMotion();
 
   useEffect(() => {
@@ -23,7 +24,6 @@ export function CircuitBackground() {
 
     let animFrameId: number | undefined;
     let nodes: { x: number; y: number; vx: number; vy: number }[] = [];
-    let isVisible = true;
 
     const NODE_COUNT = 28;
     const MAX_DIST = 180;
@@ -111,15 +111,9 @@ export function CircuitBackground() {
 
     resize();
     initNodes();
-    const visibilityObserver = new IntersectionObserver(([entry]) => {
-      isVisible = !!entry?.isIntersecting;
-      if (isVisible) start();
-      else stop();
-    }, { threshold: 0 });
-    visibilityObserver.observe(canvas);
-
-    // Static render for reduced motion — one frame, no rAF loop.
-    if (reducedMotion) render();
+    // Static render for reduced motion or before the shared observer has
+    // established visibility — no work is hidden from the user.
+    if (reducedMotion || !isVisible) render();
     else start();
 
     const ro = new ResizeObserver(() => {
@@ -131,10 +125,9 @@ export function CircuitBackground() {
 
     return () => {
       stop();
-      visibilityObserver.disconnect();
       ro.disconnect();
     };
-  }, [reducedMotion]);
+  }, [isVisible, reducedMotion]);
 
   return (
     <canvas

@@ -132,50 +132,107 @@ export function useFocusTrap(
 // real consumer exists). Restore verbatim in Phase 5 if the Trust Bar
 // genuinely needs a scroll-triggered reveal.
 
+type VisibilityListener = (isVisible: boolean) => void;
+
+type ObserverBucket = {
+  observer: IntersectionObserver;
+  listeners: Map<Element, Set<VisibilityListener>>;
+};
+
+const observerBuckets = new Map<string, ObserverBucket>();
+
+function getObserverBucket(rootMargin: string): ObserverBucket | null {
+  if (typeof IntersectionObserver === "undefined") return null;
+  const existing = observerBuckets.get(rootMargin);
+  if (existing) return existing;
+
+  const listeners = new Map<Element, Set<VisibilityListener>>();
+  const observer = new IntersectionObserver(
+    (entries) => {
+      for (const entry of entries) {
+        const elementListeners = listeners.get(entry.target);
+        if (!elementListeners) continue;
+        for (const listener of elementListeners) listener(entry.isIntersecting);
+      }
+    },
+    { rootMargin }
+  );
+  const bucket = { observer, listeners };
+  observerBuckets.set(rootMargin, bucket);
+  return bucket;
+}
+
+function releaseObserverBucket(rootMargin: string, bucket: ObserverBucket) {
+  if (bucket.listeners.size > 0) return;
+  bucket.observer.disconnect();
+  observerBuckets.delete(rootMargin);
+}
+
+/**
+ * Shared viewport activity signal for decorative and interactive motion.
+ * One native IntersectionObserver is shared by every consumer using the same
+ * root margin, so lifecycle-aware effects do not each create their own
+ * observer. The hook remains live (rather than one-shot) so loops pause when
+ * off-screen and resume when the surface re-enters the viewport.
+ */
+export function useViewportActivity<T extends Element = HTMLDivElement>(
+  targetRef: RefObject<T | null>,
+  rootMargin = "0px",
+  onVisibilityChange?: VisibilityListener
+): { isVisible: boolean } {
+  const [isVisible, setIsVisible] = useState(false);
+
+  useEffect(() => {
+    const element = targetRef.current;
+    if (!element) return;
+
+    const bucket = getObserverBucket(rootMargin);
+    if (!bucket) {
+      const fallbackTimer = window.setTimeout(() => {
+        setIsVisible(true);
+        onVisibilityChange?.(true);
+      }, 0);
+      return () => window.clearTimeout(fallbackTimer);
+    }
+
+    const listener: VisibilityListener = (next) => {
+      setIsVisible((current) => (current === next ? current : next));
+      onVisibilityChange?.(next);
+    };
+    const elementListeners = bucket.listeners.get(element) ?? new Set<VisibilityListener>();
+    elementListeners.add(listener);
+    bucket.listeners.set(element, elementListeners);
+    bucket.observer.observe(element);
+
+    return () => {
+      elementListeners.delete(listener);
+      if (elementListeners.size === 0) {
+        bucket.listeners.delete(element);
+        bucket.observer.unobserve(element);
+      }
+      releaseObserverBucket(rootMargin, bucket);
+    };
+  }, [rootMargin, targetRef, onVisibilityChange]);
+
+  return { isVisible };
+}
+
 /**
  * BUG-003 (corrective #3): Lazy-mount hook for below-the-fold content.
- *
- * Uses IntersectionObserver to detect when a sentinel element approaches
- * the viewport (with configurable lookahead via rootMargin), then flips a
- * one-shot shouldMount flag. Designed for the DynamicBuildConsole wrapper
- * so that the GSAP-heavy HorizontalCinematic component only loads when the
- * user has scrolled near it — moving its chunk-fetch + GSAP initialization
- * outside Lighthouse's measurement window.
- *
- * Falls back to immediate mount if IntersectionObserver is unavailable
- * (SSR, extremely old browsers) — never withholds content permanently.
+ * Uses the shared viewport registry, then flips a one-shot shouldMount flag.
+ * The registry keeps observer construction bounded while the one-shot state
+ * preserves the existing deferred loading and reserved-layout contract.
  */
 export function useLazyMount(
   options?: { rootMargin?: string }
 ): { sentinelRef: React.RefObject<HTMLDivElement | null>; shouldMount: boolean } {
-  const [shouldMount, setShouldMount] = useState(false);
-  const sentinelRef = useRef<HTMLDivElement | null>(null);
   const rootMargin = options?.rootMargin ?? "200px";
+  const sentinelRef = useRef<HTMLDivElement | null>(null);
+  const [shouldMount, setShouldMount] = useState(false);
+  const handleVisibilityChange = useCallback((visible: boolean) => {
+    if (visible) setShouldMount(true);
+  }, []);
+  const { isVisible } = useViewportActivity<HTMLDivElement>(sentinelRef, rootMargin, handleVisibilityChange);
 
-  useEffect(() => {
-    if (shouldMount) return;
-
-    if (typeof IntersectionObserver === "undefined") {
-      const fallbackTimer = window.setTimeout(() => setShouldMount(true), 0);
-      return () => window.clearTimeout(fallbackTimer);
-    }
-
-    const el = sentinelRef.current;
-    if (!el) return;
-
-    const observer = new IntersectionObserver(
-      ([entry]) => {
-        if (entry?.isIntersecting) {
-          setShouldMount(true);
-          observer.disconnect();
-        }
-      },
-      { rootMargin }
-    );
-
-    observer.observe(el);
-    return () => observer.disconnect();
-  }, [rootMargin, shouldMount]);
-
-  return { sentinelRef, shouldMount };
+  return { sentinelRef, shouldMount: shouldMount || isVisible };
 }

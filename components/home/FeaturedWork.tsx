@@ -2,7 +2,7 @@
 
 import { useRef, useEffect, useState, useSyncExternalStore } from "react";
 import { motion, useInView, useMotionValue, useSpring, AnimatePresence } from "framer-motion";
-import { usePrefersReducedMotion } from "@/lib/hooks";
+import { usePrefersReducedMotion, useViewportActivity } from "@/lib/hooks";
 import { RevealSection } from "@/components/ui/RevealSection";
 import { featuredWork } from "@/data/featured-work";
 import { ICON_MAP, ICON_STROKE_WIDTH } from "@/lib/icons";
@@ -317,7 +317,8 @@ function MagneticChip({ label, rm, hasFinePointer, delay, active }: { label: str
 function HeroWorkCard({ work, rm, hasFinePointer }: { work: FeaturedWork; rm: boolean; hasFinePointer: boolean }) {
   const cardRef = useRef<HTMLDivElement>(null);
   const inView = useInView(cardRef, { once: true, margin: MOTION_VIEWPORT_MARGIN.reveal });
-  const activeInView = useInView(cardRef, { margin: "0px" });
+  const activeVisibility = useViewportActivity<HTMLDivElement>(cardRef, "0px");
+  const activeInView = activeVisibility.isVisible;
   const [swept, setSwept] = useState(false);
   useEffect(() => {
     if (!inView || rm || swept) return;
@@ -364,7 +365,8 @@ function HeroWorkCard({ work, rm, hasFinePointer }: { work: FeaturedWork; rm: bo
 function StandardWorkCard({ work, rm, hasFinePointer }: { work: FeaturedWork; rm: boolean; hasFinePointer: boolean }) {
   const cardRef = useRef<HTMLDivElement>(null);
   const inView = useInView(cardRef, { once: true, margin: MOTION_VIEWPORT_MARGIN.reveal });
-  const activeInView = useInView(cardRef, { margin: "0px" });
+  const activeVisibility = useViewportActivity<HTMLDivElement>(cardRef, "0px");
+  const activeInView = activeVisibility.isVisible;
   const isPricing = work.id === "hafyn-investment-engine";
   const isDesign = work.id === "hafyn-design-system";
   const metricTarget = parseInt(work.metric.value.replace(/\D/g, ""), 10) || 0;
