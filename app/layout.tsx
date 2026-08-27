@@ -138,11 +138,7 @@ export default function RootLayout({
                   script.src = 'https://www.googletagmanager.com/gtag/js?id=' + encodeURIComponent(gaId);
                   document.head.appendChild(script);
                 }
-                if ('requestIdleCallback' in window) {
-                  window.requestIdleCallback(loadAnalytics, { timeout: 5000 });
-                } else {
-                  window.setTimeout(loadAnalytics, 5000);
-                }
+                window.setTimeout(loadAnalytics, 5000);
               })();
             `}
           </Script>
