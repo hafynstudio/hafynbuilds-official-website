@@ -35,7 +35,7 @@ export function CustomPackageCTA() {
           <div className="flex shrink-0 flex-col gap-4 self-stretch sm:self-auto">
             <Link
               href="/contact"
-              className="inline-flex items-center justify-center gap-2 rounded-sm border border-text-primary bg-text-primary px-7 py-3 font-mono text-[11px] uppercase tracking-[0.18em] text-bg-deep transition-[background-color,border-color,color,transform] duration-base ease-out-quart hover:border-accent hover:bg-accent hover:text-white"
+              className="inline-flex items-center justify-center gap-2 rounded-sm border border-text-primary bg-text-primary px-7 py-3 font-mono text-[11px] uppercase tracking-[0.18em] text-bg-deep transition-[background-color,border-color,color,transform] duration-base ease-out-quart hover:border-accent-button hover:bg-accent-button-hover hover:text-white"
             >
               Start a Custom Build
               <ArrowRight size={14} strokeWidth={ICON_STROKE_WIDTH} aria-hidden="true" />

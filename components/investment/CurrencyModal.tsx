@@ -280,8 +280,8 @@ export function CurrencyModal() {
                   type="button"
                   onClick={handleConfirm}
                   className={cn(
-                    "w-full rounded-button bg-accent px-5 py-2.5 text-sm font-semibold text-white sm:w-auto",
-                    "transition-colors duration-fast hover:bg-accent-hover",
+                    "w-full rounded-button bg-accent-button px-5 py-2.5 text-sm font-semibold text-white sm:w-auto",
+                    "transition-colors duration-fast hover:bg-accent-button-hover",
                     "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2 focus-visible:ring-offset-bg-secondary"
                   )}
                 >

@@ -66,7 +66,7 @@ const STAGE_LOGS: LogLine[][] = [
 ];
 
 const TYPE_COLOR: Record<LogLine["type"], string> = {
-  system:  "rgb(113 113 122)",
+  system:  "rgb(var(--color-text-tertiary))",
   info:    "rgb(161 161 170)",
   success: "rgb(34 197 94)",
   warning: "rgb(245 158 11)",

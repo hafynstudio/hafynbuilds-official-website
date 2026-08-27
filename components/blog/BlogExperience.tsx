@@ -87,7 +87,7 @@ export function BlogExperience({
             >
               Featured Insight
             </h2>
-            <span className="font-mono text-[10px] uppercase tracking-widest text-text-disabled">
+            <span className="font-mono text-[10px] uppercase tracking-widest text-text-tertiary">
               Pinned
             </span>
           </div>
@@ -108,7 +108,7 @@ export function BlogExperience({
           >
             {isFiltered ? "Search Results" : "Latest Articles"}
           </h2>
-          <span className="font-mono text-[10px] uppercase tracking-widest text-text-disabled">
+          <span className="font-mono text-[10px] uppercase tracking-widest text-text-tertiary">
             {isFiltered ? `${filteredPosts.length} matching` : `${posts.length} total`}
           </span>
         </div>

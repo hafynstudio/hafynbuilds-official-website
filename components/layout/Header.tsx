@@ -103,7 +103,7 @@ function HeaderShell({ pathname }: { pathname: string }) {
             <Link
               href="/contact"
               prefetch={false}
-              className="inline-flex h-9 items-center justify-center gap-2 rounded-md bg-accent px-4 text-sm font-medium text-text-primary transition-colors duration-fast hover:bg-accent-hover hover:shadow-glow-accent focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2 focus-visible:ring-offset-bg-primary"
+              className="inline-flex h-9 items-center justify-center gap-2 rounded-md bg-accent-button px-4 text-sm font-medium text-text-primary transition-colors duration-fast hover:bg-accent-button-hover hover:shadow-glow-accent focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2 focus-visible:ring-offset-bg-primary"
             >
               Start a Build
             </Link>

@@ -292,7 +292,7 @@ export function ValuesSection() {
         <motion.p
           animate={headerInView ? { opacity: 1 } : {}}
           transition={{ duration: 0.5, delay: 0.25, ease: EASE }}
-          className="mt-10 text-center text-xs leading-relaxed text-text-disabled sm:mt-12"
+          className="mt-10 text-center text-xs leading-relaxed text-text-tertiary sm:mt-12"
         >
           These six values are why clients stay, builds ship on time,
           and systems keep running long after handoff.

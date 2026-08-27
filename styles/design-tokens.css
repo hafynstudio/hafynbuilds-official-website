@@ -16,11 +16,15 @@
 
   --color-text-primary: 250 250 250;
   --color-text-secondary: 161 161 170;
-  --color-text-tertiary: 113 113 122;
+  /* AA-safe tertiary text across the darkest and elevated surfaces. */
+  --color-text-tertiary: 145 145 154;
   --color-text-disabled: 76 76 83;
 
   --color-accent-primary: 62 123 250;
   --color-accent-primary-hover: 91 143 252;
+  /* AA-safe fills for white/primary text on compact CTAs. */
+  --color-accent-button: 52 105 215;
+  --color-accent-button-hover: 40 85 180;
   --color-accent-glow: 34 211 238;
 
   --color-success: 34 197 94;
@@ -110,7 +114,7 @@
   --color-bg-elevated-hover: 23 23 26;
 
   --color-success-green: 52 211 153;
-  --color-price-strike: 82 82 91;
+  --color-price-strike: 145 145 154;
   --color-price-active: 255 255 255;
   --color-badge-founding: 245 158 11;
 

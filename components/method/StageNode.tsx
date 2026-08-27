@@ -89,7 +89,7 @@ export function StageNode({
           ) : (
             <span
               className="font-mono text-xs font-bold tabular-nums"
-              style={{ color: isActive ? accentCss : "rgb(113 113 122)" }}
+              style={{ color: isActive ? accentCss : "rgb(var(--color-text-tertiary))" }}
               aria-hidden="true"
             >
               {String(index + 1).padStart(2, "0")}
@@ -287,7 +287,7 @@ export function StageNode({
                   style={{ backgroundColor: accentCss }}
                 />
               </span>
-              <span className="font-mono text-xs" style={{ color: `rgb(${accent} / 0.75)` }}>
+              <span className="font-mono text-xs" style={{ color: accentCss }}>
                 {stage.statusLabel}
               </span>
             </motion.div>

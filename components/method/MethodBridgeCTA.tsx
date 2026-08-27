@@ -39,7 +39,7 @@ export function MethodBridgeCTA() {
               : { duration: 0.5, ease: EASE_OUT_EXPO }
           }
           className="mb-3 font-mono text-xs uppercase tracking-widest"
-          style={{ color: "rgb(62 123 250 / 0.75)" }}
+          style={{ color: "rgb(var(--color-accent-primary))" }}
           aria-hidden="true"
         >
           Ready to build?

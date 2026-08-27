@@ -39,10 +39,10 @@ export default function TeamPage() {
   return (
     <>
       <JsonLd id="team-breadcrumb-schema" data={breadcrumbJsonLd} />
-      <main>
+      <div>
       <FounderSpotlight />
             <TeamGrid />
-      </main>
+      </div>
     </>
   );
 }

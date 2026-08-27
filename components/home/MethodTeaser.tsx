@@ -249,7 +249,7 @@ function DesktopNode({
 
           <p
             className="mt-3 font-mono text-[9px] font-medium leading-tight"
-            style={{ color: `rgb(${STATUS_COLOR[status]} / 0.9)` }}
+            style={{ color: status === "active" ? "rgb(var(--color-accent-primary))" : `rgb(${STATUS_COLOR[status]} / 0.9)` }}
           >
             {status === "active"
               ? `[~] ${stage.statusLabel}`

@@ -467,16 +467,16 @@ export function EcosystemDiagram() {
                     }
                   >
                     <Card
-                      className="flex h-full flex-col items-center gap-1 rounded-xl px-4 py-5 text-center opacity-60 transition-all duration-300 hover:opacity-100 md:px-3 md:py-4"
+                      className="flex h-full flex-col items-center gap-1 rounded-xl px-4 py-5 text-center transition-all duration-300 md:px-3 md:py-4"
                       style={{
-                        background: "rgb(var(--color-bg-tertiary) / 0.35)",
-                        border: "1px dashed rgb(var(--color-accent-primary) / 0.28)",
+                        background: "rgb(var(--color-bg-tertiary) / 0.21)",
+                        border: "1px dashed rgb(var(--color-accent-primary) / 0.17)",
                       }}
                     >
-                      <span className="text-xs font-semibold text-text-secondary sm:text-sm">
+                      <span className="text-xs font-semibold text-text-primary sm:text-sm">
                         {sub.name}
                       </span>
-                      <span className="text-[10px] leading-tight text-text-disabled sm:text-[11px]">
+                      <span className="text-[10px] leading-tight text-text-tertiary sm:text-[11px]">
                         {sub.focus}
                       </span>
                       <motion.span
@@ -529,7 +529,7 @@ export function EcosystemDiagram() {
                 "linear-gradient(90deg, transparent, rgb(var(--color-border-hover)), transparent)",
             }}
           />
-          <p className="font-mono text-xs uppercase tracking-[0.16em] text-text-disabled">
+          <p className="font-mono text-xs uppercase tracking-[0.16em] text-text-tertiary">
             More builds coming as the ecosystem grows.
           </p>
         </motion.div>

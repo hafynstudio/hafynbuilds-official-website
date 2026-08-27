@@ -120,7 +120,7 @@ export function IndustryModal({
           </p>
           <Link
             href="/contact"
-            className="mt-4 inline-flex items-center justify-center rounded-sm border border-accent/30 bg-accent/6 px-6 py-3 font-mono text-[11px] uppercase tracking-[0.18em] text-text-primary transition-[background-color,border-color,color] duration-base hover:border-accent hover:bg-accent hover:text-white"
+            className="mt-4 inline-flex items-center justify-center rounded-sm border border-accent/30 bg-accent/6 px-6 py-3 font-mono text-[11px] uppercase tracking-[0.18em] text-text-primary transition-[background-color,border-color,color] duration-base hover:border-accent-button hover:bg-accent-button-hover hover:text-white"
           >
             Request a Custom Build
           </Link>

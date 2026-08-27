@@ -23,7 +23,7 @@ const SITEMAP_LINKS = [
  */
 function FooterLink({ href, label }: { href: string; label: string }) {
   return (
-    <Link href={href} className="group relative inline-block w-fit text-sm text-text-secondary transition-colors duration-fast hover:text-text-primary">
+    <Link href={href} className="group relative inline-flex min-h-11 w-fit items-center text-sm text-text-secondary transition-colors duration-fast hover:text-text-primary">
       {label}
       <span
         aria-hidden="true"
@@ -87,7 +87,7 @@ export function Footer() {
                       key={social.platform}
                       title={`${social.label} — coming soon`}
                       aria-hidden="true"
-                      className="flex h-10 w-10 cursor-not-allowed items-center justify-center rounded-md border border-border text-text-disabled"
+                      className="flex h-11 w-11 cursor-not-allowed items-center justify-center rounded-md border border-border text-text-disabled"
                     >
                       <Icon className="h-4 w-4" />
                     </span>
@@ -98,7 +98,7 @@ export function Footer() {
                     key={social.platform}
                     href={social.url}
                     aria-label={social.label}
-                    className="flex h-10 w-10 items-center justify-center rounded-md border border-border text-text-secondary transition-colors duration-fast hover:border-accent/50 hover:text-accent"
+                    className="flex h-11 w-11 items-center justify-center rounded-md border border-border text-text-secondary transition-colors duration-fast hover:border-accent/50 hover:text-accent"
                   >
                     <Icon className="h-4 w-4" />
                   </a>

@@ -34,7 +34,7 @@ export default function MethodPage() {
   return (
     <>
       <JsonLd id="method-breadcrumb-schema" data={breadcrumbJsonLd} />
-      <main
+      <div
       className="relative min-h-screen"
       style={{ backgroundColor: "rgb(10 10 11)" }}
     >
@@ -73,7 +73,7 @@ export default function MethodPage() {
 
       {/* 4. Bridge CTA */}
       <MethodBridgeCTA />
-      </main>
+      </div>
     </>
   );
 }

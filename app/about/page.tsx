@@ -52,7 +52,7 @@ export default function AboutPage() {
   return (
     <>
       <JsonLd id="about-breadcrumb-schema" data={breadcrumbJsonLd} />
-      <main>
+      <div>
       <AboutHero />
       <OriginStory />
       <MissionVision />
@@ -60,7 +60,7 @@ export default function AboutPage() {
       <ValuesCards />
       <Standards />
             <FounderBridge />
-      </main>
+      </div>
     </>
   );
 }

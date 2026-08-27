@@ -37,6 +37,8 @@ const config: Config = {
         accent: {
           DEFAULT: "rgb(var(--color-accent-primary) / <alpha-value>)",
           hover: "rgb(var(--color-accent-primary-hover) / <alpha-value>)",
+          button: "rgb(var(--color-accent-button) / <alpha-value>)",
+          "button-hover": "rgb(var(--color-accent-button-hover) / <alpha-value>)",
           glow: "rgb(var(--color-accent-glow) / <alpha-value>)",
         },
         success: {

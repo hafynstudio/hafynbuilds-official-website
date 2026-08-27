@@ -45,7 +45,7 @@ type ButtonProps = ButtonOwnProps &
 
 const VARIANT_STYLES: Record<ButtonVariant, string> = {
   primary:
-    "bg-accent text-text-primary hover:bg-accent-hover hover:shadow-glow-accent",
+    "bg-accent-button text-text-primary hover:bg-accent-button-hover hover:shadow-glow-accent",
   secondary:
     "bg-surface border border-border text-text-primary hover:border-border-hover hover:bg-surface-raised",
   ghost:

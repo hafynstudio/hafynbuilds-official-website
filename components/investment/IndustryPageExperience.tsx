@@ -32,9 +32,9 @@ export function IndustryPageExperience({
         <div className="mx-auto grid max-w-7xl gap-12 px-5 pb-20 pt-32 sm:px-8 lg:grid-cols-[minmax(0,1fr)_minmax(380px,0.85fr)] lg:items-center lg:gap-16 lg:px-12 lg:pb-28 lg:pt-40">
           <div>
             <nav aria-label="Breadcrumb" className="mb-10 flex flex-wrap items-center gap-2 font-mono text-[10px] uppercase tracking-[0.18em] text-text-tertiary">
-              <Link href="/" prefetch={false} className="transition-colors duration-fast hover:text-text-primary">Home</Link>
+              <Link href="/" prefetch={false} className="inline-flex min-h-11 items-center transition-colors duration-fast hover:text-text-primary">Home</Link>
               <span aria-hidden="true">/</span>
-              <Link href="/investment" prefetch={false} className="transition-colors duration-fast hover:text-text-primary">Investment</Link>
+              <Link href="/investment" prefetch={false} className="inline-flex min-h-11 items-center transition-colors duration-fast hover:text-text-primary">Investment</Link>
               <span aria-hidden="true">/</span>
               <span className="text-accent">{industry.name}</span>
             </nav>
@@ -48,7 +48,7 @@ export function IndustryPageExperience({
             </p>
 
             <div className="mt-9 flex flex-wrap gap-3">
-              <Link href="/contact" prefetch={false} className="inline-flex items-center gap-3 rounded-sm border border-accent bg-accent px-5 py-3 font-mono text-[11px] uppercase tracking-[0.18em] text-white transition-[background-color,border-color,color,transform] duration-medium ease-out-quart hover:bg-accent-hover active:translate-y-px focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2 focus-visible:ring-offset-bg-deep">
+              <Link href="/contact" prefetch={false} className="inline-flex items-center gap-3 rounded-sm border border-accent-button bg-accent-button px-5 py-3 font-mono text-[11px] uppercase tracking-[0.18em] text-white transition-[background-color,border-color,color,transform] duration-medium ease-out-quart hover:bg-accent-button-hover active:translate-y-px focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2 focus-visible:ring-offset-bg-deep">
                 Start a build <ArrowRight size={15} aria-hidden="true" />
               </Link>
               <Link href="/investment" prefetch={false} className="inline-flex items-center gap-3 rounded-sm border border-border-hairline px-5 py-3 font-mono text-[11px] uppercase tracking-[0.18em] text-text-primary transition-[background-color,border-color,color,transform] duration-medium ease-out-quart hover:border-text-primary active:translate-y-px focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2 focus-visible:ring-offset-bg-deep">

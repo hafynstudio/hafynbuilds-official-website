@@ -24,7 +24,7 @@ function CategoryPill({
       aria-checked={isActive}
       data-industry-category={value}
       className={cn(
-        "relative rounded-full px-3 py-1.5",
+        "relative min-h-11 min-w-11 rounded-full px-3 py-1.5",
         "font-sans text-xs font-medium",
         "border transition-[border-color,background-color,color] duration-base ease-out-quart",
         "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2 focus-visible:ring-offset-bg-deep",
@@ -114,14 +114,14 @@ export function IndustryExplorer() {
                 data-industry-clear
                 hidden
                 aria-label="Clear search"
-                className="rounded-sm text-text-tertiary transition-colors duration-fast hover:text-text-secondary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
+                className="flex min-h-11 min-w-11 items-center justify-center rounded-sm text-text-tertiary transition-colors duration-fast hover:text-text-secondary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
               >
                 <X size={13} aria-hidden="true" />
               </button>
             </div>
           </div>
 
-          <div role="group" aria-label="Filter by category" className="flex flex-wrap gap-2">
+          <div role="radiogroup" aria-label="Filter by category" aria-orientation="horizontal" className="flex flex-wrap gap-2">
             <CategoryPill
               label="All"
               value={ALL_CATEGORY_VALUE}

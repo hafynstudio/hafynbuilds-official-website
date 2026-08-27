@@ -198,7 +198,7 @@ export default async function BlogPostPage({ params }: BlogPostPageProps) {
                 <li>
                   <Link
                     href="/"
-                    className="transition-colors duration-fast hover:text-text-tertiary"
+                    className="inline-flex min-h-11 items-center transition-colors duration-fast hover:text-text-tertiary"
                   >
                     Home
                   </Link>
@@ -207,7 +207,7 @@ export default async function BlogPostPage({ params }: BlogPostPageProps) {
                 <li>
                   <Link
                     href="/blog"
-                    className="transition-colors duration-fast hover:text-text-tertiary"
+                    className="inline-flex min-h-11 items-center transition-colors duration-fast hover:text-text-tertiary"
                   >
                     Blog
                   </Link>
@@ -216,7 +216,7 @@ export default async function BlogPostPage({ params }: BlogPostPageProps) {
                 <li>
                   <Link
                     href={`/blog/category/${category.slug}`}
-                    className="transition-colors duration-fast hover:text-text-tertiary"
+                    className="inline-flex min-h-11 items-center transition-colors duration-fast hover:text-text-tertiary"
                   >
                     {category.label}
                   </Link>

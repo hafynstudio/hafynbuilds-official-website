@@ -157,7 +157,7 @@ export function AnimatedPipeline() {
             <div className="mb-8 lg:mb-10">
               <p
                 className="mb-2 font-mono text-xs uppercase tracking-widest"
-                style={{ color: "rgb(62 123 250 / 0.75)" }}
+                style={{ color: "rgb(var(--color-accent-primary))" }}
                 aria-hidden="true"
               >
                 Live Deploy
@@ -200,7 +200,7 @@ export function AnimatedPipeline() {
 
           <div
             className="mt-6 flex items-center gap-2"
-            style={{ opacity: buildComplete ? 0 : 0.4 }}
+            style={{ opacity: buildComplete ? 0 : 0.9 }}
             aria-hidden="true"
           >
             <div className="h-px flex-1" style={{ backgroundColor: "rgb(42 42 49)" }} />

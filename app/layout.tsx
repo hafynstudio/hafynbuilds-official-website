@@ -107,7 +107,7 @@ export default function RootLayout({
           <LoadingScreen />
           <Header />
 
-          <main id="main-content" className="flex-1 overflow-x-hidden pt-header">
+          <main id="main-content" tabIndex={-1} className="flex-1 overflow-x-hidden pt-header">
             {children}
           </main>
 

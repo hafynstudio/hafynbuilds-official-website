@@ -434,7 +434,7 @@ export function FounderSpotlight() {
               >
                 &ldquo;
               </span>
-              <p className="pl-4 text-base italic leading-relaxed text-text-secondary sm:pl-6 sm:text-lg">
+              <p className="pl-4 text-base italic leading-relaxed text-text-primary sm:pl-6 sm:text-lg">
                 {founder.tagline}
               </p>
             </motion.blockquote>

@@ -23,7 +23,7 @@ export default function BlogPage() {
   return (
     <>
       <JsonLd id="blog-breadcrumb-schema" data={breadcrumbJsonLd} />
-      <main className="min-h-screen bg-bg-deep">
+      <div className="min-h-screen bg-bg-deep">
       {/* Page header */}
       <section className="border-b border-border-hairline bg-bg-deep pt-32 pb-16 md:pt-40 md:pb-20">
         <div className="mx-auto max-w-7xl px-4 md:px-6 lg:px-8">
@@ -59,7 +59,7 @@ export default function BlogPage() {
           showFeaturedPost={featuredPost !== null}
         />
       </section>
-    </main>
+    </div>
     </>
   );
 }

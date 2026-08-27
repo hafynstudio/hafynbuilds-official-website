@@ -29,7 +29,7 @@ export default function CapabilitiesPage() {
   return (
     <>
       <JsonLd id="capabilities-breadcrumb-schema" data={breadcrumbJsonLd} />
-      <main>
+      <div>
       <CapabilitiesHero />
       <section aria-labelledby="build-console-heading">
         <h2 id="build-console-heading" className="sr-only">
@@ -40,7 +40,7 @@ export default function CapabilitiesPage() {
       <TechPhilosophyStrip />
       <IndustriesMarquee />
             <CapabilitiesFinalCTA />
-      </main>
+      </div>
     </>
   );
 }

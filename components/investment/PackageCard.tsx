@@ -98,7 +98,7 @@ export function PackageCard({ pkg, index }: PackageCardProps) {
           </div>
         )}
 
-        <div className="mt-4 flex flex-wrap gap-x-4 gap-y-2 font-mono text-[10px] uppercase tracking-wider text-text-disabled">
+        <div className="mt-4 flex flex-wrap gap-x-4 gap-y-2 font-mono text-[10px] uppercase tracking-wider text-text-tertiary">
           <span>{pkg.deliveryDays} Delivery</span>
           <span>{pkg.revisionRounds} Revisions</span>
           <span>{pkg.supportPeriod} Support</span>
@@ -154,7 +154,7 @@ export function PackageCard({ pkg, index }: PackageCardProps) {
             "transition-[background-color,border-color,color,transform] duration-base ease-out-quart active:translate-y-px",
             "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2 focus-visible:ring-offset-bg-deep",
             pkg.isMostChosen
-              ? "border-accent/30 bg-accent/6 text-text-primary hover:border-accent hover:bg-accent hover:text-white"
+              ? "border-accent/30 bg-accent/6 text-text-primary hover:border-accent-button hover:bg-accent-button-hover hover:text-white"
               : "border-border-hairline text-text-primary hover:border-text-primary hover:bg-text-primary hover:text-bg-deep"
           )}
         >

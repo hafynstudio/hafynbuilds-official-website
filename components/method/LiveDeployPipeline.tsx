@@ -81,7 +81,7 @@ function MobilePipeline() {
       <div className="relative mb-8">
         <p
           className="mb-2 font-mono text-xs uppercase tracking-widest"
-          style={{ color: "rgb(62 123 250 / 0.75)" }}
+          style={{ color: "rgb(var(--color-accent-primary))" }}
           aria-hidden="true"
         >
           Live Deploy
@@ -145,7 +145,7 @@ function StaticPipeline() {
       <div className="mb-10">
         <p
           className="mb-2 font-mono text-xs uppercase tracking-widest"
-          style={{ color: "rgb(62 123 250 / 0.75)" }}
+          style={{ color: "rgb(var(--color-accent-primary))" }}
           aria-hidden="true"
         >
           Our Method

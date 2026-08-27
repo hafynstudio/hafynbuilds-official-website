@@ -46,7 +46,7 @@ export function TimelineSection() {
       <div className="mb-12 text-center">
         <p
           className="mb-3 font-mono text-xs uppercase tracking-widest"
-          style={{ color: "rgb(62 123 250 / 0.75)" }}
+          style={{ color: "rgb(var(--color-accent-primary))" }}
           aria-hidden="true"
         >
           Timeline Transparency

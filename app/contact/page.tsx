@@ -71,7 +71,7 @@ export default function ContactPage() {
 
       <CopyEmailHandler />
 
-      <main className="min-h-screen bg-bg-primary">
+      <div className="min-h-screen bg-bg-primary">
         <ContactHero replyWindow={REPLY_WINDOW} />
 
         <section className="mx-auto max-w-7xl px-5 pb-14 pt-6 sm:px-6 sm:py-20 md:px-12 lg:px-24">
@@ -136,7 +136,7 @@ export default function ContactPage() {
 
           </div>
         </section>
-      </main>
+      </div>
     </>
   );
 }

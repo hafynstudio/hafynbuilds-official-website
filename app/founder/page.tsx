@@ -52,13 +52,13 @@ export default function FounderPage() {
     <>
       <JsonLd id="founder-person-schema" data={schema} />
       <JsonLd id="founder-breadcrumb-schema" data={breadcrumbJsonLd} />
-      <main>
+      <div>
         <FounderHero />
         <FounderNarrative />
         <EcosystemCallout />
         <ClosingStatement />
         <FounderSocials />
-      </main>
+      </div>
     </>
   );
 }
