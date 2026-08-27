@@ -13,12 +13,11 @@ import {
 } from "@/lib/hooks";
 import { EASE_OUT_EXPO } from "@/lib/motion";
 
-// First-visit currency selection experience.
+// Explicit currency selection experience.
 //
 // Behavior:
-//   - Auto-opens 400ms after first mount when no localStorage preference
-//     exists (see CurrencyProvider). Page renders with detected pricing
-//     underneath, then modal fades in on top — user sees prices immediately.
+//   - Loads after the visitor activates the CurrencySwitcher; modal search,
+//     focus trapping, and animation do not enter initial hydration.
 //   - Users can reopen via the CurrencySwitcher in the header at any time.
 //   - Search filters by country name, currency code, or symbol.
 //   - Desktop: centered modal card. Mobile: bottom sheet with drag handle.

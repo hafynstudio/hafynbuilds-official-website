@@ -3,7 +3,7 @@
 import { InvestmentHero } from "@/components/investment/InvestmentHero";
 import { FoundationPackages } from "@/components/investment/FoundationPackages";
 import { IndustryExplorer } from "@/components/investment/IndustryExplorer";
-import { CurrencyModal } from "@/components/investment/CurrencyModal";
+import { DeferredCurrencyModal } from "@/components/investment/DeferredCurrencyModal";
 import { ScanLine } from "@/components/investment/ScanLine";
 import { CustomPackageCTA } from "@/components/investment/CustomPackageCTA";
 
@@ -13,9 +13,9 @@ export function InvestmentExperience() {
       {/* Ambient scanner line — blueprint atmosphere without JS-heavy effects. */}
       <ScanLine />
 
-      {/* First-visit currency selection modal. Hydration + localStorage gate
-          are controlled by CurrencyProvider in the root layout. */}
-      <CurrencyModal />
+      {/* Explicit-only currency selection. The heavy modal graph loads after
+          the visitor activates the header switcher. */}
+      <DeferredCurrencyModal />
 
       <InvestmentHero />
       <FoundationPackages />

@@ -1,25 +1,11 @@
-﻿import dynamic from "next/dynamic";
-import { buildMetadata } from "@/lib/seo/metadata";
+﻿import { buildMetadata } from "@/lib/seo/metadata";
 import { breadcrumbSchema } from "@/lib/seo/schema";
 import { WhatsAppCTA } from "@/components/contact/WhatsAppCTA";
 import { SocialGrid } from "@/components/contact/SocialGrid";
 import { ContactHero } from "@/components/contact/ContactHero";
 import { CopyEmailHandler } from "@/components/contact/CopyEmailHandler";
+import { DeferredContactForm } from "@/components/contact/DeferredContactForm";
 import { SITE_URL } from "@/lib/site";
-
-// ContactForm is dynamically imported (BUG-005). It carries a 378KB
-// module graph (Zod + react-hook-form + framer-motion) that is not
-// needed on first paint — the form is below the fold. With ssr:true
-// (the default, required for Server Components in Next.js 16), the
-// form is server-rendered and then hydrated client-side. The chunk
-// loads during hydration with no visual flash — the server HTML and
-// client output are the same component.
-const ContactForm = dynamic(
-  () =>
-    import("@/components/contact/ContactForm").then(
-      (m) => ({ default: m.ContactForm })
-    ),
-);
 
 // ---------------------------------------------------------------------------
 // Real contact channels — single source of truth for the Contact page.
@@ -120,7 +106,7 @@ export default function ContactPage() {
                   ~2 min
                 </span>
               </div>
-              <ContactForm replyWindow={REPLY_WINDOW} />
+              <DeferredContactForm replyWindow={REPLY_WINDOW} />
             </div>
 
             {/* --------------------------------------------------------

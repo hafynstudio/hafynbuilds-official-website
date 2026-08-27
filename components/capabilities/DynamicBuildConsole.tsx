@@ -1,7 +1,7 @@
 "use client";
 
 import dynamic from "next/dynamic";
-import { useCoarsePointer, useLazyMount } from "@/lib/hooks";
+import { useLazyMount } from "@/lib/hooks";
 
 function LoadingSkeleton() {
   return (
@@ -32,43 +32,27 @@ const BuildConsoleClient = dynamic(
 );
 
 /**
- * DynamicBuildConsole — lazy-mounts the BUILD CONSOLE component,
- * skipping the observer overhead entirely on mobile (coarse-pointer)
- * where the sentinel provides no deferral benefit (the observer fires
- * within ~200ms on initial load anyway, per verified viewport math).
- *
- * Desktop (fine-pointer): uses useLazyMount — IntersectionObserver
- * gates the component until the user scrolls within 200px, moving the
- * chunk fetch + GSAP initialization outside Lighthouse's initial-load
- * measurement window.
- *
- * Mobile (coarse-pointer): renders BuildConsoleClient directly —
- * no observer, no skeleton-wait cycle. The next/dynamic loading
- * skeleton still applies naturally during the chunk fetch.
- *
- * The .capabilities-console-reserve + --panel-count CSS class/property
- * are applied in BOTH branches: the @media (pointer: fine) rule
- * reserves GSAP pin-spacer height on desktop; on mobile the guard
- * doesn't apply, so only the harmless min-height: 100vh base takes
- * effect (matching the loading skeleton's own height).
+ * DynamicBuildConsole — keeps a full-height reserved slot while deferring
+ * the build-console client graph until the user reaches the console. This
+ * applies to touch and fine-pointer devices: the mobile path no longer
+ * downloads the five-panel interactive runtime during initial hydration.
+ * The reserved slot is already the loading skeleton's full viewport height,
+ * so delaying the client component cannot collapse the page.
  */
 export function DynamicBuildConsole({
   panelCount = 5,
 }: {
   panelCount?: number;
 }) {
-  const isCoarse = useCoarsePointer();
-  const { sentinelRef, shouldMount } = useLazyMount(
-    { rootMargin: "200px" }
-  );
+  const { sentinelRef, shouldMount } = useLazyMount({ rootMargin: "0px" });
 
   return (
     <div
-      ref={isCoarse ? undefined : sentinelRef}
+      ref={sentinelRef}
       className="capabilities-console-reserve"
       style={{ "--panel-count": panelCount } as React.CSSProperties}
     >
-      {(isCoarse || shouldMount) ? <BuildConsoleClient /> : <LoadingSkeleton />}
+      {shouldMount ? <BuildConsoleClient /> : <LoadingSkeleton />}
     </div>
   );
 }

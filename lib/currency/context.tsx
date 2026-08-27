@@ -49,10 +49,6 @@ export function CurrencyProvider({ children }: { children: React.ReactNode }) {
     useState<CountryPricing>(fallbackPricing);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isHydrated, setIsHydrated] = useState(false);
-  // Ensures the auto-open only fires once per page load, not on
-  // subsequent state changes.
-  const hasShownModal = useRef(false);
-
   useEffect(() => {
     async function initCurrency() {
       try {
@@ -77,12 +73,10 @@ export function CurrencyProvider({ children }: { children: React.ReactNode }) {
         setCurrentPricing(detected);
         setIsHydrated(true);
 
-        // 3. Open the modal 400ms after mount — page renders first with
-        //    the detected pricing, modal overlays on top for confirmation.
-        if (!hasShownModal.current) {
-          hasShownModal.current = true;
-          setTimeout(() => setIsModalOpen(true), 400);
-        }
+        // The modal is intentionally explicit-only. CurrencySwitcher calls
+        // openModal() when the visitor asks to change region; keeping it out
+        // of the initial lifecycle avoids loading modal search/focus logic
+        // during hydration.
       } catch {
         // Geo detection failed — silently use USD fallback, no modal.
         setCurrentPricing(fallbackPricing);

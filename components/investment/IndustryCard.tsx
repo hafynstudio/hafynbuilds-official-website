@@ -1,18 +1,9 @@
-﻿"use client";
-
-import Link from "next/link";
-import { motion } from "framer-motion";
+﻿import Link from "next/link";
 import { ArrowRight } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { ICON_MAP, ICON_STROKE_WIDTH } from "@/lib/icons";
-import { EASE_OUT_QUART } from "@/lib/motion";
-import { usePrefersReducedMotion } from "@/lib/hooks";
 import type { Industry, IndustryVisualTheme } from "@/types/industry";
 
-// Visual theme → Tailwind class maps.
-// ALL color references go through design-token-backed classes — no raw
-// hex values. warm/clean/professional reuse existing tokens;
-// elegant/vibrant use the 2 new tokens added to the system in Phase 11.
 const THEME_ICON_CLASS: Record<IndustryVisualTheme, string> = {
   warm: "text-badge-founding",
   clean: "text-accent-glow",
@@ -45,113 +36,86 @@ const THEME_DOT_CLASS: Record<IndustryVisualTheme, string> = {
   vibrant: "bg-theme-vibrant",
 };
 
-interface IndustryCardProps {
-  industry: Industry;
-  /** Visual entrance delay for stagger effect — passed from the parent grid. */
-  entranceDelay?: number;
-}
-
-export function IndustryCard({ industry, entranceDelay = 0 }: IndustryCardProps) {
+export function IndustryCard({ industry }: { industry: Industry }) {
   const IconComponent = ICON_MAP[industry.iconOrIllustration];
-  const prefersReducedMotion = usePrefersReducedMotion();
 
   return (
-    <motion.div
-      initial={prefersReducedMotion ? { opacity: 0 } : { opacity: 0, y: 20 }}
-      animate={prefersReducedMotion ? { opacity: 1 } : { opacity: 1, y: 0 }}
-      exit={prefersReducedMotion ? { opacity: 0 } : { opacity: 0, y: 10 }}
-      transition={
-        prefersReducedMotion
-          ? { duration: 0 }
-          : { duration: 0.4, delay: entranceDelay, ease: EASE_OUT_QUART }
-      }
-      layout
-      layoutId={`industry-card-${industry.id}`}
+    <Link
+      href={`/investment/${industry.id}`}
+      aria-label={`View packages for ${industry.name}`}
+      data-industry-slug={industry.id}
+      data-industry-card={industry.id}
+      data-industry-category={industry.category}
+      data-industry-search-text={`${industry.name} ${industry.description} ${industry.category}`.toLowerCase()}
+      className={cn(
+        "group relative flex cursor-pointer flex-col gap-4 rounded-card p-6",
+        "border border-border-hairline bg-bg-elevated",
+        "shadow-card-rest",
+        "before:absolute before:inset-x-0 before:top-0 before:h-px before:rounded-t-card",
+        "before:bg-gradient-to-r before:from-transparent before:via-white/8 before:to-transparent",
+        "transition-[border-color,box-shadow,transform] duration-base ease-out-quart",
+        "hover:-translate-y-1 hover:bg-bg-elevated-hover hover:shadow-card-hover",
+        THEME_BORDER_CLASS[industry.visualTheme],
+        THEME_GLOW_CLASS[industry.visualTheme],
+        "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2 focus-visible:ring-offset-bg-deep"
+      )}
     >
-      <Link
-        href={`/investment/${industry.id}`}
-        aria-label={`View packages for ${industry.name}`}
-        data-industry-slug={industry.id}
-        className={cn(
-          // Native link semantics make the whole visual card keyboard and crawler discoverable.
-          "group relative flex cursor-pointer flex-col gap-4 rounded-card p-6",
-          "border border-border-hairline bg-bg-elevated",
-          "shadow-card-rest",
-          // Top-edge highlight — same micro-detail as Card.tsx's ::before
-          "before:absolute before:inset-x-0 before:top-0 before:h-px before:rounded-t-card",
-          "before:bg-gradient-to-r before:from-transparent before:via-white/8 before:to-transparent",
-          // Transitions
-          "transition-[border-color,box-shadow,transform] duration-base ease-out-quart",
-          "hover:-translate-y-1 hover:bg-bg-elevated-hover hover:shadow-card-hover",
-          // Theme-specific border + glow on hover
-          THEME_BORDER_CLASS[industry.visualTheme],
-          THEME_GLOW_CLASS[industry.visualTheme],
-          // Visible keyboard focus ring
-          "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2 focus-visible:ring-offset-bg-deep"
-        )}
-      >
-        {/* Icon row */}
-        <div className="flex items-start justify-between">
-          <div
-            className={cn(
-              "flex h-10 w-10 items-center justify-center rounded-md",
-              "border border-border-hairline bg-bg-primary/60"
-            )}
-          >
-            {IconComponent ? (
-              <IconComponent
-                size={18}
-                strokeWidth={ICON_STROKE_WIDTH}
-                className={cn(
-                  "transition-colors duration-base",
-                  THEME_ICON_CLASS[industry.visualTheme]
-                )}
-                aria-hidden="true"
-              />
-            ) : null}
-          </div>
-
-          {/* Category dot — visual theme accent, top-right corner */}
-          <span
-            aria-hidden="true"
-            className={cn(
-              "mt-1 h-1.5 w-1.5 rounded-full opacity-60",
-              THEME_DOT_CLASS[industry.visualTheme]
-            )}
-          />
+      <div className="flex items-start justify-between">
+        <div
+          className={cn(
+            "flex h-10 w-10 items-center justify-center rounded-md",
+            "border border-border-hairline bg-bg-primary/60"
+          )}
+        >
+          {IconComponent ? (
+            <IconComponent
+              size={18}
+              strokeWidth={ICON_STROKE_WIDTH}
+              className={cn(
+                "transition-colors duration-base",
+                THEME_ICON_CLASS[industry.visualTheme]
+              )}
+              aria-hidden="true"
+            />
+          ) : null}
         </div>
+        <span
+          aria-hidden="true"
+          className={cn(
+            "mt-1 h-1.5 w-1.5 rounded-full opacity-60",
+            THEME_DOT_CLASS[industry.visualTheme]
+          )}
+        />
+      </div>
 
-        {/* Name + description */}
-        <div className="flex flex-col gap-1.5">
-          <h3 className="font-sans text-sm font-semibold leading-snug text-text-primary">
-            {industry.name}
-          </h3>
-          <p className="font-sans text-xs leading-relaxed text-text-secondary line-clamp-2">
-            {industry.description}
-          </p>
-        </div>
+      <div className="flex flex-col gap-1.5">
+        <h3 className="font-sans text-sm font-semibold leading-snug text-text-primary">
+          {industry.name}
+        </h3>
+        <p className="font-sans text-xs leading-relaxed text-text-secondary line-clamp-2">
+          {industry.description}
+        </p>
+      </div>
 
-        {/* Footer row: category label + arrow */}
-        <div className="mt-auto flex items-center justify-between">
-          <span className="font-mono text-[10px] uppercase tracking-widest text-text-secondary">
-            {industry.category}
-          </span>
-          <ArrowRight
-            size={14}
-            strokeWidth={ICON_STROKE_WIDTH}
-            aria-hidden="true"
-            className={cn(
-              "transition-[transform,color] duration-base ease-out-quart",
-              "text-text-tertiary",
-              "group-hover:translate-x-0.5",
-              THEME_ICON_CLASS[industry.visualTheme].replace(
-                "text-",
-                "group-hover:text-"
-              )
-            )}
-          />
-        </div>
-      </Link>
-    </motion.div>
+      <div className="mt-auto flex items-center justify-between">
+        <span className="font-mono text-[10px] uppercase tracking-widest text-text-secondary">
+          {industry.category}
+        </span>
+        <ArrowRight
+          size={14}
+          strokeWidth={ICON_STROKE_WIDTH}
+          aria-hidden="true"
+          className={cn(
+            "transition-[transform,color] duration-base ease-out-quart",
+            "text-text-tertiary",
+            "group-hover:translate-x-0.5",
+            THEME_ICON_CLASS[industry.visualTheme].replace(
+              "text-",
+              "group-hover:text-"
+            )
+          )}
+        />
+      </div>
+    </Link>
   );
 }
