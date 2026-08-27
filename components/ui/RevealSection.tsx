@@ -3,16 +3,20 @@
 import { useRef, type ReactNode } from "react";
 import { motion, useInView, type Variants } from "framer-motion";
 import { usePrefersReducedMotion } from "@/lib/hooks";
-import { EASE_OUT_QUART } from "@/lib/motion";
+import {
+  EASE_MICRO,
+  MOTION_DURATION_S,
+  MOTION_VIEWPORT_MARGIN,
+} from "@/lib/motion";
 
 // PRD §3.2 specifies: "fade + slide-up 20–30px, 0.6–0.8s ease-out,
 // Intersection-Observer-triggered" and "staggered children 80–100ms".
 // Values chosen at the mid-point of each specified range.
 const REVEAL_DISTANCE_PX = 24;
-const REVEAL_DURATION_S = 0.7;
-// Negative margin fires the observer while the element is still ~80px
-// below the viewport bottom — reveals feel anticipatory, not delayed.
-const REVEAL_MARGIN = "-80px 0px -80px 0px";
+const REVEAL_DURATION_S = MOTION_DURATION_S.reveal;
+// Shared margin fires the observer while the element is still ~80px below
+// the viewport bottom — reveals feel anticipatory, not delayed.
+const REVEAL_MARGIN = MOTION_VIEWPORT_MARGIN.reveal;
 
 // Framer Motion supports only the five HTML tags enumerated below as
 // typed motion components — kept as a constrained map rather than a
@@ -33,7 +37,7 @@ const fullVariants: Variants = {
   visible: {
     opacity: 1,
     y: 0,
-    transition: { duration: REVEAL_DURATION_S, ease: EASE_OUT_QUART },
+    transition: { duration: REVEAL_DURATION_S, ease: EASE_MICRO },
   },
 };
 

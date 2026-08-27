@@ -2,6 +2,7 @@
 
 import dynamic from "next/dynamic";
 import { useLazyMount } from "@/lib/hooks";
+import { MOTION_VIEWPORT_MARGIN } from "@/lib/motion";
 
 const CapabilitiesTeaser = dynamic(
   () =>
@@ -53,7 +54,7 @@ function DeferredSection({
   minHeight: string;
   children: React.ReactNode;
 }) {
-  const { sentinelRef, shouldMount } = useLazyMount({ rootMargin: "200px" });
+  const { sentinelRef, shouldMount } = useLazyMount({ rootMargin: MOTION_VIEWPORT_MARGIN.nearViewport });
 
   return (
     <div ref={sentinelRef} style={{ minHeight }}>

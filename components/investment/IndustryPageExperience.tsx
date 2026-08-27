@@ -32,9 +32,9 @@ export function IndustryPageExperience({
         <div className="mx-auto grid max-w-7xl gap-12 px-5 pb-20 pt-32 sm:px-8 lg:grid-cols-[minmax(0,1fr)_minmax(380px,0.85fr)] lg:items-center lg:gap-16 lg:px-12 lg:pb-28 lg:pt-40">
           <div>
             <nav aria-label="Breadcrumb" className="mb-10 flex flex-wrap items-center gap-2 font-mono text-[10px] uppercase tracking-[0.18em] text-text-tertiary">
-              <Link href="/" className="transition-colors hover:text-text-primary">Home</Link>
+              <Link href="/" className="transition-colors duration-fast hover:text-text-primary">Home</Link>
               <span aria-hidden="true">/</span>
-              <Link href="/investment" className="transition-colors hover:text-text-primary">Investment</Link>
+              <Link href="/investment" className="transition-colors duration-fast hover:text-text-primary">Investment</Link>
               <span aria-hidden="true">/</span>
               <span className="text-accent">{industry.name}</span>
             </nav>
@@ -48,10 +48,10 @@ export function IndustryPageExperience({
             </p>
 
             <div className="mt-9 flex flex-wrap gap-3">
-              <Link href="/contact" className="inline-flex items-center gap-3 rounded-sm border border-accent bg-accent px-5 py-3 font-mono text-[11px] uppercase tracking-[0.18em] text-white transition-colors hover:bg-accent-hover focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2 focus-visible:ring-offset-bg-deep">
+              <Link href="/contact" className="inline-flex items-center gap-3 rounded-sm border border-accent bg-accent px-5 py-3 font-mono text-[11px] uppercase tracking-[0.18em] text-white transition-[background-color,border-color,color,transform] duration-medium ease-out-quart hover:bg-accent-hover active:translate-y-px focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2 focus-visible:ring-offset-bg-deep">
                 Start a build <ArrowRight size={15} aria-hidden="true" />
               </Link>
-              <Link href="/investment" className="inline-flex items-center gap-3 rounded-sm border border-border-hairline px-5 py-3 font-mono text-[11px] uppercase tracking-[0.18em] text-text-primary transition-colors hover:border-text-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2 focus-visible:ring-offset-bg-deep">
+              <Link href="/investment" className="inline-flex items-center gap-3 rounded-sm border border-border-hairline px-5 py-3 font-mono text-[11px] uppercase tracking-[0.18em] text-text-primary transition-[background-color,border-color,color,transform] duration-medium ease-out-quart hover:border-text-primary active:translate-y-px focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2 focus-visible:ring-offset-bg-deep">
                 All industries
               </Link>
             </div>
@@ -137,13 +137,13 @@ export function IndustryPageExperience({
           <p className="font-mono text-[10px] uppercase tracking-[0.24em] text-accent">Ready when you are</p>
           <h2 className="mt-3 max-w-2xl font-sans text-3xl font-bold tracking-tight text-text-primary sm:text-4xl">Tell us what your business needs to run better.</h2>
         </div>
-        <Link href="/contact" className="inline-flex shrink-0 items-center gap-3 rounded-sm border border-text-primary px-5 py-3 font-mono text-[11px] uppercase tracking-[0.18em] text-text-primary transition-colors hover:bg-text-primary hover:text-bg-deep focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2 focus-visible:ring-offset-bg-deep">
+        <Link href="/contact" className="inline-flex shrink-0 items-center gap-3 rounded-sm border border-text-primary px-5 py-3 font-mono text-[11px] uppercase tracking-[0.18em] text-text-primary transition-[background-color,border-color,color,transform] duration-medium ease-out-quart hover:bg-text-primary hover:text-bg-deep active:translate-y-px focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2 focus-visible:ring-offset-bg-deep">
           Start a conversation <ArrowRight size={15} aria-hidden="true" />
         </Link>
       </section>
 
       <div className="mx-auto max-w-7xl px-5 pb-12 sm:px-8 lg:px-12">
-        <Link href="/investment" className="inline-flex items-center gap-2 font-mono text-[10px] uppercase tracking-[0.18em] text-text-tertiary transition-colors hover:text-text-primary">
+        <Link href="/investment" className="inline-flex items-center gap-2 font-mono text-[10px] uppercase tracking-[0.18em] text-text-tertiary transition-colors duration-fast hover:text-text-primary">
           <ArrowLeft size={14} aria-hidden="true" /> Back to investment
         </Link>
       </div>

@@ -4,7 +4,11 @@ import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { CheckCircle, ChevronDown, Clock, Users, Package } from "lucide-react";
 import type { MethodStage } from "@/types/method-stage";
-import { EASE_OUT_EXPO, EASE_OUT_QUART } from "@/lib/motion";
+import {
+  EASE_ENTRANCE,
+  EASE_MICRO,
+  MOTION_DURATION_S,
+} from "@/lib/motion";
 
 interface StageNodeProps {
   stage: MethodStage;
@@ -61,8 +65,8 @@ export function StageNode({
           aria-label={`${stage.name} stage — ${isActive || isComplete ? "click to expand" : "not yet reached"}`}
           variants={reducedMotion ? {} : nodeVariants}
           animate={nodeState}
-          transition={{ duration: 0.4, ease: EASE_OUT_EXPO }}
-          className="relative z-10 flex h-12 w-12 items-center justify-center rounded-full border-2 transition-colors duration-300 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-offset-bg-primary"
+          transition={{ duration: MOTION_DURATION_S.medium, ease: EASE_ENTRANCE }}
+          className="relative z-10 flex h-12 w-12 items-center justify-center rounded-full border-2 transition-colors duration-base focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-offset-bg-primary"
           style={{
             borderColor: isActive || isComplete ? accentCss : "rgb(42 42 49)",
             backgroundColor: isComplete
@@ -105,7 +109,7 @@ export function StageNode({
               style={{ backgroundColor: accentCss }}
               animate={reducedMotion ? {} : { scaleY: connectorFill, opacity: connectorFill > 0 ? 1 : 0 }}
               initial={{ scaleY: 0, opacity: 0 }}
-              transition={{ duration: 0.5, ease: EASE_OUT_QUART }}
+              transition={{ duration: MOTION_DURATION_S.large, ease: EASE_MICRO }}
             />
           </div>
         )}
@@ -129,7 +133,7 @@ export function StageNode({
           transition={
             reducedMotion
               ? { duration: 0 }
-              : { duration: 0.5, ease: EASE_OUT_EXPO, delay: 0.05 }
+              : { duration: MOTION_DURATION_S.large, ease: EASE_ENTRANCE, delay: MOTION_DURATION_S.staggerStep }
           }
           className="flex items-start justify-between gap-4"
         >
@@ -164,7 +168,7 @@ export function StageNode({
             <button
               onClick={() => setExpanded(v => !v)}
               aria-label={expanded ? "Collapse stage detail" : "Expand stage detail"}
-              className="mt-1 shrink-0 rounded-full p-1.5 transition-colors hover:bg-white/5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-offset-bg-primary"
+              className="mt-1 flex min-h-11 min-w-11 shrink-0 items-center justify-center rounded-full transition-colors hover:bg-white/5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-offset-bg-primary"
               style={{ ["--tw-ring-color" as string]: accentCss }}
             >
               <motion.div
@@ -172,7 +176,7 @@ export function StageNode({
                 transition={
                   reducedMotion
                     ? { duration: 0 }
-                    : { duration: 0.25, ease: EASE_OUT_QUART }
+                    : { duration: MOTION_DURATION_S.small, ease: EASE_MICRO }
                 }
               >
                 <ChevronDown size={18} style={{ color: accentCss }} aria-hidden="true" />
@@ -192,7 +196,7 @@ export function StageNode({
               transition={
                 reducedMotion
                   ? { duration: 0 }
-                  : { duration: 0.35, ease: EASE_OUT_QUART }
+                  : { duration: MOTION_DURATION_S.medium, ease: EASE_MICRO }
               }
               className="overflow-hidden"
             >
@@ -266,7 +270,7 @@ export function StageNode({
               transition={
                 reducedMotion
                   ? { duration: 0 }
-                  : { duration: 0.3, ease: EASE_OUT_EXPO }
+                  : { duration: MOTION_DURATION_S.medium, ease: EASE_ENTRANCE }
               }
               className="mt-3 flex items-center gap-2"
               aria-live="polite"

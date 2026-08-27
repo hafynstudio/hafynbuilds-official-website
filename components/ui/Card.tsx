@@ -39,7 +39,7 @@ export function Card({
         // real "glass surface" from a flat bordered box.
         "before:absolute before:inset-x-0 before:top-0 before:h-px before:rounded-t-lg before:bg-gradient-to-r before:from-transparent before:via-white/10 before:to-transparent",
         interactive &&
-          "transition-[transform,box-shadow,border-color] duration-base ease-out-quart hover:-translate-y-1 hover:border-border-hover hover:shadow-glass-lg",
+          "transition-[transform,box-shadow,border-color] duration-base ease-out-quart hover:-translate-y-1 active:-translate-y-0.5 hover:border-border-hover active:border-border-hover hover:shadow-glass-lg active:shadow-glass-lg motion-reduce:transform-none",
         noise && "bg-grain",
         PADDING_STYLES[padding],
         className

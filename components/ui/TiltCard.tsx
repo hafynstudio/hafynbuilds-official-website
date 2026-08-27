@@ -4,12 +4,7 @@ import { useRef, type ReactNode, type PointerEvent } from "react";
 import { motion, useMotionValue, useSpring } from "framer-motion";
 import { useHasFinePointer, usePrefersReducedMotion } from "@/lib/hooks";
 import { cn } from "@/lib/utils";
-
-// 6 degrees maximum tilt — enough to register visual depth without
-// feeling vertiginous. Spring settings chosen for a snappy-but-physical
-// feel: high stiffness (snaps back fast), moderate damping (no jitter).
-const MAX_TILT_DEG = 6;
-const TILT_SPRING = { stiffness: 200, damping: 20, mass: 0.4 };
+import { TILT_MAX_DEG, TILT_SPRING } from "@/lib/motion";
 
 interface TiltCardProps {
   children: ReactNode;
@@ -58,8 +53,8 @@ export function TiltCard({ children, className }: TiltCardProps) {
     // Normalise to -0.5 → +0.5 range centred on the card midpoint.
     const px = (e.clientX - rect.left) / rect.width - 0.5;
     const py = (e.clientY - rect.top) / rect.height - 0.5;
-    rotateYRaw.set(px * MAX_TILT_DEG * 2);
-    rotateXRaw.set(-py * MAX_TILT_DEG * 2);
+    rotateYRaw.set(px * TILT_MAX_DEG * 2);
+    rotateXRaw.set(-py * TILT_MAX_DEG * 2);
   }
 
   function handlePointerLeave() {

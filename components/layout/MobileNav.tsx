@@ -9,6 +9,7 @@ import { Logo } from "@/components/ui/Logo";
 import { SOCIAL_ICONS } from "@/components/ui/icons/SocialIcons";
 import { socialLinks } from "@/data/social-links";
 import { useFocusTrap, usePrefersReducedMotion } from "@/lib/hooks";
+import { EASE_ENTRANCE, MOTION_DURATION_S } from "@/lib/motion";
 
 interface NavLink {
   href: string;
@@ -86,7 +87,7 @@ export function MobileNav({
           initial={{ opacity: 0, y: prefersReducedMotion ? 0 : -16 }}
           animate={{ opacity: 1, y: 0 }}
           exit={{ opacity: 0, y: prefersReducedMotion ? 0 : -16 }}
-          transition={{ duration: prefersReducedMotion ? 0.01 : 0.3 }}
+          transition={{ duration: prefersReducedMotion ? 0 : MOTION_DURATION_S.medium, ease: EASE_ENTRANCE }}
           className="fixed inset-0 z-modal flex flex-col bg-bg-primary md:hidden"
         >
           <div className="flex h-header items-center justify-between px-6">
@@ -95,7 +96,7 @@ export function MobileNav({
               type="button"
               onClick={onClose}
               aria-label="Close menu"
-              className="rounded-md p-2 text-text-primary"
+              className="flex min-h-11 min-w-11 items-center justify-center rounded-md p-2 text-text-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2 focus-visible:ring-offset-bg-primary"
             >
               <X size={24} aria-hidden="true" />
             </button>
@@ -112,8 +113,9 @@ export function MobileNav({
                   initial={{ opacity: 0, y: prefersReducedMotion ? 0 : 12 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{
-                    delay: prefersReducedMotion ? 0 : 0.05 * index,
-                    duration: 0.3,
+                    delay: prefersReducedMotion ? 0 : MOTION_DURATION_S.staggerStep * index,
+                    duration: prefersReducedMotion ? 0 : MOTION_DURATION_S.medium,
+                    ease: EASE_ENTRANCE,
                   }}
                 >
                   <Link

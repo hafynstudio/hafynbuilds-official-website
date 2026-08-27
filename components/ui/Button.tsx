@@ -5,7 +5,11 @@ import Link from "next/link";
 import { motion, useMotionValue, useSpring } from "framer-motion";
 import { cn } from "@/lib/utils";
 import { useHasFinePointer, usePrefersReducedMotion } from "@/lib/hooks";
-import { MAGNETIC_MAX_PULL_PX, SPRING_SNAPPY } from "@/lib/motion";
+import {
+  EASE_IN_OUT_QUART,
+  MAGNETIC_MAX_PULL_PX,
+  SPRING_SNAPPY,
+} from "@/lib/motion";
 
 type ButtonVariant = "primary" | "secondary" | "ghost";
 type ButtonSize = "sm" | "md" | "lg";
@@ -75,7 +79,7 @@ function LoadingDots({ reducedMotion }: { reducedMotion: boolean }) {
                   duration: 1,
                   repeat: Infinity,
                   delay: i * 0.15,
-                  ease: "easeInOut",
+                  ease: EASE_IN_OUT_QUART,
                 }
           }
         />

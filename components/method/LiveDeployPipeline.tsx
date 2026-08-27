@@ -5,6 +5,7 @@ import { useEffect, useRef, useState } from "react";
 import { methodStages } from "@/data/method-stages";
 import { usePrefersReducedMotion, useCoarsePointer, useIsClient } from "@/lib/hooks";
 import { StageNode } from "@/components/method/StageNode";
+import { MOTION_VIEWPORT_MARGIN } from "@/lib/motion";
 import { StatusLog } from "@/components/method/StatusLog";
 import { BuildComplete } from "@/components/method/BuildComplete";
 import { CircuitBackground } from "@/components/method/CircuitBackground";
@@ -54,13 +55,13 @@ function MobilePipeline() {
           if (!Number.isNaN(idx)) setActiveIndex(idx);
         });
       },
-      { rootMargin: "-35% 0px -35% 0px", threshold: 0 }
+      { rootMargin: MOTION_VIEWPORT_MARGIN.stageActive, threshold: 0 }
     );
     stageRefs.current.forEach((el) => el && stageObserver.observe(el));
 
     const completeObserver = new IntersectionObserver(
       ([entry]) => setBuildComplete(!!entry?.isIntersecting),
-      { rootMargin: "-18% 0px -18% 0px", threshold: 0 }
+      { rootMargin: MOTION_VIEWPORT_MARGIN.completion, threshold: 0 }
     );
     if (completeRef.current) completeObserver.observe(completeRef.current);
 

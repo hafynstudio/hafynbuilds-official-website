@@ -11,7 +11,11 @@ import {
   useMediaQuery,
   usePrefersReducedMotion,
 } from "@/lib/hooks";
-import { SPRING_SMOOTH } from "@/lib/motion";
+import {
+  MOTION_DURATION_S,
+  REDUCED_MOTION_TRANSITION,
+  SPRING_SMOOTH,
+} from "@/lib/motion";
 
 interface ModalProps {
   isOpen: boolean;
@@ -93,7 +97,7 @@ export function Modal({
   }
 
   const panelTransition = prefersReducedMotion
-    ? { duration: 0.01 }
+    ? REDUCED_MOTION_TRANSITION
     : { type: "spring" as const, ...SPRING_SMOOTH };
 
   return createPortal(
@@ -105,7 +109,7 @@ export function Modal({
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            transition={{ duration: prefersReducedMotion ? 0.01 : 0.2 }}
+            transition={{ duration: prefersReducedMotion ? 0 : MOTION_DURATION_S.small }}
             onClick={onClose}
             aria-hidden="true"
           />
@@ -159,7 +163,7 @@ export function Modal({
                 onClick={onClose}
                 aria-label="Close"
                 className={cn(
-                  "absolute right-4 z-10 rounded-full p-2 text-text-secondary transition-colors duration-fast hover:bg-surface hover:text-text-primary",
+                  "absolute right-4 z-10 flex min-h-11 min-w-11 items-center justify-center rounded-full p-2 text-text-secondary transition-colors duration-fast hover:bg-surface hover:text-text-primary",
                   isDesktop ? "top-4" : "top-10"
                 )}
               >

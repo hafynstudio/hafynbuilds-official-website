@@ -21,8 +21,9 @@ export function CircuitBackground() {
     const ctx = canvas.getContext("2d");
     if (!ctx) return;
 
-    let animFrameId: number;
+    let animFrameId: number | undefined;
     let nodes: { x: number; y: number; vx: number; vy: number }[] = [];
+    let isVisible = true;
 
     const NODE_COUNT = 28;
     const MAX_DIST = 180;
@@ -44,7 +45,7 @@ export function CircuitBackground() {
       }));
     }
 
-    function draw() {
+    function render() {
       if (!canvas || !ctx) return;
       ctx.clearRect(0, 0, canvas.width, canvas.height);
 
@@ -86,30 +87,51 @@ export function CircuitBackground() {
         ctx.fillStyle = "rgb(62 123 250 / 0.22)";
         ctx.fill();
       }
+    }
 
-      animFrameId = requestAnimationFrame(draw);
+    function stop() {
+      if (animFrameId !== undefined) {
+        cancelAnimationFrame(animFrameId);
+        animFrameId = undefined;
+      }
+    }
+
+    function animate() {
+      animFrameId = undefined;
+      if (!isVisible || reducedMotion) return;
+      render();
+      animFrameId = requestAnimationFrame(animate);
+    }
+
+    function start() {
+      if (reducedMotion || !isVisible || animFrameId !== undefined) return;
+      render();
+      animFrameId = requestAnimationFrame(animate);
     }
 
     resize();
     initNodes();
+    const visibilityObserver = new IntersectionObserver(([entry]) => {
+      isVisible = !!entry?.isIntersecting;
+      if (isVisible) start();
+      else stop();
+    }, { threshold: 0 });
+    visibilityObserver.observe(canvas);
 
-    // Static render for reduced motion — draw once, no rAF loop
-    if (reducedMotion) {
-      draw();
-      cancelAnimationFrame(animFrameId!);
-      return;
-    }
-
-    draw();
+    // Static render for reduced motion — one frame, no rAF loop.
+    if (reducedMotion) render();
+    else start();
 
     const ro = new ResizeObserver(() => {
       resize();
       initNodes();
+      if (!reducedMotion && isVisible) start();
     });
     ro.observe(canvas);
 
     return () => {
-      cancelAnimationFrame(animFrameId);
+      stop();
+      visibilityObserver.disconnect();
       ro.disconnect();
     };
   }, [reducedMotion]);

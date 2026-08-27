@@ -11,6 +11,7 @@ import { resolveIndustryPrice } from "@/lib/currency/industry-engine";
 import { getIndustryPackagePrice } from "@/data/industry-package-pricing";
 import { PriceCallout } from "./PriceCallout";
 import { CornerBrackets } from "./CornerBrackets";
+import { MOTION_DURATION_S } from "@/lib/motion";
 import { RecommendedStamp } from "./RecommendedStamp";
 import type { ResolvedPrice } from "@/lib/currency/engine";
 import type { IndustryPackage } from "@/types/industry-package";
@@ -48,13 +49,13 @@ export function PackageCard({ pkg, index }: PackageCardProps) {
       transition={
         prefersReducedMotion
           ? { duration: 0 }
-          : { duration: 0.45, delay: index * 0.08, ease: EASE_OUT_QUART }
+          : { duration: MOTION_DURATION_S.large, delay: index * MOTION_DURATION_S.staggerStep, ease: EASE_OUT_QUART }
       }
       className={cn(
         "group relative flex h-full flex-col rounded-card border p-6",
         "bg-bg-elevated shadow-card-rest",
         "transition-[border-color,background-color,box-shadow,transform] duration-base ease-out-quart",
-        "hover:-translate-y-1 motion-reduce:hover:translate-y-0 hover:bg-bg-elevated-hover hover:shadow-card-hover",
+        "hover:-translate-y-1 active:-translate-y-0.5 motion-reduce:hover:translate-y-0 motion-reduce:active:translate-y-0 hover:bg-bg-elevated-hover active:bg-bg-elevated-hover hover:shadow-card-hover active:shadow-card-hover motion-reduce:transform-none",
         pkg.isMostChosen
           ? "border-accent/30 ring-1 ring-accent/10"
           : "border-border-hairline hover:border-border-hover"
@@ -153,7 +154,7 @@ export function PackageCard({ pkg, index }: PackageCardProps) {
           className={cn(
             "inline-flex w-full items-center justify-center rounded-sm border px-4 py-3",
             "font-mono text-[11px] uppercase tracking-[0.18em]",
-            "transition-[background-color,border-color,color,transform] duration-base ease-out-quart",
+            "transition-[background-color,border-color,color,transform] duration-base ease-out-quart active:translate-y-px",
             "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2 focus-visible:ring-offset-bg-deep",
             pkg.isMostChosen
               ? "border-accent/30 bg-accent/6 text-text-primary hover:border-accent hover:bg-accent hover:text-white"

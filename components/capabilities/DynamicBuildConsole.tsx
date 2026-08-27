@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { useLazyMount } from "@/lib/hooks";
+import { MOTION_VIEWPORT_MARGIN } from "@/lib/motion";
 import type { BuildConsole } from "@/components/capabilities/BuildConsole";
 
 function LoadingSkeleton() {
@@ -33,7 +34,7 @@ export function DynamicBuildConsole({
 }: {
   panelCount?: number;
 }) {
-  const { sentinelRef, shouldMount } = useLazyMount({ rootMargin: "0px" });
+  const { sentinelRef, shouldMount } = useLazyMount({ rootMargin: MOTION_VIEWPORT_MARGIN.onArrival });
   const [BuildConsoleClient, setBuildConsoleClient] =
     useState<BuildConsoleComponent | null>(null);
 

@@ -11,7 +11,11 @@ import {
   useIsClient,
   usePrefersReducedMotion,
 } from "@/lib/hooks";
-import { EASE_OUT_EXPO } from "@/lib/motion";
+import {
+  EASE_ENTRANCE,
+  MOTION_DURATION_S,
+  REDUCED_MOTION_TRANSITION,
+} from "@/lib/motion";
 
 // Explicit currency selection experience.
 //
@@ -108,7 +112,7 @@ export function CurrencyModal() {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            transition={{ duration: prefersReduced ? 0.01 : 0.25 }}
+            transition={{ duration: prefersReduced ? 0 : MOTION_DURATION_S.small }}
             onClick={dismiss}
             aria-hidden="true"
           />
@@ -139,8 +143,8 @@ export function CurrencyModal() {
             }
             transition={
               prefersReduced
-                ? { duration: 0.01 }
-                : { duration: 0.4, ease: EASE_OUT_EXPO }
+                ? REDUCED_MOTION_TRANSITION
+                : { duration: MOTION_DURATION_S.medium, ease: EASE_ENTRANCE }
             }
           >
             {/* Mobile drag-handle affordance (visual only — actual drag
@@ -173,7 +177,7 @@ export function CurrencyModal() {
                 type="button"
                 onClick={dismiss}
                 aria-label="Close currency selector"
-                className="ml-4 shrink-0 rounded-md p-1.5 text-text-secondary transition-colors duration-fast hover:bg-surface hover:text-text-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
+                className="ml-4 flex min-h-11 min-w-11 shrink-0 items-center justify-center rounded-md p-1.5 text-text-secondary transition-colors duration-fast hover:bg-surface hover:text-text-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
               >
                 <X size={18} />
               </button>
@@ -201,7 +205,7 @@ export function CurrencyModal() {
                     type="button"
                     onClick={() => setQuery("")}
                     aria-label="Clear search"
-                    className="text-text-tertiary transition-colors duration-fast hover:text-text-secondary"
+                    className="flex min-h-11 min-w-11 items-center justify-center rounded-md text-text-tertiary transition-colors duration-fast hover:text-text-secondary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
                   >
                     <X size={13} />
                   </button>

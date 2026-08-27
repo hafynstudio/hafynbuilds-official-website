@@ -5,9 +5,46 @@
 // component code or GSAP timelines. Never inline a new spring config or
 // bezier array directly in a component — add it here first, then import.
 
-export const EASE_OUT_EXPO = [0.16, 1, 0.3, 1] as const;
-export const EASE_OUT_QUART = [0.25, 1, 0.5, 1] as const;
+export const EASE_ENTRANCE = [0.16, 1, 0.3, 1] as const;
+export const EASE_EXIT = [0.7, 0, 0.84, 0] as const;
+export const EASE_MICRO = [0.25, 1, 0.5, 1] as const;
+export const EASE_EMPHASIS = [0.34, 1.56, 0.64, 1] as const;
 export const EASE_IN_OUT_QUART = [0.76, 0, 0.24, 1] as const;
+
+// Backwards-compatible aliases used by existing components during the
+// migration to semantic names.
+export const EASE_OUT_EXPO = EASE_ENTRANCE;
+export const EASE_OUT_QUART = EASE_MICRO;
+
+export const MOTION_DURATION_S = {
+  micro: 0.12,
+  small: 0.18,
+  medium: 0.32,
+  large: 0.52,
+  reveal: 0.7,
+  staggerStep: 0.048,
+} as const;
+
+export const MOTION_DELAY_S = {
+  none: 0,
+  heroHeadline: 0.1,
+  heroSubtext: 0.5,
+  heroCta: 0.65,
+  heroVisual: 0.75,
+} as const;
+
+/** Shared viewport windows for all viewport-triggered motion. */
+export const MOTION_VIEWPORT_MARGIN = {
+  reveal: "-80px 0px -80px 0px",
+  nearViewport: "200px",
+  onArrival: "0px",
+  strictArrival: "0px 0px -90% 0px",
+  stageActive: "-35% 0px -35% 0px",
+  completion: "-18% 0px -18% 0px",
+} as const;
+
+/** Reduced motion is a readable final state: no transforms and no stagger. */
+export const REDUCED_MOTION_TRANSITION = { duration: 0 } as const;
 
 // Used for magnetic buttons and other snappy, short-travel interactions.
 export const SPRING_SNAPPY = { stiffness: 300, damping: 30, mass: 0.5 };
@@ -19,6 +56,10 @@ export const SPRING_SMOOTH = { stiffness: 150, damping: 20, mass: 0.8 };
 // small deliberately ("subtle cursor-proximity pull" per PRD, not a
 // dramatic jump).
 export const MAGNETIC_MAX_PULL_PX = 10;
+
+// Shared physical model for cursor-reactive card depth.
+export const TILT_MAX_DEG = 6;
+export const TILT_SPRING = { stiffness: 200, damping: 20, mass: 0.4 };
 
 // Hero word-by-word headline reveal. Word-level granularity: (a) lets
 // each word carry its own weight/gradient treatment cleanly, since a

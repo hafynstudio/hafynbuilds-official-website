@@ -13,19 +13,19 @@ const THEME_ICON_CLASS: Record<IndustryVisualTheme, string> = {
 };
 
 const THEME_GLOW_CLASS: Record<IndustryVisualTheme, string> = {
-  warm: "group-hover:shadow-[0_0_40px_rgba(245,158,11,0.12)]",
-  clean: "group-hover:shadow-[0_0_40px_rgba(34,211,238,0.12)]",
-  professional: "group-hover:shadow-[0_0_40px_rgba(62,123,250,0.12)]",
-  elegant: "group-hover:shadow-[0_0_40px_rgba(244,165,178,0.12)]",
-  vibrant: "group-hover:shadow-[0_0_40px_rgba(192,111,247,0.12)]",
+  warm: "group-hover:shadow-[0_0_40px_rgba(245,158,11,0.12)] group-active:shadow-[0_0_40px_rgba(245,158,11,0.12)] group-focus-visible:shadow-[0_0_40px_rgba(245,158,11,0.12)]",
+  clean: "group-hover:shadow-[0_0_40px_rgba(34,211,238,0.12)] group-active:shadow-[0_0_40px_rgba(34,211,238,0.12)] group-focus-visible:shadow-[0_0_40px_rgba(34,211,238,0.12)]",
+  professional: "group-hover:shadow-[0_0_40px_rgba(62,123,250,0.12)] group-active:shadow-[0_0_40px_rgba(62,123,250,0.12)] group-focus-visible:shadow-[0_0_40px_rgba(62,123,250,0.12)]",
+  elegant: "group-hover:shadow-[0_0_40px_rgba(244,165,178,0.12)] group-active:shadow-[0_0_40px_rgba(244,165,178,0.12)] group-focus-visible:shadow-[0_0_40px_rgba(244,165,178,0.12)]",
+  vibrant: "group-hover:shadow-[0_0_40px_rgba(192,111,247,0.12)] group-active:shadow-[0_0_40px_rgba(192,111,247,0.12)] group-focus-visible:shadow-[0_0_40px_rgba(192,111,247,0.12)]",
 };
 
 const THEME_BORDER_CLASS: Record<IndustryVisualTheme, string> = {
-  warm: "group-hover:border-badge-founding/25",
-  clean: "group-hover:border-accent-glow/25",
-  professional: "group-hover:border-accent/25",
-  elegant: "group-hover:border-theme-elegant/25",
-  vibrant: "group-hover:border-theme-vibrant/25",
+  warm: "group-hover:border-badge-founding/25 group-active:border-badge-founding/25 group-focus-visible:border-badge-founding/25",
+  clean: "group-hover:border-accent-glow/25 group-active:border-accent-glow/25 group-focus-visible:border-accent-glow/25",
+  professional: "group-hover:border-accent/25 group-active:border-accent/25 group-focus-visible:border-accent/25",
+  elegant: "group-hover:border-theme-elegant/25 group-active:border-theme-elegant/25 group-focus-visible:border-theme-elegant/25",
+  vibrant: "group-hover:border-theme-vibrant/25 group-active:border-theme-vibrant/25 group-focus-visible:border-theme-vibrant/25",
 };
 
 const THEME_DOT_CLASS: Record<IndustryVisualTheme, string> = {
@@ -54,7 +54,7 @@ export function IndustryCard({ industry }: { industry: Industry }) {
         "before:absolute before:inset-x-0 before:top-0 before:h-px before:rounded-t-card",
         "before:bg-gradient-to-r before:from-transparent before:via-white/8 before:to-transparent",
         "transition-[border-color,box-shadow,transform] duration-base ease-out-quart",
-        "hover:-translate-y-1 hover:bg-bg-elevated-hover hover:shadow-card-hover",
+        "hover:-translate-y-1 active:-translate-y-0.5 hover:bg-bg-elevated-hover active:bg-bg-elevated-hover hover:shadow-card-hover active:shadow-card-hover motion-reduce:transform-none",
         THEME_BORDER_CLASS[industry.visualTheme],
         THEME_GLOW_CLASS[industry.visualTheme],
         "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2 focus-visible:ring-offset-bg-deep"
@@ -108,7 +108,7 @@ export function IndustryCard({ industry }: { industry: Industry }) {
           className={cn(
             "transition-[transform,color] duration-base ease-out-quart",
             "text-text-tertiary",
-            "group-hover:translate-x-0.5",
+            "group-hover:translate-x-0.5 group-active:translate-x-0.5 group-focus-visible:translate-x-0.5",
             THEME_ICON_CLASS[industry.visualTheme].replace(
               "text-",
               "group-hover:text-"

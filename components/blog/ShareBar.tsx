@@ -98,8 +98,8 @@ function ShareButton({
         "group relative flex items-center justify-center",
         "rounded-lg border border-border-hairline bg-bg-elevated",
         "text-text-tertiary",
-        // Size -- 40x40 on desktop (sidebar), 44x44 on mobile (bottom bar)
-        "h-10 w-10 md:h-10 md:w-10",
+        // Size -- 44x44 on desktop and mobile for a consistent touch target
+        "h-11 w-11 min-h-11 min-w-11",
         // Transition
         "transition-[border-color,color,background-color,box-shadow] duration-base ease-out-quart",
         // Hover
@@ -229,7 +229,7 @@ export function ShareBar({ title, url }: ShareBarProps) {
           "hidden md:flex flex-col gap-2",
           // Visibility transition -- opacity + slight x-translate.
           // prefers-reduced-motion collapses the transition.
-          "transition-[opacity,transform] duration-300 ease-out-quart",
+          "transition-[opacity,transform] duration-base ease-out-quart",
           "motion-reduce:transition-none",
           isVisible
             ? "opacity-100 translate-x-0"

@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { useLazyMount } from "@/lib/hooks";
+import { MOTION_VIEWPORT_MARGIN } from "@/lib/motion";
 import type { ContactForm } from "@/components/contact/ContactForm";
 
 type ContactFormComponent = typeof ContactForm;
@@ -17,7 +18,7 @@ type ContactFormComponent = typeof ContactForm;
  * the initial Lighthouse viewport.
  */
 export function DeferredContactForm({ replyWindow }: { replyWindow: string }) {
-  const { sentinelRef, shouldMount } = useLazyMount({ rootMargin: "0px 0px -90% 0px" });
+  const { sentinelRef, shouldMount } = useLazyMount({ rootMargin: MOTION_VIEWPORT_MARGIN.strictArrival });
   const [ContactFormClient, setContactFormClient] =
     useState<ContactFormComponent | null>(null);
 

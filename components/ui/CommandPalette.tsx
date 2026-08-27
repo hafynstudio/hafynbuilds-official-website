@@ -149,7 +149,7 @@ export function CommandPalette({
               onClick={handleClear}
               aria-label="Clear search"
               className={cn(
-                "flex h-5 w-5 items-center justify-center rounded-full",
+                "flex min-h-11 min-w-11 items-center justify-center rounded-full",
                 "bg-surface text-text-tertiary",
                 "transition-colors duration-fast",
                 "hover:bg-surface-raised hover:text-text-primary",

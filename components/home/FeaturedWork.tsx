@@ -8,9 +8,15 @@ import { featuredWork } from "@/data/featured-work";
 import { ICON_MAP, ICON_STROKE_WIDTH } from "@/lib/icons";
 import { cn } from "@/lib/utils";
 import type { FeaturedWork } from "@/types/featured-work";
+import {
+  EASE_ENTRANCE,
+  MOTION_DURATION_S,
+  SPRING_SNAPPY,
+  MOTION_VIEWPORT_MARGIN,
+} from "@/lib/motion";
 
-const EASE: [number, number, number, number] = [0.22, 1, 0.36, 1];
-const EASE_SPRING = { stiffness: 260, damping: 24, mass: 0.6 };
+const EASE = EASE_ENTRANCE;
+const EASE_SPRING = SPRING_SNAPPY;
 const SYNTAX = { blue: "79 193 255", green: "78 201 176", purple: "197 134 192", orange: "206 145 120", yellow: "220 220 170", gray: "106 153 85" } as const;
 const TECH_CYCLE = [
   { label: "Next.js", color: SYNTAX.blue, comment: "// React framework" },
@@ -57,12 +63,27 @@ function AnimatedCounter({ target, suffix = "", inView, rm, className }: { targe
     const steps = target;
     const stepDuration = duration / steps;
     let current = 0;
+    let cancelled = false;
+    const timers: ReturnType<typeof setTimeout>[] = [];
+    const schedule = (fn: () => void, ms: number) => {
+      const timer = setTimeout(() => { if (!cancelled) fn(); }, ms);
+      timers.push(timer);
+    };
     const tick = () => {
       current += 1;
       setCount(current);
-      if (current < target) { setTimeout(tick, stepDuration); } else { setGlowing(true); setTimeout(() => setGlowing(false), 4500); }
+      if (current < target) {
+        schedule(tick, stepDuration);
+      } else {
+        setGlowing(true);
+        schedule(() => setGlowing(false), 4500);
+      }
     };
-    setTimeout(tick, 300);
+    schedule(tick, 300);
+    return () => {
+      cancelled = true;
+      timers.forEach(clearTimeout);
+    };
   }, [inView, target, rm]);
   const displayValue = rm ? (inView ? target : 0) : count;
   return <span className={cn(className, glowing && !rm && "fw-counter-glow")}>{displayValue}{suffix}</span>;
@@ -73,28 +94,35 @@ function TechCycleTerminal({ inView, rm }: { inView: boolean; rm: boolean }) {
   const [phase, setPhase] = useState<"typing" | "done" | "exiting">("typing");
   const [typedLen, setTypedLen] = useState(0);
   const [swept, setSwept] = useState(false);
-  const started = useRef(false);
   useEffect(() => {
-    if (!inView || started.current) return;
-    started.current = true;
+    if (!inView) return;
+    let cancelled = false;
+    let typeInterval: ReturnType<typeof setInterval> | null = null;
+    const timeouts: ReturnType<typeof setTimeout>[] = [];
+    const later = (fn: () => void, ms: number) => {
+      const timer = setTimeout(() => { if (!cancelled) fn(); }, ms);
+      timeouts.push(timer);
+    };
     const runCycle = (index: number): void => {
+      if (cancelled) return;
       const tech = TECH_CYCLE[index];
       setPhase("typing");
       setTypedLen(0);
       setSwept(false);
       if (rm) { setTypedLen(tech.label.length); setPhase("done"); return; }
       let i = 0;
-      const typeInterval = setInterval(() => {
+      typeInterval = setInterval(() => {
+        if (cancelled) return;
         i++;
         setTypedLen(i);
         if (i >= tech.label.length) {
-          clearInterval(typeInterval);
-          setTimeout(() => {
+          if (typeInterval) clearInterval(typeInterval);
+          later(() => {
             setPhase("done");
             setSwept(true);
-            setTimeout(() => {
+            later(() => {
               setPhase("exiting");
-              setTimeout(() => {
+              later(() => {
                 const next = (index + 1) % TECH_CYCLE.length;
                 setCycleIndex(next);
                 runCycle(next);
@@ -105,6 +133,11 @@ function TechCycleTerminal({ inView, rm }: { inView: boolean; rm: boolean }) {
       }, 55);
     };
     runCycle(0);
+    return () => {
+      cancelled = true;
+      if (typeInterval) clearInterval(typeInterval);
+      timeouts.forEach(clearTimeout);
+    };
   }, [inView, rm]);
   const tech = TECH_CYCLE[cycleIndex];
   return (
@@ -119,7 +152,7 @@ function TechCycleTerminal({ inView, rm }: { inView: boolean; rm: boolean }) {
       <div className="flex items-baseline gap-0 text-[13px]">
         <span style={{ color: `rgb(${SYNTAX.blue})` }}>import&nbsp;</span>
         <AnimatePresence mode="wait" initial={false}>
-          <motion.span key={`${cycleIndex}-${phase}`} animate={rm ? { opacity: 1 } : { opacity: 1, y: 0 }} exit={rm ? { opacity: 0 } : { opacity: 0, y: -4 }} transition={{ duration: rm ? 0 : 0.2 }} style={{ color: `rgb(${tech.color})` }} className="relative">
+          <motion.span key={`${cycleIndex}-${phase}`} animate={rm ? { opacity: 1 } : { opacity: 1, y: 0 }} exit={rm ? { opacity: 0 } : { opacity: 0, y: -4 }} transition={{ duration: rm ? 0 : MOTION_DURATION_S.small }} style={{ color: `rgb(${tech.color})` }} className="relative">
             {tech.label.slice(0, typedLen)}
             {phase === "typing" && <span className="animate-caret-blink ml-px inline-block h-[1em] w-[2px] translate-y-[1px] bg-current align-middle" />}
             {phase === "done" && swept && !rm && <span key="sweep" className="fw-sweep-once pointer-events-none absolute inset-0 rounded" style={{ background: `linear-gradient(90deg, transparent, rgb(${tech.color} / 0.3), transparent)` }} />}
@@ -136,7 +169,7 @@ function TechCycleTerminal({ inView, rm }: { inView: boolean; rm: boolean }) {
       <motion.div
         initial={false}
         animate={{ opacity: phase === "done" ? 1 : 0 }}
-        transition={phase === "done" ? { duration: 0 } : { duration: rm ? 0 : 0.25 }}
+        transition={phase === "done" ? { duration: 0 } : { duration: rm ? 0 : MOTION_DURATION_S.medium }}
         className="mt-2 flex items-center gap-1.5 text-[11px]"
         aria-hidden={phase !== "done"}
       >
@@ -144,7 +177,7 @@ function TechCycleTerminal({ inView, rm }: { inView: boolean; rm: boolean }) {
         <span style={{ color: `rgb(${SYNTAX.green})` }}>Built</span>
       </motion.div>
       <div className="mt-3 flex items-center gap-1">
-        {TECH_CYCLE.map((_, i) => <span key={i} className="h-1 rounded-full transition-all duration-500" style={{ width: i === cycleIndex ? 16 : 4, background: i === cycleIndex ? `rgb(${tech.color})` : "rgb(var(--color-border))" }} />)}
+        {TECH_CYCLE.map((_, i) => <span key={i} className="h-1 rounded-full transition-all duration-medium" style={{ width: i === cycleIndex ? 16 : 4, background: i === cycleIndex ? `rgb(${tech.color})` : "rgb(var(--color-border))" }} />)}
       </div>
     </div>
   );
@@ -152,10 +185,8 @@ function TechCycleTerminal({ inView, rm }: { inView: boolean; rm: boolean }) {
 
 function PipelineVisual({ inView, rm }: { inView: boolean; rm: boolean }) {
   const [activeNode, setActiveNode] = useState(0);
-  const started = useRef(false);
   useEffect(() => {
-    if (!inView || started.current || rm) return;
-    started.current = true;
+    if (!inView || rm) return;
     const interval = setInterval(() => { setActiveNode((prev) => (prev + 1) % PIPELINE_NODES.length); }, 900);
     return () => clearInterval(interval);
   }, [inView, rm]);
@@ -185,7 +216,7 @@ function PipelineVisual({ inView, rm }: { inView: boolean; rm: boolean }) {
   );
 }
 
-function CurrencyFloatVisual({ rm }: { rm: boolean }) {
+function CurrencyFloatVisual({ rm, active }: { rm: boolean; active: boolean }) {
   const floatClasses = ["fw-float-a", "fw-float-b", "fw-float-c", "fw-float-a", "fw-float-b", "fw-float-c"];
   const delays = ["0s", "0.7s", "1.4s", "0.35s", "1.1s", "1.8s"];
   const durations = ["4s", "5s", "3.5s", "4.5s", "3.8s", "5.2s"];
@@ -201,7 +232,7 @@ function CurrencyFloatVisual({ rm }: { rm: boolean }) {
         </div>
       </div>
       {CURRENCIES.map((cur, i) => (
-        <div key={cur.label} aria-hidden="true" className={cn("absolute font-mono font-bold", !rm && floatClasses[i])} style={{ ...positions[i], fontSize: i % 3 === 0 ? "1.5rem" : i % 3 === 1 ? "1.1rem" : "0.9rem", color: i % 2 === 0 ? "rgb(var(--color-accent-primary) / 0.94)" : "rgb(var(--color-accent-glow) / 0.72)", animationDelay: delays[i], ["--float-dur" as never]: durations[i] }}>{cur.symbol}</div>
+        <div key={cur.label} aria-hidden="true" className={cn("absolute font-mono font-bold", !rm && active && floatClasses[i])} style={{ ...positions[i], fontSize: i % 3 === 0 ? "1.5rem" : i % 3 === 1 ? "1.1rem" : "0.9rem", color: i % 2 === 0 ? "rgb(var(--color-accent-primary) / 0.94)" : "rgb(var(--color-accent-glow) / 0.72)", animationDelay: delays[i], ["--float-dur" as never]: durations[i] }}>{cur.symbol}</div>
       ))}
       <div className="absolute inset-x-0 bottom-3 flex justify-center gap-2">
         {CURRENCIES.map((cur) => <span key={cur.label} className="rounded border border-border bg-surface px-1.5 py-0.5 font-mono text-[9px] text-text-secondary">{cur.label}</span>)}
@@ -242,12 +273,12 @@ function DesignNetworkVisual({ inView, rm }: { inView: boolean; rm: boolean }) {
   );
 }
 
-function StatusDot({ status }: { status: FeaturedWork["status"] }) {
+function StatusDot({ status, active = true }: { status: FeaturedWork["status"]; active?: boolean }) {
   const colors = { live: "bg-success", "in-progress": "bg-accent", completed: "bg-text-secondary" };
   const showPing = status !== "completed";
   return (
     <span className="relative flex h-1.5 w-1.5 shrink-0" aria-hidden="true">
-      {showPing && <span className={cn("absolute inline-flex h-full w-full animate-ping motion-reduce:animate-none rounded-full opacity-60", colors[status])} />}
+      {showPing && active && <span className={cn("absolute inline-flex h-full w-full animate-ping motion-reduce:animate-none rounded-full opacity-60", colors[status])} />}
       <span className={cn("relative inline-flex h-1.5 w-1.5 rounded-full", colors[status])} />
     </span>
   );
@@ -256,7 +287,7 @@ function StatusDot({ status }: { status: FeaturedWork["status"] }) {
 const STATUS_LABEL: Record<FeaturedWork["status"], string> = { live: "LIVE", "in-progress": "IN PROGRESS", completed: "COMPLETED" };
 const STATUS_TEXT: Record<FeaturedWork["status"], string> = { live: "text-success", "in-progress": "text-accent", completed: "text-text-secondary" };
 
-function MagneticChip({ label, rm, hasFinePointer, delay }: { label: string; rm: boolean; hasFinePointer: boolean; delay: number }) {
+function MagneticChip({ label, rm, hasFinePointer, delay, active }: { label: string; rm: boolean; hasFinePointer: boolean; delay: number; active: boolean }) {
   const chipRef = useRef<HTMLSpanElement>(null);
   // Cached DOMRect — populated once on mouseenter, read-only in mousemove.
   // Prevents a synchronous forced layout flush on every mousemove tick
@@ -280,44 +311,48 @@ function MagneticChip({ label, rm, hasFinePointer, delay }: { label: string; rm:
     x.set(dx); y.set(dy);
   }
   function handleMouseLeave() { rectCacheRef.current = null; x.set(0); y.set(0); }
-  return <motion.span ref={chipRef} style={{ x: hasFinePointer && !rm ? sx : 0, y: hasFinePointer && !rm ? sy : 0, animationDelay: `${delay}s` }} onMouseEnter={handleMouseEnter} onMouseMove={handleMouseMove} onMouseLeave={handleMouseLeave} className={cn("inline-block cursor-default rounded-md border border-border bg-surface px-2.5 py-1 font-mono text-[11px] text-text-secondary transition-colors duration-200 hover:border-border-hover hover:text-text-primary", !rm && !hasFinePointer && "fw-chip-float")}>{label}</motion.span>;
+  return <motion.span ref={chipRef} style={{ x: hasFinePointer && !rm ? sx : 0, y: hasFinePointer && !rm ? sy : 0, animationDelay: `${delay}s` }} onMouseEnter={handleMouseEnter} onMouseMove={handleMouseMove} onMouseLeave={handleMouseLeave} className={cn("inline-block cursor-default rounded-md border border-border bg-surface px-2.5 py-1 font-mono text-[11px] text-text-secondary transition-colors duration-fast hover:border-border-hover hover:text-text-primary", !rm && active && !hasFinePointer && "fw-chip-float")}>{label}</motion.span>;
 }
 
 function HeroWorkCard({ work, rm, hasFinePointer }: { work: FeaturedWork; rm: boolean; hasFinePointer: boolean }) {
   const cardRef = useRef<HTMLDivElement>(null);
-  const inView = useInView(cardRef, { once: true, margin: "-60px" });
+  const inView = useInView(cardRef, { once: true, margin: MOTION_VIEWPORT_MARGIN.reveal });
+  const activeInView = useInView(cardRef, { margin: "0px" });
   const [swept, setSwept] = useState(false);
   useEffect(() => {
-    if (inView && !rm && !swept) {
-      setTimeout(() => setSwept(true), 600);
-      setTimeout(() => setSwept(false), 2000);
-    }
+    if (!inView || rm || swept) return;
+    const revealTimer = setTimeout(() => setSwept(true), 600);
+    const hideTimer = setTimeout(() => setSwept(false), 2000);
+    return () => {
+      clearTimeout(revealTimer);
+      clearTimeout(hideTimer);
+    };
   }, [inView, rm, swept]);
   const metricTarget = parseInt(work.metric.value.replace(/\D/g, ""), 10) || 0;
   const metricSuffix = work.metric.value.replace(/\d/g, "");
   return (
-    <motion.div ref={cardRef} animate={inView ? { opacity: 1, y: 0, filter: "none" } : {}} transition={{ duration: 0.9, ease: EASE }} className="relative overflow-hidden rounded-2xl border border-border bg-[#07070a]" style={{ boxShadow: "0 0 0 1px rgb(255 255 255 / 0.04) inset, 0 32px 80px rgb(0 0 0 / 0.6)" }}>
+    <motion.div ref={cardRef} animate={inView ? { opacity: 1, y: 0, filter: "none" } : {}} transition={{ duration: MOTION_DURATION_S.reveal, ease: EASE }} className="relative overflow-hidden rounded-2xl border border-border bg-[#07070a]" style={{ boxShadow: "0 0 0 1px rgb(255 255 255 / 0.04) inset, 0 32px 80px rgb(0 0 0 / 0.6)" }}>
       <svg aria-hidden="true" className="pointer-events-none absolute inset-0 z-[1] h-full w-full opacity-[0.06] mix-blend-screen"><filter id="fw-grain"><feTurbulence type="fractalNoise" baseFrequency="0.8" numOctaves={3} stitchTiles="stitch" /><feColorMatrix type="saturate" values="0" /></filter><rect width="100%" height="100%" filter="url(#fw-grain)" /></svg>
-      <div aria-hidden="true" className={cn("pointer-events-none absolute -left-20 -top-20 h-64 w-64 rounded-full bg-accent blur-3xl", !rm && "fw-glow-breathe")} />
-      <div aria-hidden="true" className={cn("pointer-events-none absolute -bottom-16 -right-16 h-48 w-48 rounded-full bg-accent-glow blur-3xl", !rm && "fw-glow-breathe")} style={{ animationDelay: "2s" }} />
+      <div aria-hidden="true" className={cn("pointer-events-none absolute -left-20 -top-20 h-64 w-64 rounded-full bg-accent blur-3xl", !rm && activeInView && "fw-glow-breathe")} />
+      <div aria-hidden="true" className={cn("pointer-events-none absolute -bottom-16 -right-16 h-48 w-48 rounded-full bg-accent-glow blur-3xl", !rm && activeInView && "fw-glow-breathe")} style={{ animationDelay: "2s" }} />
       <div className="absolute inset-x-0 top-0 z-[2] h-[1px] bg-gradient-to-r from-transparent via-accent to-transparent" />
       {swept && !rm && <div aria-hidden="true" className="fw-sweep-once pointer-events-none absolute inset-0 z-[3]" style={{ background: "linear-gradient(105deg, transparent 0%, rgb(255 255 255 / 0.04) 45%, rgb(255 255 255 / 0.07) 50%, rgb(255 255 255 / 0.04) 55%, transparent 100%)" }} />}
       <div className="relative z-[4] p-6 sm:p-8">
         <div className="mb-6 flex flex-wrap items-center gap-3">
-          <span className={cn("flex items-center gap-1.5 font-mono text-[10px] font-semibold uppercase tracking-widest", STATUS_TEXT[work.status])}><StatusDot status={work.status} />{STATUS_LABEL[work.status]}</span>
+          <span className={cn("flex items-center gap-1.5 font-mono text-[10px] font-semibold uppercase tracking-widest", STATUS_TEXT[work.status])}><StatusDot status={work.status} active={activeInView} />{STATUS_LABEL[work.status]}</span>
           <span className="rounded-full border border-border px-3 py-0.5 font-mono text-[10px] text-text-secondary">{work.tag}</span>
         </div>
         <div className="flex flex-col gap-8 lg:flex-row lg:gap-10">
           <div className="flex flex-1 flex-col">
             <motion.h3 animate={inView ? { opacity: 1, y: 0, letterSpacing: "0em", filter: "none" } : {}} transition={{ duration: 0.8, delay: 0.2, ease: EASE }} className="text-2xl font-bold text-text-primary tracking-normal sm:text-3xl lg:text-4xl">{work.name}</motion.h3>
             <motion.p animate={inView ? { opacity: 1, y: 0 } : {}} transition={{ duration: 0.7, delay: 0.35, ease: EASE }} className="mt-4 max-w-lg text-sm leading-relaxed text-text-secondary sm:text-base">{work.description}</motion.p>
-            <motion.div animate={inView ? { opacity: 1, y: 0 } : {}} transition={{ duration: 0.7, delay: 0.5, ease: EASE }} className="mt-6"><TechCycleTerminal inView={inView} rm={rm} /></motion.div>
-            <motion.div animate={inView ? { opacity: 1 } : {}} transition={{ duration: 0.5, delay: 0.65 }} className="mt-4 flex flex-wrap gap-2">{work.techStack.map((tech, i) => <MagneticChip key={tech} label={tech} rm={rm} hasFinePointer={hasFinePointer} delay={i * 0.6} />)}</motion.div>
+            <motion.div animate={inView ? { opacity: 1, y: 0 } : {}} transition={{ duration: 0.7, delay: 0.5, ease: EASE }} className="mt-6"><TechCycleTerminal inView={activeInView} rm={rm} /></motion.div>
+            <motion.div animate={inView ? { opacity: 1 } : {}} transition={{ duration: 0.5, delay: 0.65 }} className="mt-4 flex flex-wrap gap-2">{work.techStack.map((tech, i) => <MagneticChip key={tech} label={tech} rm={rm} hasFinePointer={hasFinePointer} delay={i * 0.6} active={activeInView} />)}</motion.div>
             <motion.div animate={inView ? { opacity: 1, y: 0 } : {}} transition={{ duration: 0.6, delay: 0.75, ease: EASE }} className="mt-8 flex items-end gap-4 border-t border-border pt-6"><div><AnimatedCounter target={metricTarget} suffix={metricSuffix} inView={inView} rm={rm} className="font-mono text-5xl font-bold text-text-primary sm:text-6xl" /><p className="mt-1 font-mono text-xs text-text-secondary">{work.metric.label}</p></div></motion.div>
           </div>
           <motion.div animate={inView ? { opacity: 1, x: 0 } : {}} transition={{ duration: 0.8, delay: 0.4, ease: EASE }} className="flex w-full flex-col lg:w-72 lg:shrink-0">
             <p className="mb-2 font-mono text-[10px] uppercase tracking-widest text-text-secondary">Architecture</p>
-            <div className="flex-1"><PipelineVisual inView={inView} rm={rm} /></div>
+            <div className="flex-1"><PipelineVisual inView={activeInView} rm={rm} /></div>
             <div className="mt-4 grid grid-cols-3 gap-2">{["SSG", "ISR", "Edge"].map((label) => <div key={label} className="flex flex-col items-center rounded-lg border border-border bg-surface/50 py-2"><span className="font-mono text-[10px] font-bold text-accent">{label}</span><span className="mt-0.5 font-mono text-[9px] text-text-secondary">enabled</span></div>)}</div>
           </motion.div>
         </div>
@@ -328,25 +363,26 @@ function HeroWorkCard({ work, rm, hasFinePointer }: { work: FeaturedWork; rm: bo
 
 function StandardWorkCard({ work, rm, hasFinePointer }: { work: FeaturedWork; rm: boolean; hasFinePointer: boolean }) {
   const cardRef = useRef<HTMLDivElement>(null);
-  const inView = useInView(cardRef, { once: true, margin: "-60px" });
+  const inView = useInView(cardRef, { once: true, margin: MOTION_VIEWPORT_MARGIN.reveal });
+  const activeInView = useInView(cardRef, { margin: "0px" });
   const isPricing = work.id === "hafyn-investment-engine";
   const isDesign = work.id === "hafyn-design-system";
   const metricTarget = parseInt(work.metric.value.replace(/\D/g, ""), 10) || 0;
   const metricSuffix = work.metric.value.replace(/\d/g, "");
   return (
-    <motion.div ref={cardRef} animate={inView ? { opacity: 1, y: 0, filter: "none" } : {}} transition={{ duration: 0.8, ease: EASE }} className="relative flex h-full flex-col overflow-hidden rounded-2xl border border-border bg-[#07070a]" style={{ boxShadow: "0 0 0 1px rgb(255 255 255 / 0.04) inset, 0 16px 48px rgb(0 0 0 / 0.5)" }}>
+    <motion.div ref={cardRef} animate={inView ? { opacity: 1, y: 0, filter: "none" } : {}} transition={{ duration: MOTION_DURATION_S.large, ease: EASE }} className="relative flex h-full flex-col overflow-hidden rounded-2xl border border-border bg-[#07070a]" style={{ boxShadow: "0 0 0 1px rgb(255 255 255 / 0.04) inset, 0 16px 48px rgb(0 0 0 / 0.5)" }}>
       <svg aria-hidden="true" className="pointer-events-none absolute inset-0 z-[1] h-full w-full opacity-[0.05] mix-blend-screen"><filter id={`fw-grain-${work.id}`}><feTurbulence type="fractalNoise" baseFrequency="0.8" numOctaves={3} stitchTiles="stitch" /><feColorMatrix type="saturate" values="0" /></filter><rect width="100%" height="100%" filter={`url(#fw-grain-${work.id})`} /></svg>
-      <div aria-hidden="true" className={cn("pointer-events-none absolute -right-12 -top-12 h-40 w-40 rounded-full blur-3xl", isPricing ? "bg-accent" : "bg-accent-glow", !rm && "fw-glow-breathe")} />
+      <div aria-hidden="true" className={cn("pointer-events-none absolute -right-12 -top-12 h-40 w-40 rounded-full blur-3xl", isPricing ? "bg-accent" : "bg-accent-glow", !rm && activeInView && "fw-glow-breathe")} />
       <div className="absolute inset-x-0 top-0 z-[2] h-[1px]" style={{ background: work.status === "live" ? "linear-gradient(to right, transparent, rgb(34 197 94 / 0.5), transparent)" : "linear-gradient(to right, transparent, rgb(62 123 250 / 0.5), transparent)" }} />
       <div className="relative z-[4] flex flex-1 flex-col p-6">
         <div className="mb-4 flex items-center justify-between">
           {(() => { const Icon = ICON_MAP[work.icon]; return Icon ? <div className="flex h-10 w-10 items-center justify-center rounded-lg border border-border bg-surface"><Icon className="h-5 w-5 text-accent" strokeWidth={ICON_STROKE_WIDTH} aria-hidden="true" /></div> : null; })()}
-          <span className={cn("flex items-center gap-1.5 font-mono text-[10px] font-semibold uppercase tracking-widest", STATUS_TEXT[work.status])}><StatusDot status={work.status} />{STATUS_LABEL[work.status]}</span>
+          <span className={cn("flex items-center gap-1.5 font-mono text-[10px] font-semibold uppercase tracking-widest", STATUS_TEXT[work.status])}><StatusDot status={work.status} active={activeInView} />{STATUS_LABEL[work.status]}</span>
         </div>
         <motion.h3 animate={inView ? { opacity: 1, y: 0 } : {}} transition={{ duration: 0.6, delay: 0.15, ease: EASE }} className="text-lg font-bold text-text-primary">{work.name}</motion.h3>
         <motion.p animate={inView ? { opacity: 1 } : {}} transition={{ duration: 0.6, delay: 0.25 }} className="mt-2 flex-1 text-sm leading-relaxed text-text-secondary">{work.description}</motion.p>
-        <motion.div animate={inView ? { opacity: 1, scale: 1 } : {}} transition={{ duration: 0.7, delay: 0.35, ease: EASE }} className="mt-4 h-36">{isPricing && <CurrencyFloatVisual rm={rm} />}{isDesign && <DesignNetworkVisual inView={inView} rm={rm} />}</motion.div>
-        <div className="mt-4 flex flex-wrap gap-1.5">{work.techStack.slice(0, 3).map((tech, i) => <MagneticChip key={tech} label={tech} rm={rm} hasFinePointer={hasFinePointer} delay={i * 0.8} />)}{work.techStack.length > 3 && <span className="inline-block rounded-md border border-border bg-surface px-2.5 py-1 font-mono text-[11px] text-text-secondary">+{work.techStack.length - 3}</span>}</div>
+        <motion.div animate={inView ? { opacity: 1, scale: 1 } : {}} transition={{ duration: 0.7, delay: 0.35, ease: EASE }} className="mt-4 h-36">{isPricing && <CurrencyFloatVisual rm={rm} active={activeInView} />}{isDesign && <DesignNetworkVisual inView={activeInView} rm={rm} />}</motion.div>
+        <div className="mt-4 flex flex-wrap gap-1.5">{work.techStack.slice(0, 3).map((tech, i) => <MagneticChip key={tech} label={tech} rm={rm} hasFinePointer={hasFinePointer} delay={i * 0.8} active={activeInView} />)}{work.techStack.length > 3 && <span className="inline-block rounded-md border border-border bg-surface px-2.5 py-1 font-mono text-[11px] text-text-secondary">+{work.techStack.length - 3}</span>}</div>
         <div className="mt-5 flex items-end justify-between border-t border-border pt-4"><div><AnimatedCounter target={metricTarget} suffix={metricSuffix} inView={inView} rm={rm} className="font-mono text-3xl font-bold text-text-primary" /><p className="mt-0.5 font-mono text-[10px] text-text-secondary">{work.metric.label}</p></div></div>
       </div>
     </motion.div>

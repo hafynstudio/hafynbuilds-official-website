@@ -100,7 +100,7 @@ function HeaderShell({ pathname }: { pathname: string }) {
               onClick={() => setIsMobileNavOpen(true)}
               aria-label="Open menu"
               aria-expanded={isMobileNavOpen}
-              className="rounded-md p-2 text-text-primary"
+              className="flex min-h-11 min-w-11 items-center justify-center rounded-md p-2 text-text-primary"
             >
               <Menu size={24} aria-hidden="true" />
             </button>
