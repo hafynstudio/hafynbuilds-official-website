@@ -1,5 +1,8 @@
 ﻿import { buildMetadata } from "@/lib/seo/metadata";
 import { InvestmentExperience } from "@/components/investment/InvestmentExperience";
+import { JsonLd } from "@/components/seo/JsonLd";
+import { breadcrumbSchema } from "@/lib/seo/schema";
+import { SITE_URL } from "@/lib/site";
 
 export const metadata = buildMetadata({
   title: "Custom Website Packages, Plans & Pricing",
@@ -8,6 +11,16 @@ export const metadata = buildMetadata({
   path: "/investment",
 });
 
+const breadcrumbJsonLd = breadcrumbSchema([
+  { name: "Home", url: SITE_URL },
+  { name: "Investment", url: `${SITE_URL}/investment` },
+]);
+
 export default function InvestmentPage() {
-  return <InvestmentExperience />;
+  return (
+    <>
+      <JsonLd id="investment-breadcrumb-schema" data={breadcrumbJsonLd} />
+      <InvestmentExperience />
+    </>
+  );
 }

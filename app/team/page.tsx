@@ -1,6 +1,9 @@
 ﻿import { buildMetadata } from "@/lib/seo/metadata";
 import { FounderSpotlight } from "@/components/team/FounderSpotlight";
 import { TeamGrid } from "@/components/team/TeamGrid";
+import { JsonLd } from "@/components/seo/JsonLd";
+import { breadcrumbSchema } from "@/lib/seo/schema";
+import { SITE_URL } from "@/lib/site";
 
 // BUG-028 note: TeamGrid was briefly converted to next/dynamic under
 // the hypothesis that its below-fold Framer Motion instance was
@@ -27,11 +30,19 @@ export const metadata = buildMetadata({
   path: "/team",
 });
 
+const breadcrumbJsonLd = breadcrumbSchema([
+  { name: "Home", url: SITE_URL },
+  { name: "Team", url: `${SITE_URL}/team` },
+]);
+
 export default function TeamPage() {
   return (
-    <main>
+    <>
+      <JsonLd id="team-breadcrumb-schema" data={breadcrumbJsonLd} />
+      <main>
       <FounderSpotlight />
-      <TeamGrid />
-    </main>
+            <TeamGrid />
+      </main>
+    </>
   );
 }

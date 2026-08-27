@@ -9,6 +9,7 @@ import {
   getPostsByCategory,
 } from "@/data/blog-posts";
 import { BlogExperience } from "@/components/blog/BlogExperience";
+import { JsonLd } from "@/components/seo/JsonLd";
 
 export function generateStaticParams() {
   return BLOG_CATEGORIES.map((cat) => ({ slug: cat.slug }));
@@ -52,10 +53,7 @@ export default async function BlogCategoryPage({
 
   return (
     <>
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbJsonLd) }}
-      />
+      <JsonLd id="category-breadcrumb-schema" data={breadcrumbJsonLd} />
 
       <main className="min-h-screen bg-bg-deep">
         <section className="border-b border-border-hairline bg-bg-deep pt-32 pb-16 md:pt-40 md:pb-20">

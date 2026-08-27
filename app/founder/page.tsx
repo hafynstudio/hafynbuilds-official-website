@@ -1,5 +1,7 @@
 ﻿import { buildMetadata } from "@/lib/seo/metadata";
-import { personSchema } from "@/lib/seo/schema";
+import { personSchema, breadcrumbSchema } from "@/lib/seo/schema";
+import { JsonLd } from "@/components/seo/JsonLd";
+import { SITE_URL } from "@/lib/site";
 import { FounderHero } from "@/components/founder/FounderHero";
 import { FounderNarrative } from "@/components/founder/FounderNarrative";
 import { EcosystemCallout } from "@/components/founder/EcosystemCallout";
@@ -41,13 +43,15 @@ export const metadata = buildMetadata({
  */
 export default function FounderPage() {
   const schema = personSchema();
+  const breadcrumbJsonLd = breadcrumbSchema([
+    { name: "Home", url: SITE_URL },
+    { name: "Founder", url: `${SITE_URL}/founder` },
+  ]);
 
   return (
     <>
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(schema) }}
-      />
+      <JsonLd id="founder-person-schema" data={schema} />
+      <JsonLd id="founder-breadcrumb-schema" data={breadcrumbJsonLd} />
       <main>
         <FounderHero />
         <FounderNarrative />

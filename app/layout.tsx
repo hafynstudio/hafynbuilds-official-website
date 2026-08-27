@@ -3,6 +3,7 @@ import localFont from "next/font/local";
 import dynamic from "next/dynamic";
 import Script from "next/script";
 import { organizationSchema } from "@/lib/seo/schema";
+import { JsonLd } from "@/components/seo/JsonLd";
 import { Footer } from "@/components/layout/Footer";
 import { CursorSpotlight } from "@/components/ui/CursorSpotlight";
 import { CurrencyProvider } from "@/lib/currency/context";
@@ -97,12 +98,7 @@ export default function RootLayout({
           Skip to main content
         </a>
 
-        <script
-          type="application/ld+json"
-          dangerouslySetInnerHTML={{
-            __html: JSON.stringify(organizationSchema()),
-          }}
-        />
+        <JsonLd id="organization-schema" data={organizationSchema()} />
 
         <CursorSpotlight />
 

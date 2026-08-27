@@ -5,9 +5,10 @@ import { generatedIndustryImageIds } from "@/data/industry-page-content";
 import { getPackagesForIndustry } from "@/data/industry-packages";
 import { getVisibleIndustries } from "@/lib/industries/provider";
 import { buildMetadata } from "@/lib/seo/metadata";
-import { breadcrumbSchema } from "@/lib/seo/schema";
+import { breadcrumbSchema, serviceSchema } from "@/lib/seo/schema";
 import { SITE_URL } from "@/lib/site";
 import { IndustryPageExperience } from "@/components/investment/IndustryPageExperience";
+import { JsonLd } from "@/components/seo/JsonLd";
 
 interface IndustryPageProps {
   params: Promise<{ industry: string }>;
@@ -76,13 +77,12 @@ export default async function IndustryPage({ params }: IndustryPageProps) {
     { name: "Investment", url: `${SITE_URL}/investment` },
     { name: industry.name, url: `${SITE_URL}/investment/${industry.id}` },
   ]);
+  const serviceJsonLd = serviceSchema(industry);
 
   return (
     <>
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbJsonLd) }}
-      />
+      <JsonLd id="industry-breadcrumb-schema" data={breadcrumbJsonLd} />
+      <JsonLd id="industry-service-schema" data={serviceJsonLd} />
       <IndustryPageExperience industry={industry} packages={packages} />
     </>
   );

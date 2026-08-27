@@ -6,6 +6,7 @@ import { ContactHero } from "@/components/contact/ContactHero";
 import { CopyEmailHandler } from "@/components/contact/CopyEmailHandler";
 import { DeferredContactForm } from "@/components/contact/DeferredContactForm";
 import { SITE_URL } from "@/lib/site";
+import { JsonLd } from "@/components/seo/JsonLd";
 
 // ---------------------------------------------------------------------------
 // Real contact channels — single source of truth for the Contact page.
@@ -66,10 +67,7 @@ const breadcrumb = breadcrumbSchema([
 export default function ContactPage() {
   return (
     <>
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumb) }}
-      />
+      <JsonLd id="contact-breadcrumb-schema" data={breadcrumb} />
 
       <CopyEmailHandler />
 

@@ -3,6 +3,8 @@ import { buildMetadata } from "@/lib/seo/metadata";
 import { Hero } from "@/components/home/Hero";
 import { TrustBar } from "@/components/home/TrustBar";
 import { DeferredHomeSections } from "@/components/home/DeferredHomeSections";
+import { JsonLd } from "@/components/seo/JsonLd";
+import { websiteSchema } from "@/lib/seo/schema";
 
 // Title passed WITHOUT the brand name so buildMetadata applies its normal
 // suffix, producing:
@@ -15,9 +17,12 @@ export const metadata: Metadata = buildMetadata({
   path: "/",
 });
 
+const websiteJsonLd = websiteSchema();
+
 export default function HomePage() {
   return (
     <>
+      <JsonLd id="website-schema" data={websiteJsonLd} />
       <Hero />
       <TrustBar />
       <DeferredHomeSections />

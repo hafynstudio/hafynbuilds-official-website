@@ -1,154 +1,154 @@
-// JSON-LD generators -- centralizes every schema type per TAD Section 11
-// so each page's structured data stays consistent instead of being
-// hand-rolled inline. organizationSchema is sitewide (needed from day
-// one). personSchema is added in Phase 13 for the Founder page --
-// business-critical for the "who is Zain Marwat" SEO/AI-attribution
-// goal (PRD Section 4, TAD Section 11). articleSchema and
-// breadcrumbSchema are added in Phase 15 -- articleSchema chains every
-// blog article back to the Founder's Person schema, which is the
-// compounding SEO/AI-attribution mechanism described in PRD Section 4.
-
 import { socialLinks } from "@/data/social-links";
 import type { SocialPlatform } from "@/types/social";
 import type { BlogPost } from "@/types/blog-post";
 import type { BlogCategory } from "@/data/blog-posts";
-import { SITE_URL } from "@/lib/site";
+import type { Industry } from "@/types/industry";
+import { SITE_NAME, SITE_URL } from "@/lib/site";
 
-// ---------------------------------------------------------------------------
-// Organization schema -- injected sitewide in Phase 17 (root layout).
-// ---------------------------------------------------------------------------
+export const ORGANIZATION_ID = `${SITE_URL}/#organization`;
+export const PERSON_ID = `${SITE_URL}/#zain-marwat`;
+export const WEBSITE_ID = `${SITE_URL}/#website`;
+export const LOGO_ID = `${SITE_URL}/#logo`;
 
-export function organizationSchema() {
-  return {
-    "@context": "https://schema.org",
-    "@type": "Organization",
-    name: "HAFYN BUILDS",
-    url: SITE_URL,
-    logo: `${SITE_URL}/images/logo.png`,
-    description:
-      "HAFYN BUILDS is the flagship software engineering & AI company of the HAFYN technology holding group.",
-    foundingDate: "2026-06-01",
-    founder: {
-      "@type": "Person",
-      name: "Zain Marwat",
-    },
-  };
-}
+const LOGO_URL = `${SITE_URL}/images/logo.png`;
+const FOUNDER_IMAGE_URL = `${SITE_URL}/images/founder.webp`;
+const CONTACT_EMAIL = "hafynbuilds@gmail.com";
+const WHATSAPP_URL = "https://wa.me/923091310489";
 
-// ---------------------------------------------------------------------------
-// Person schema -- Founder page. The technical backbone of the
-// "who is Zain Marwat" SEO/AI-attribution goal (PRD Section 4).
-// sameAs is derived live from data/social-links.ts and filtered to only
-// include real (non-placeholder) profile URLs -- a "#" placeholder in
-// structured data actively harms SEO. Real URLs flow in automatically
-// the moment data/social-links.ts is updated, zero code changes needed.
-// ---------------------------------------------------------------------------
-
-// Only these platforms represent genuine "profile" identities suitable
-// for schema.org sameAs -- email (mailto:) and WhatsApp (wa.me) are
-// contact channels, not profile URLs, and are deliberately excluded.
+// Only real profile URLs are included. Placeholder "#" values and contact
+// channels are deliberately excluded from sameAs.
 const SAMEAS_PLATFORMS: SocialPlatform[] = [
   "facebook",
   "instagram",
-  "linkedin",
   "twitter",
-  "tiktok",
 ];
 
-export function personSchema() {
-  const sameAs = socialLinks
+function realSocialProfileUrls() {
+  return socialLinks
     .filter(
       (link) =>
         SAMEAS_PLATFORMS.includes(link.platform) && link.url.startsWith("http")
     )
     .map((link) => link.url);
+}
 
+/**
+ * Canonical Organization entity. The stable @id is reused by Person, Article,
+ * and Service nodes so the site describes one organization rather than
+ * disconnected inline Organization objects.
+ */
+export function organizationSchema() {
   return {
     "@context": "https://schema.org",
-    "@type": "Person",
-    name: "Zain Marwat",
-    jobTitle: "Founder, Director & CEO",
-    worksFor: {
-      "@type": "Organization",
-      name: "HAFYN BUILDS",
-      url: SITE_URL,
+    "@type": "Organization",
+    "@id": ORGANIZATION_ID,
+    name: SITE_NAME,
+    url: SITE_URL,
+    logo: {
+      "@type": "ImageObject",
+      "@id": LOGO_ID,
+      url: LOGO_URL,
+      contentUrl: LOGO_URL,
+      width: 1024,
+      height: 1024,
+      encodingFormat: "image/png",
     },
-    url: `${SITE_URL}/founder`,
-    image: `${SITE_URL}/images/founder.jpg`,
-    ...(sameAs.length > 0 ? { sameAs } : {}),
+    description:
+      "HAFYN BUILDS is the flagship software engineering & AI company of the HAFYN technology holding group.",
+    foundingDate: "2026-06-01",
+    founder: { "@id": PERSON_ID },
+    sameAs: realSocialProfileUrls(),
+    contactPoint: {
+      "@type": "ContactPoint",
+      contactType: "customer support",
+      email: CONTACT_EMAIL,
+      url: WHATSAPP_URL,
+      availableLanguage: "English",
+    },
   };
 }
 
-// ---------------------------------------------------------------------------
-// Article schema -- injected on every individual blog post page.
-//
-// The author field deliberately points to the Founder page URL
-// (SITE_URL/founder) rather than just a name string. This creates the
-// Article -> Person -> Organization chain that Google's Knowledge Graph
-// and AI systems (Perplexity, ChatGPT, Gemini) use to build confidence
-// in the attribution "Zain Marwat = Founder of HAFYN BUILDS". Every
-// published article strengthens this signal -- it compounds over time
-// with zero further engineering work required (PRD Section 4).
-// ---------------------------------------------------------------------------
+/** Canonical founder entity used by the Founder page and Article authors. */
+export function personSchema() {
+  return {
+    "@context": "https://schema.org",
+    "@type": "Person",
+    "@id": PERSON_ID,
+    name: "Zain Marwat",
+    jobTitle: "Founder, Director & CEO",
+    worksFor: { "@id": ORGANIZATION_ID },
+    url: `${SITE_URL}/founder`,
+    image: FOUNDER_IMAGE_URL,
+  };
+}
 
-export function articleSchema(post: BlogPost) {
-  // Resolve cover image to an absolute URL. If coverImage is already
-  // absolute (starts with http), use it directly. If it's a relative
-  // path (starts with /), prefix with SITE_URL. If empty (dev sentinel
-  // per Decision D40), omit the image field entirely rather than
-  // embedding a broken URL in structured data.
-  const imageUrl = post.coverImage
-    ? post.coverImage.startsWith("http")
+function articleImageUrl(post: BlogPost) {
+  if (post.coverImage) {
+    return post.coverImage.startsWith("http")
       ? post.coverImage
-      : `${SITE_URL}${post.coverImage}`
-    : null;
+      : `${SITE_URL}${post.coverImage}`;
+  }
+
+  // The content model has no real cover image yet. Reuse the same truthful,
+  // crawlable 1200x630 article-specific OG card already emitted in metadata;
+  // do not invent a photographic cover or claim an unavailable image.
+  const fallback = new URL("/og-image.png", SITE_URL);
+  fallback.searchParams.set("title", post.title);
+  fallback.searchParams.set("route", `/blog/${post.slug}`);
+  return fallback.toString();
+}
+
+/** Article markup remains data-driven for every future production post. */
+export function articleSchema(post: BlogPost) {
+  const url = `${SITE_URL}/blog/${post.slug}`;
 
   return {
     "@context": "https://schema.org",
     "@type": "Article",
+    "@id": `${url}#article`,
     headline: post.title,
     description: post.excerpt,
-    ...(imageUrl ? { image: imageUrl } : {}),
+    image: [articleImageUrl(post)],
     datePublished: post.publishedAt,
-    // dateModified intentionally omitted -- BlogPost type has no
-    // updatedAt field yet. Add when the data layer supports edits.
-    url: `${SITE_URL}/blog/${post.slug}`,
+    // dateModified is intentionally omitted because BlogPost has no verified
+    // update field. It must be added when the data layer records one.
+    url,
+    inLanguage: "en",
     author: {
-      // Full Person node, not just a name string. This is what creates
-      // the schema chain back to the Founder page (PRD Section 4).
       "@type": "Person",
+      "@id": PERSON_ID,
       name: "Zain Marwat",
       jobTitle: "Founder, Director & CEO",
       url: `${SITE_URL}/founder`,
     },
     publisher: {
       "@type": "Organization",
-      name: "HAFYN BUILDS",
+      "@id": ORGANIZATION_ID,
+      name: SITE_NAME,
       url: SITE_URL,
-      logo: {
-        "@type": "ImageObject",
-        url: `${SITE_URL}/images/logo.png`,
-      },
+      logo: { "@id": LOGO_ID },
     },
     mainEntityOfPage: {
       "@type": "WebPage",
-      "@id": `${SITE_URL}/blog/${post.slug}`,
+      "@id": url,
     },
+    isPartOf: { "@id": WEBSITE_ID },
     articleSection: post.category,
-    // wordCount omitted -- not stored in BlogPost. Add if/when the data
-    // layer tracks it (it's a nice-to-have, not a ranking signal).
   };
 }
 
-// ---------------------------------------------------------------------------
-// Breadcrumb schema -- injected on blog article pages and category pages.
-//
-// Structure: Home > Blog > [Category] > [Article Title]
-// On category pages the 4th item (article) is omitted.
-//
-// BreadcrumbList signals page hierarchy to Google and triggers the
-// breadcrumb display in search results (visually increases CTR).
-// ---------------------------------------------------------------------------
+/** WebSite entity for the homepage; no SearchAction because no crawlable search URL exists. */
+export function websiteSchema() {
+  return {
+    "@context": "https://schema.org",
+    "@type": "WebSite",
+    "@id": WEBSITE_ID,
+    name: SITE_NAME,
+    url: SITE_URL,
+    inLanguage: "en",
+    publisher: { "@id": ORGANIZATION_ID },
+  };
+}
 
 interface BreadcrumbItem {
   name: string;
@@ -168,12 +168,28 @@ export function breadcrumbSchema(items: BreadcrumbItem[]) {
   };
 }
 
-// ---------------------------------------------------------------------------
-// Breadcrumb item builders -- convenience helpers so call sites don't
-// hand-construct URL strings. Each returns a BreadcrumbItem[].
-// ---------------------------------------------------------------------------
+/** Service entity for an industry-specific website build page. */
+export function serviceSchema(
+  industry: Pick<Industry, "id" | "name" | "description">
+) {
+  const url = `${SITE_URL}/investment/${industry.id}`;
 
-/** Breadcrumbs for an individual article page. */
+  return {
+    "@context": "https://schema.org",
+    "@type": "Service",
+    "@id": `${url}#service`,
+    name: `${industry.name} website service`,
+    serviceType: `${industry.name} website design and development`,
+    description: industry.description,
+    provider: { "@id": ORGANIZATION_ID },
+    url,
+    mainEntityOfPage: {
+      "@type": "WebPage",
+      "@id": url,
+    },
+  };
+}
+
 export function articleBreadcrumbs(
   post: BlogPost,
   category: BlogCategory
@@ -189,7 +205,6 @@ export function articleBreadcrumbs(
   ];
 }
 
-/** Breadcrumbs for a category archive page. */
 export function categoryBreadcrumbs(category: BlogCategory): BreadcrumbItem[] {
   return [
     { name: "Home", url: SITE_URL },

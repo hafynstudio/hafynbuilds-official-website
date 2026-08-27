@@ -22,6 +22,7 @@ import {
 import type { BlogPost } from "@/types/blog-post";
 import Image from "next/image";
 import { cn } from "@/lib/utils";
+import { JsonLd } from "@/components/seo/JsonLd";
 
 // ---------------------------------------------------------------------------
 // Route config
@@ -154,24 +155,9 @@ export default async function BlogPostPage({ params }: BlogPostPageProps) {
 
   return (
     <>
-      {/* ----------------------------------------------------------------
-          JSON-LD schema injection
-          Article schema: chains this post to the Founder's Person schema
-          via the author.url field -- the compounding SEO/AI-attribution
-          mechanism (PRD Section 4, Decision D45).
-          Breadcrumb schema: signals page hierarchy, triggers breadcrumb
-          display in Google search results.
-      ---------------------------------------------------------------- */}
-      <script
-        id="article-schema"
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(articleJsonLd) }}
-      />
-      <script
-        id="breadcrumb-schema"
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbJsonLd) }}
-      />
+      {/* Server-rendered structured data; no client boundary or hydration work. */}
+      <JsonLd id="article-schema" data={articleJsonLd} />
+      <JsonLd id="breadcrumb-schema" data={breadcrumbJsonLd} />
 
       {/* Reading progress bar -- sticky top, fills on scroll */}
       <ReadingProgress />

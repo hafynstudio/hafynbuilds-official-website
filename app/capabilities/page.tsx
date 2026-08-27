@@ -5,6 +5,9 @@ import { TechPhilosophyStrip } from "@/components/capabilities/TechPhilosophyStr
 import { IndustriesMarquee } from "@/components/capabilities/IndustriesMarquee";
 import { CapabilitiesFinalCTA } from "@/components/capabilities/CapabilitiesFinalCTA";
 import { capabilities } from "@/data/capabilities";
+import { JsonLd } from "@/components/seo/JsonLd";
+import { breadcrumbSchema } from "@/lib/seo/schema";
+import { SITE_URL } from "@/lib/site";
 
 // Phase 17 fix (C6): added page-specific description. Previously falling
 // back to the generic site description with no differentiation signal
@@ -17,9 +20,16 @@ export const metadata = buildMetadata({
   path: "/capabilities",
 });
 
+const breadcrumbJsonLd = breadcrumbSchema([
+  { name: "Home", url: SITE_URL },
+  { name: "Capabilities", url: `${SITE_URL}/capabilities` },
+]);
+
 export default function CapabilitiesPage() {
   return (
-    <main>
+    <>
+      <JsonLd id="capabilities-breadcrumb-schema" data={breadcrumbJsonLd} />
+      <main>
       <CapabilitiesHero />
       <section aria-labelledby="build-console-heading">
         <h2 id="build-console-heading" className="sr-only">
@@ -29,7 +39,8 @@ export default function CapabilitiesPage() {
       </section>
       <TechPhilosophyStrip />
       <IndustriesMarquee />
-      <CapabilitiesFinalCTA />
-    </main>
+            <CapabilitiesFinalCTA />
+      </main>
+    </>
   );
 }

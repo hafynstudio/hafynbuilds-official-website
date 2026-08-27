@@ -1,6 +1,9 @@
 ﻿import { buildMetadata } from "@/lib/seo/metadata";
 import { blogPosts, getFeaturedPost } from "@/data/blog-posts";
 import { BlogExperience } from "@/components/blog/BlogExperience";
+import { JsonLd } from "@/components/seo/JsonLd";
+import { breadcrumbSchema } from "@/lib/seo/schema";
+import { SITE_URL } from "@/lib/site";
 
 export const metadata = buildMetadata({
   title: "Practical Software Engineering & AI Insights",
@@ -12,8 +15,15 @@ export const metadata = buildMetadata({
 export default function BlogPage() {
   const featuredPost = getFeaturedPost();
 
+  const breadcrumbJsonLd = breadcrumbSchema([
+    { name: "Home", url: SITE_URL },
+    { name: "Blog", url: `${SITE_URL}/blog` },
+  ]);
+
   return (
-    <main className="min-h-screen bg-bg-deep">
+    <>
+      <JsonLd id="blog-breadcrumb-schema" data={breadcrumbJsonLd} />
+      <main className="min-h-screen bg-bg-deep">
       {/* Page header */}
       <section className="border-b border-border-hairline bg-bg-deep pt-32 pb-16 md:pt-40 md:pb-20">
         <div className="mx-auto max-w-7xl px-4 md:px-6 lg:px-8">
@@ -50,5 +60,6 @@ export default function BlogPage() {
         />
       </section>
     </main>
+    </>
   );
 }

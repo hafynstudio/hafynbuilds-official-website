@@ -2,6 +2,9 @@
 import dynamic from "next/dynamic";
 import { buildMetadata } from "@/lib/seo/metadata";
 import { AboutHero } from "@/components/about/AboutHero";
+import { JsonLd } from "@/components/seo/JsonLd";
+import { breadcrumbSchema } from "@/lib/seo/schema";
+import { SITE_URL } from "@/lib/site";
 
 // Below-fold sections deferred via next/dynamic (BUG-025).
 // AboutHero is above the fold and loads synchronously — it is the LCP section.
@@ -40,16 +43,24 @@ export const metadata: Metadata = buildMetadata({
   path: "/about",
 });
 
+const breadcrumbJsonLd = breadcrumbSchema([
+  { name: "Home", url: SITE_URL },
+  { name: "About", url: `${SITE_URL}/about` },
+]);
+
 export default function AboutPage() {
   return (
-    <main>
+    <>
+      <JsonLd id="about-breadcrumb-schema" data={breadcrumbJsonLd} />
+      <main>
       <AboutHero />
       <OriginStory />
       <MissionVision />
       <EcosystemDiagram />
       <ValuesCards />
       <Standards />
-      <FounderBridge />
-    </main>
+            <FounderBridge />
+      </main>
+    </>
   );
 }

@@ -4,6 +4,9 @@ import { LiveDeployPipeline } from "@/components/method/LiveDeployPipeline";
 import { TimelineSection } from "@/components/method/TimelineSection";
 import { CommunicationSection } from "@/components/method/CommunicationSection";
 import { MethodBridgeCTA } from "@/components/method/MethodBridgeCTA";
+import { JsonLd } from "@/components/seo/JsonLd";
+import { breadcrumbSchema } from "@/lib/seo/schema";
+import { SITE_URL } from "@/lib/site";
 
 export const metadata: Metadata = buildMetadata({
   title: "How We Build Software & AI Products",
@@ -22,9 +25,16 @@ export const metadata: Metadata = buildMetadata({
  *   3. CommunicationSection — 4 communication promises
  *   4. MethodBridgeCTA     — Bridge → /investment
  */
+const breadcrumbJsonLd = breadcrumbSchema([
+  { name: "Home", url: SITE_URL },
+  { name: "Method", url: `${SITE_URL}/method` },
+]);
+
 export default function MethodPage() {
   return (
-    <main
+    <>
+      <JsonLd id="method-breadcrumb-schema" data={breadcrumbJsonLd} />
+      <main
       className="relative min-h-screen"
       style={{ backgroundColor: "rgb(10 10 11)" }}
     >
@@ -63,6 +73,7 @@ export default function MethodPage() {
 
       {/* 4. Bridge CTA */}
       <MethodBridgeCTA />
-    </main>
+      </main>
+    </>
   );
 }
