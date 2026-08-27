@@ -19,19 +19,22 @@ const isDev = process.env.NODE_ENV === "development";
 // 'unsafe-eval' is required only in development (React dev uses eval for
 // error reconstruction); it is absent from the production policy.
 // ---------------------------------------------------------------------------
-// GA4 allowlist: Google Analytics 4 (loaded via @next/third-parties
-// GoogleAnalytics in app/layout.tsx) requires the gtag.js loader from
-// googletagmanager.com (script-src) and sends events to Google's Analytics
-// collection endpoints (connect-src for /g/collect beacons, img-src as a
-// fallback beacon). These three GA endpoints are the minimal, canonical set
-// needed for GA4 tracking to reach the browser; everything else stays strict.
+// GA4 allowlist: Google Analytics 4 (loaded from the shared layout) requires
+// the gtag.js loader from googletagmanager.com (script-src), sends events to
+// Google's Analytics collection endpoints (connect-src for /g/collect), and
+// uses both Google Analytics and Google Tag Manager image origins for fallback
+// beacons. These are the minimal, observed hosts needed for GA4 tracking; all
+// other origins stay strict.
 const gaScriptHosts = ["https://www.googletagmanager.com"];
 const gaConnectHosts = [
   "https://www.google-analytics.com",
   "https://analytics.google.com",
   "https://stats.g.doubleclick.net",
 ];
-const gaImageHosts = ["https://www.google-analytics.com"];
+const gaImageHosts = [
+  "https://www.google-analytics.com",
+  "https://www.googletagmanager.com",
+];
 
 // Vercel Analytics allowlist: Vercel Web Analytics (@vercel/analytics)
 // requires script loading from va.vercel-scripts.com (script-src, primarily

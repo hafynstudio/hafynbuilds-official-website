@@ -102,7 +102,7 @@ export const founder: FounderProfile = {
   },
 
   closingQuote: {
-    quote: "I don't build websites. I engineer advantage.",
+    quote: "I don't just build websites. I engineer digital products and systems that create advantage.",
     context: "Zain Marwat",
   },
 };
