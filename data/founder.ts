@@ -102,7 +102,7 @@ export const founder: FounderProfile = {
   },
 
   closingQuote: {
-    quote: "I don't just build websites. I engineer digital products and systems that create advantage.",
+    quote: "Vision without engineering is a dream. Engineering without vision is noise. I exist between the two.",
     context: "Zain Marwat",
   },
 };
