@@ -6,14 +6,11 @@ import { DeferredHomeSections } from "@/components/home/DeferredHomeSections";
 import { JsonLd } from "@/components/seo/JsonLd";
 import { websiteSchema } from "@/lib/seo/schema";
 
-// Title passed WITHOUT the brand name so buildMetadata applies its normal
-// suffix, producing:
-// "Engineering the Impossible. Building What Matters. | HAFYN BUILDS"
-// The motto leads; the brand name closes — correct for homepage SEO.
+// The homepage title is intentionally brand-first and fully qualified.
 export const metadata: Metadata = buildMetadata({
-  title: "Software Engineering, AI & Digital Products",
+  title: "HAFYN BUILDS | Software, AI & Enterprise Systems",
   description:
-    "HAFYN BUILDS engineers web apps, AI systems, and automation for companies. Explore digital products and enterprise software built to last, from idea to launch.",
+    "HAFYN BUILDS is a software engineering and AI company building custom SaaS platforms, AI-powered products, and scalable digital infrastructure.",
   path: "/",
 });
 

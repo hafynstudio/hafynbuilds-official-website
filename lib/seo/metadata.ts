@@ -49,7 +49,12 @@ export function buildMetadata({
   author,
   section,
 }: BuildMetadataArgs): Metadata {
-  const fullTitle = title === SITE_NAME ? title : `${title} | ${SITE_NAME}`;
+  const fullTitle =
+    title === SITE_NAME ||
+    title.startsWith(`${SITE_NAME} | `) ||
+    title.endsWith(` | ${SITE_NAME}`)
+      ? title
+      : `${title} | ${SITE_NAME}`;
   const url = `${SITE_URL}${path}`;
 
   // Resolve OG image to an absolute URL. next/og requires absolute URLs.
