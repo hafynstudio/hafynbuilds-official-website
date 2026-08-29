@@ -31,7 +31,16 @@ function getResend(): Resend | null {
   return resendClient;
 }
 
-const MAX_BODY_BYTES = 64 * 1024; // 64 KB — far above any real message
+const MAX_BODY_BYTES = 12 * 1024 * 1024; // 12 MB envelope for the optional 10 MB attachment
+const MAX_ATTACHMENT_BYTES = 10 * 1024 * 1024;
+const ALLOWED_ATTACHMENT_TYPES = new Set([
+  "application/pdf",
+  "application/msword",
+  "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+  "image/png",
+  "image/jpeg",
+  "image/webp",
+]);
 const UNAVAILABLE_MESSAGE =
   "We couldn't process your message right now. Please try again in a moment, or reach us directly on WhatsApp or email.";
 
@@ -473,6 +482,50 @@ function clientIp(req: Request): string {
   return req.headers.get("x-real-ip") ?? "unknown";
 }
 
+function safeAttachmentName(name: string): string {
+  return name.replace(/[\\/\\\r\\\n]/g, "_").trim().slice(0, 120) || "attachment";
+}
+
+interface ParsedContactBody {
+  payload: unknown;
+  attachment?: {
+    filename: string;
+    content: Buffer;
+    contentType: string;
+  };
+}
+
+async function parseContactBody(req: Request): Promise<ParsedContactBody> {
+  const contentType = req.headers.get("content-type") ?? "";
+  if (!contentType.toLowerCase().startsWith("multipart/form-data")) {
+    return { payload: await req.json() };
+  }
+
+  const form = await req.formData();
+  const payload: Record<string, string> = {};
+  let attachment: ParsedContactBody["attachment"];
+
+  for (const [key, value] of form.entries()) {
+    if (key === "attachment" && typeof File !== "undefined" && value instanceof File) {
+      if (value.size > MAX_ATTACHMENT_BYTES) {
+        throw new Error("Attachment must be under 10MB");
+      }
+      if (!ALLOWED_ATTACHMENT_TYPES.has(value.type)) {
+        throw new Error("Allowed attachments: PDF, DOC, DOCX, PNG, JPG, WEBP");
+      }
+      attachment = {
+        filename: safeAttachmentName(value.name),
+        content: Buffer.from(await value.arrayBuffer()),
+        contentType: value.type,
+      };
+      continue;
+    }
+    if (typeof value === "string") payload[key] = value;
+  }
+
+  return { payload, attachment };
+}
+
 /**
  * POST /api/contact
  * Handles build request submissions. The payload is validated server-side,
@@ -511,10 +564,16 @@ export async function POST(req: Request) {
     // 4. Parse + validate. Malformed JSON and invalid payloads both become
     //    clean 4xx responses — never a stack trace, never a 500.
     let body: unknown;
+    let attachment: ParsedContactBody["attachment"];
     try {
-      body = await req.json();
-    } catch {
-      return NextResponse.json({ success: false, message: "Invalid JSON payload" }, { status: 400 });
+      const parsed = await parseContactBody(req);
+      body = parsed.payload;
+      attachment = parsed.attachment;
+    } catch (error) {
+      return NextResponse.json(
+        { success: false, message: error instanceof Error ? error.message : "Invalid request payload" },
+        { status: 400 }
+      );
     }
 
     const result = contactSchema.safeParse(body);
@@ -578,19 +637,20 @@ export async function POST(req: Request) {
         to: RESEND_TO_EMAIL,
         replyTo: data.email,
         subject,
-        html: buildLeadEmail({
-          name: data.name,
-          email: data.email,
-          company: data.company,
-          phone: data.phone,
-          projectTypeLabel: PROJECT_TYPE_LABELS[data.projectType] ?? data.projectType,
-          budgetLabel: BUDGET_LABELS[data.budgetRange] ?? data.budgetRange,
-          timelineLabel: TIMELINE_LABELS[data.timeline] ?? data.timeline,
-          message: data.message,
-          submittedAt,
-          source,
-        }),
-      },
+          html: buildLeadEmail({
+            name: data.name,
+            email: data.email,
+            company: data.company,
+            phone: data.phone,
+            projectTypeLabel: PROJECT_TYPE_LABELS[data.projectType] ?? data.projectType,
+            budgetLabel: BUDGET_LABELS[data.budgetRange] ?? data.budgetRange,
+            timelineLabel: TIMELINE_LABELS[data.timeline] ?? data.timeline,
+            message: data.message,
+            submittedAt,
+            source,
+          }),
+          ...(attachment ? { attachments: [attachment] } : {}),
+        },
       { idempotencyKey }
     );
 

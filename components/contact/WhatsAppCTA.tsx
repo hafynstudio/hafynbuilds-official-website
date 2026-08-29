@@ -4,6 +4,7 @@ import { motion } from "framer-motion";
 import { socialLinks } from "@/data/social-links";
 import { usePrefersReducedMotion } from "@/lib/hooks";
 import { cn } from "@/lib/utils";
+import { trackEvent } from "@/lib/analytics";
 
 function WhatsAppIcon({ className }: { className?: string }) {
   return (
@@ -81,6 +82,7 @@ export function WhatsAppCTA({
         href={href}
         target="_blank"
         rel="noopener noreferrer"
+        onClick={() => trackEvent("contact_whatsapp_click", { placement: variant })}
         className={cn(
           "group relative flex w-full items-center gap-4 rounded-2xl transition-all",
           "border border-whatsapp/25 bg-whatsapp/[0.06]",

@@ -16,6 +16,7 @@ import {
 import { EASE_OUT_EXPO, EASE_OUT_QUART, FRAMER_COLOR_TOKENS, rgbaToken } from "@/lib/motion";
 import { cn } from "@/lib/utils";
 import { socialLinks } from "@/data/social-links";
+import { trackEvent } from "@/lib/analytics";
 
 const STORAGE_KEY = "hafyn_contact_draft";
 
@@ -261,6 +262,9 @@ export function ContactForm({ replyWindow }: ContactFormProps) {
 
   const whatsapp = socialLinks.find((l) => l.platform === "whatsapp");
 
+  useEffect(() => {
+    trackEvent("contact_form_view", { form: "build_request" });
+  }, []);
 
   const {
     control,
@@ -320,13 +324,20 @@ export function ContactForm({ replyWindow }: ContactFormProps) {
   async function goNext() {
     const fields = STEP_FIELDS[step];
     const valid = await trigger(fields);
-    if (!valid) return;
-    setStep((s) => s + 1);
+    if (!valid) {
+      trackEvent("contact_form_validation_failure", { form: "build_request", step });
+      return;
+    }
+    const nextStep = step + 1;
+    setStep(nextStep);
+    trackEvent("contact_form_step_complete", { form: "build_request", step: nextStep });
     scrollStepIntoView();
   }
 
   function goBack() {
-    setStep((s) => s - 1);
+    const previousStep = Math.max(0, step - 1);
+    setStep(previousStep);
+    trackEvent("contact_form_step_back", { form: "build_request", step: previousStep });
     scrollStepIntoView();
   }
 
@@ -335,11 +346,13 @@ export function ContactForm({ replyWindow }: ContactFormProps) {
     setAttachmentError(null);
     if (!file) { setAttachedFile(null); return; }
     if (!ALLOWED_FILE_TYPES.includes(file.type)) {
+      trackEvent("contact_form_attachment_rejected", { form: "build_request", reason: "type" });
       setAttachmentError("Allowed: PDF, DOC, DOCX, PNG, JPG, WEBP");
       e.target.value = "";
       return;
     }
     if (file.size > MAX_FILE_SIZE_BYTES) {
+      trackEvent("contact_form_attachment_rejected", { form: "build_request", reason: "size" });
       setAttachmentError(`File must be under ${MAX_FILE_SIZE_MB}MB`);
       e.target.value = "";
       return;
@@ -368,24 +381,39 @@ export function ContactForm({ replyWindow }: ContactFormProps) {
       setIsSubmitting(true);
       setSubmitError(null);
     });
+    trackEvent("contact_form_submit_attempt", {
+      form: "build_request",
+      project_type: data.projectType,
+      has_attachment: Boolean(attachedFile),
+    });
     try {
+      const body = new FormData();
+      Object.entries(data).forEach(([key, value]) => {
+        if (value !== undefined) body.append(key, String(value));
+      });
+      if (attachedFile) body.append("attachment", attachedFile, attachedFile.name);
+
       const res = await fetch("/api/contact", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(data),
+        body,
       });
-      const json = await res.json();
+      const json = await res.json().catch(() => ({ success: false, message: "Unexpected server response" }));
       if (!res.ok || !json.success) throw new Error(json.message || "Submission failed");
 
-      if (typeof window !== "undefined" && "gtag" in window) {
-        (window as unknown as { gtag: (...args: unknown[]) => void }).gtag(
-          "event", "contact_submit",
-          { event_category: "engagement", event_label: data.projectType }
-        );
-      }
+      trackEvent("contact_form_submit_success", {
+        form: "build_request",
+        project_type: data.projectType,
+        has_attachment: Boolean(attachedFile),
+      });
       clearDraft();
       setIsSuccess(true);
     } catch (err) {
+      trackEvent("contact_form_submit_failure", {
+        form: "build_request",
+        project_type: data.projectType,
+        has_attachment: Boolean(attachedFile),
+        failure_type: err instanceof TypeError ? "network" : "server",
+      });
       // FIX (Phase 2, CONV-001): distinguish a network failure (fetch
       // rejects with a TypeError) from an application error, so the user
       // always gets an honest, human-readable state — never "Failed to
