@@ -539,7 +539,7 @@ export function ContactForm({ replyWindow }: ContactFormProps) {
     <div className="relative">
       <form onSubmit={handleSubmit(onSubmit)} noValidate>
         <div aria-hidden="true" className="absolute -left-[9999px] -top-[9999px] opacity-0">
-          <input type="text" tabIndex={-1} autoComplete="off" {...register("hp_field")} />
+          <input type="text" tabIndex={-1} autoComplete="off" aria-label="Leave this field empty" {...register("hp_field")} />
         </div>
 
         <div className={cn(GLASS_CARD, "p-6 sm:p-8", isMobile && "pb-6")}>
