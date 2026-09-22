@@ -43,19 +43,22 @@ const gaImageHosts = [
 // platform while maintaining strict CSP for all other origins.
 const vercelAnalyticsScriptHosts = ["https://va.vercel-scripts.com"];
 const vercelAnalyticsConnectHosts = ["https://vitals.vercel-insights.com"];
+const cromojoHosts = ["https://app.cromojo.com"];
 
 const cspHeader = [
   "default-src 'self'",
   "script-src 'self' 'unsafe-inline'" +
     (isDev ? " 'unsafe-eval'" : "") +
     gaScriptHosts.map((h) => ` ${h}`).join("") +
-    vercelAnalyticsScriptHosts.map((h) => ` ${h}`).join(""),
+    vercelAnalyticsScriptHosts.map((h) => ` ${h}`).join("") +
+    cromojoHosts.map((h) => ` ${h}`).join(""),
   "style-src 'self' 'unsafe-inline'",
   "img-src 'self' blob: data:" + gaImageHosts.map((h) => ` ${h}`).join(""),
   "font-src 'self'",
   "connect-src 'self'" +
     gaConnectHosts.map((h) => ` ${h}`).join("") +
-    vercelAnalyticsConnectHosts.map((h) => ` ${h}`).join(""),
+    vercelAnalyticsConnectHosts.map((h) => ` ${h}`).join("") +
+    cromojoHosts.map((h) => ` ${h}`).join(""),
   "object-src 'none'",
   "base-uri 'self'",
   "form-action 'self'",

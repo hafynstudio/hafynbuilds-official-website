@@ -141,6 +141,14 @@ export default function RootLayout({
           </Script>
         ) : null}
 
+        {/* Cromojo Web Analytics */}
+        <Script
+          src="https://app.cromojo.com/script.min.js"
+          data-site-id="s0tjn1g8jsqygxxp6p21ayu3"
+          data-ingest-key="9e8L2v92pVgXJUiBiCbgwH2LMePLZ6utAIBK207"
+          strategy="afterInteractive"
+        />
+
         {/* Vercel Web Analytics */}
         <Analytics />
       </body>
